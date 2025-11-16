@@ -137,7 +137,13 @@ CREATE TABLE task_assignees (
 
 
 
-
+ALTER TABLE comments
+ADD COLUMN type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') NOT NULL DEFAULT 'Pertanyaan' AFTER content,
+ADD COLUMN privacy ENUM('ALL_MEMBERS', 'MANAGER_AND_ME') NOT NULL DEFAULT 'ALL_MEMBERS' AFTER type,
+ADD COLUMN file_path VARCHAR(255) NULL AFTER privacy,
+ADD COLUMN file_name VARCHAR(255) NULL AFTER file_path,
+ADD COLUMN file_size INT NULL AFTER file_name,
+ADD COLUMN file_type VARCHAR(50) NULL AFTER file_size;
 
 
 

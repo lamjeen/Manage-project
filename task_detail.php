@@ -25,10 +25,22 @@ if (!$task) {
  $assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
  $task['assignee_names'] = implode(', ', $assignees);
 
-// Get comments for this task
+// --- PERUBAHAN: Get comments dengan kolom baru dan filter privasi ---
+// Kita ambil semua komentar dulu, nanti di-filter di PHP
  $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.created_at ASC");
  $stmt->execute([$task_id]);
- $comments = $stmt->fetchAll();
+ $all_comments = $stmt->fetchAll();
+
+ $comments_to_display = [];
+foreach ($all_comments as $comment) {
+    // Logika privasi: tampilkan jika publik, atau jika user adalah admin/manager/pembuat
+    if ($comment['privacy'] === 'ALL_MEMBERS' || 
+        $_SESSION['user_role'] === 'ADMIN' || 
+        $_SESSION['user_role'] === 'MANAGER' || 
+        $comment['author_id'] == $_SESSION['user_id']) {
+        $comments_to_display[] = $comment;
+    }
+}
 
 // Get documents for this task
  $stmt = $pdo->prepare("SELECT d.*, u.name as uploader_name FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id WHERE d.task_id = ? ORDER BY d.uploaded_at DESC");
@@ -174,7 +186,6 @@ if (!$task) {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p><strong>Dibuat oleh:</strong> <?php echo $task['creator_name']; ?></p>
-                                        <!-- MODIFIKASI: Tampilkan nama assignee yang sudah digabung -->
                                         <p><strong>Penanggung Jawab:</strong> <?php echo $task['assignee_names'] ?: 'Tidak ada'; ?></p>
                                     </div>
                                     <div class="col-md-6">
@@ -221,27 +232,75 @@ if (!$task) {
                                 <h5 class="mb-0">Komentar</h5>
                             </div>
                             <div class="card-body">
-                                <!-- Add Comment Form -->
-                                <form action="handle_add_comment.php" method="post" class="mb-4">
+                                <!-- --- PERUBAHAN: Form Tambah Komentar yang Baru --- -->
+                                <form action="handle_add_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
                                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="type" class="form-label">Tipe Komentar</label>
+                                            <select class="form-select" id="type" name="type" required>
+                                                <option value="Pertanyaan">Pertanyaan</option>
+                                                <option value="Saran">Saran</option>
+                                                <option value="Laporan Bug">Laporan Bug</option>
+                                                <option value="Blocker">Blocker</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="privacy" class="form-label">Privasi Komentar</label>
+                                            <select class="form-select" id="privacy" name="privacy" required>
+                                                <option value="ALL_MEMBERS">Dapat dilihat semua anggota tim</option>
+                                                <option value="MANAGER_AND_ME">Hanya Manajer & Saya</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="mb-3">
-                                        <label for="content" class="form-label">Tambah Komentar</label>
+                                        <label for="content" class="form-label">Isi Komentar</label>
                                         <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
                                     </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="attachment" class="form-label">Lampirkan File (Opsional)</label>
+                                        <input type="file" class="form-control" id="attachment" name="attachment">
+                                    </div>
+                                    
                                     <button type="submit" class="btn btn-primary">Komentar</button>
                                 </form>
 
-                                <!-- Display Comments -->
-                                <?php if (empty($comments)): ?>
+                                <!-- --- PERUBAHAN: Tampilan Komentar dengan Info Baru --- -->
+                                <?php if (empty($comments_to_display)): ?>
                                     <p>Belum ada komentar.</p>
                                 <?php else: ?>
-                                    <?php foreach ($comments as $comment): ?>
+                                    <?php foreach ($comments_to_display as $comment): ?>
                                     <div class="comment">
-                                        <div class="d-flex justify-content-between">
-                                            <h6 class="mb-1"><?php echo $comment['author_name']; ?></h6>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-1">
+                                                <?php echo $comment['author_name']; ?>
+                                                <!-- Badge Tipe Komentar -->
+                                                <span class="badge bg-<?php 
+                                                    echo match($comment['type']) {
+                                                        'Pertanyaan' => 'info',
+                                                        'Saran' => 'success',
+                                                        'Laporan Bug' => 'danger',
+                                                        'Blocker' => 'dark',
+                                                        default => 'secondary'
+                                                    };
+                                                ?> ms-2"><?php echo $comment['type']; ?></span>
+                                            </h6>
                                             <small><?php echo date('d M Y H:i', strtotime($comment['created_at'])); ?></small>
                                         </div>
                                         <p class="mb-1"><?php echo nl2br($comment['content']); ?></p>
+                                        
+                                        <!-- Tampilkan Lampiran jika ada -->
+                                        <?php if (!empty($comment['file_path'])): ?>
+                                        <div class="alert alert-light d-flex align-items-center" role="alert">
+                                            <i class="bi bi-paperclip me-2"></i>
+                                            <a href="uploads/<?php echo $comment['file_path']; ?>" target="_blank"><?php echo $comment['file_name']; ?></a>
+                                            <span class="text-muted ms-auto">(<?php echo number_format($comment['file_size'] / 1024, 2); ?> KB)</span>
+                                        </div>
+                                        <?php endif; ?>
+
                                         <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $comment['author_id'] == $_SESSION['user_id']): ?>
                                         <div>
                                             <a href="form_comment.php?id=<?php echo $comment['id']; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
