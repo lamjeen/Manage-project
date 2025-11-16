@@ -48,6 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
     $priority = $_POST['priority'];
     $manager_id = $_POST['manager_id'];
+    // Data dari multi-select dropdown akan diterima sebagai array
     $members = $_POST['members'] ?? [];
     
     if ($is_edit) {
@@ -100,6 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Proyek' : 'Proyek Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- PERUBAHAN: Tambahkan CSS Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
         .sidebar {
             min-height: 100vh;
@@ -235,15 +239,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="members" class="form-label">Anggota Tim</label>
-                                        <select class="form-select" id="members" name="members[]" multiple>
+                                        <label for="project-members-select" class="form-label">Anggota Tim</label>
+                                        <!-- PERUBAHAN: Ganti select multiple lama dengan select baru untuk Tom Select -->
+                                        <select id="project-members-select" name="members[]" multiple placeholder="Pilih Anggota Tim...">
                                             <?php foreach ($users as $user): ?>
                                                 <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $project_members) ? 'selected' : ''; ?>>
-                                                    <?php echo $user['name']; ?>
+                                                    <?php echo htmlspecialchars($user['name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <div class="form-text">Tahan Ctrl/Cmd untuk memilih lebih dari satu anggota</div>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <a href="projects.php" class="btn btn-secondary me-2">Batal</a>
@@ -275,5 +279,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PERUBAHAN: Tambahkan JS Tom Select -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi Tom Select untuk dropdown anggota proyek
+            new TomSelect('#project-members-select', {
+                plugins: {
+                    'checkbox_options': {},
+                    'remove_button':{
+                        'title':'Hapus item ini',
+                    }
+                },
+                create: false,
+                maxItems: null
+            });
+        });
+    </script>
 </body>
 </html>

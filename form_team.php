@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $team_head_id = $_POST['team_head_id'];
+    // Data dari multi-select dropdown akan diterima sebagai array
     $members = $_POST['members'] ?? [];
     
     if ($is_edit) {
@@ -85,22 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Tim' : 'Tim Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- PERUBAHAN: Tambahkan CSS Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
         .sidebar {
             min-height: 100vh;
             background-color: #f8f9fa;
-        }
-        .dual-listbox .box {
-            height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .dual-listbox .box select {
-            height: 100%;
-            width: 100%;
-            border: none;
         }
     </style>
 </head>
@@ -201,37 +193,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Daftar Anggota</label>
-                                        <div class="dual-listbox">
-                                            <div class="row">
-                                                <div class="col-md-5">
-                                                    <div class="box">
-                                                        <select id="available_users" multiple>
-                                                            <?php foreach ($users as $user): ?>
-                                                                <?php if (!in_array($user['id'], $team_members)): ?>
-                                                                    <option value="<?php echo $user['id']; ?>"><?php echo $user['name']; ?></option>
-                                                                <?php endif; ?>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-                                                    <button type="button" id="btn-add" class="btn btn-sm btn-primary mb-2"><i class="bi bi-chevron-right"></i></button>
-                                                    <button type="button" id="btn-remove" class="btn btn-sm btn-secondary"><i class="bi bi-chevron-left"></i></button>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <div class="box">
-                                                        <select id="selected_users" name="members[]" multiple>
-                                                            <?php foreach ($users as $user): ?>
-                                                                <?php if (in_array($user['id'], $team_members)): ?>
-                                                                    <option value="<?php echo $user['id']; ?>"><?php echo $user['name']; ?></option>
-                                                                <?php endif; ?>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <label for="members-select" class="form-label">Daftar Anggota</label>
+                                        <!-- PERUBAHAN: Ganti dropdown lama dengan select multiple untuk Tom Select -->
+                                        <select id="members-select" name="members[]" multiple placeholder="Pilih Anggota Tim...">
+                                            <?php foreach ($users as $user): ?>
+                                                <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $team_members) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($user['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <a href="teams.php" class="btn btn-secondary me-2">Batal</a>
@@ -247,25 +217,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PERUBAHAN: Tambahkan JS Tom Select -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const btnAdd = document.getElementById('btn-add');
-            const btnRemove = document.getElementById('btn-remove');
-            const availableUsers = document.getElementById('available_users');
-            const selectedUsers = document.getElementById('selected_users');
-
-            btnAdd.addEventListener('click', function() {
-                const selected = Array.from(availableUsers.selectedOptions);
-                selected.forEach(option => {
-                    selectedUsers.add(option);
-                });
-            });
-
-            btnRemove.addEventListener('click', function() {
-                const selected = Array.from(selectedUsers.selectedOptions);
-                selected.forEach(option => {
-                    availableUsers.add(option);
-                });
+            // Inisialisasi Tom Select untuk dropdown anggota tim
+            new TomSelect('#members-select', {
+                plugins: {
+                    'checkbox_options': {},
+                    'remove_button':{
+                        'title':'Hapus item ini',
+                    }
+                },
+                create: false,
+                maxItems: null
             });
         });
     </script>

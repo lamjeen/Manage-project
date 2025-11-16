@@ -127,6 +127,22 @@ CREATE TABLE documents (
   FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE task_assignees (
+    task_id INT,
+    user_id INT,
+    PRIMARY KEY (task_id, user_id),
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+
+
+
+
+
+
+
 -- Tambahkan data pengguna awal untuk testing
 -- Password untuk semua adalah 'password'
 
@@ -137,7 +153,8 @@ INSERT INTO `users` (`name`, `email`, `password_hash`, `role`) VALUES
 
 
 
-ALTER TABLE comments ADD COLUMN type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') DEFAULT 'Pertanyaan' AFTER content;
-ALTER TABLE comments ADD COLUMN privacy ENUM('Semua Anggota Tim', 'Hanya Manajer & Saya') DEFAULT 'Semua Anggota Tim' AFTER type;
-ALTER TABLE comments ADD COLUMN file_path VARCHAR(255) NULL AFTER privacy;
-ALTER TABLE comments ADD COLUMN file_name VARCHAR(255) NULL AFTER file_path;
+
+-- ALTER TABLE comments ADD COLUMN type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') DEFAULT 'Pertanyaan' AFTER content;
+-- ALTER TABLE comments ADD COLUMN privacy ENUM('Semua Anggota Tim', 'Hanya Manajer & Saya') DEFAULT 'Semua Anggota Tim' AFTER type;
+-- ALTER TABLE comments ADD COLUMN file_path VARCHAR(255) NULL AFTER privacy;
+-- ALTER TABLE comments ADD COLUMN file_name VARCHAR(255) NULL AFTER file_path;

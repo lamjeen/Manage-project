@@ -9,8 +9,8 @@ if (!isset($_GET['id'])) {
 
  $task_id = $_GET['id'];
 
-// Get task data
- $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, u.name as assignee_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users u ON t.assignee_id = u.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
+// MODIFIKASI: Get task data tanpa join ke assignee, karena sekarang bisa banyak
+ $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $task = $stmt->fetch();
 
@@ -18,6 +18,12 @@ if (!$task) {
     header("Location: tasks.php");
     exit;
 }
+
+// MODIFIKASI: Ambil semua nama assignee dari tabel pivot task_assignees
+ $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN task_assignees ta ON u.id = ta.user_id WHERE ta.task_id = ?");
+ $stmt->execute([$task_id]);
+ $assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
+ $task['assignee_names'] = implode(', ', $assignees);
 
 // Get comments for this task
  $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.created_at ASC");
@@ -168,7 +174,8 @@ if (!$task) {
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p><strong>Dibuat oleh:</strong> <?php echo $task['creator_name']; ?></p>
-                                        <p><strong>Penanggung Jawab:</strong> <?php echo $task['assignee_name'] ?? 'Tidak ada'; ?></p>
+                                        <!-- MODIFIKASI: Tampilkan nama assignee yang sudah digabung -->
+                                        <p><strong>Penanggung Jawab:</strong> <?php echo $task['assignee_names'] ?: 'Tidak ada'; ?></p>
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Tenggat Waktu:</strong> <?php echo $task['due_date'] ? date('d M Y H:i', strtotime($task['due_date'])) : '-'; ?></p>

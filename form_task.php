@@ -3,6 +3,7 @@ require_once 'auth_check.php';
 require_once 'db_connect.php';
 
  $task = null;
+ $task_assignees = [];
  $is_edit = false;
 
 // Check if editing existing task
@@ -24,6 +25,11 @@ if (isset($_GET['id'])) {
         header("Location: tasks.php");
         exit;
     }
+
+    // Ambil data assignee dari tabel pivot task_assignees
+    $stmt = $pdo->prepare("SELECT user_id FROM task_assignees WHERE task_id = ?");
+    $stmt->execute([$task_id]);
+    $task_assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
 // Handle form submission
@@ -35,17 +41,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $due_date = $_POST['due_date'];
     $estimated_hours = $_POST['estimated_hours'];
     $project_id = $_POST['project_id'];
-    $assignee_id = $_POST['assignee_id'];
+    // Data dari multi-select dropdown akan diterima sebagai array
+    $assignees = $_POST['assignees'] ?? [];
     
     if ($is_edit) {
-        $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, estimated_hours = ?, project_id = ?, assignee_id = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $assignee_id, $task_id]);
+        $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, estimated_hours = ?, project_id = ? WHERE id = ?");
+        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $task_id]);
+
+        // Hapus assignee lama dan tambahkan yang baru
+        $stmt = $pdo->prepare("DELETE FROM task_assignees WHERE task_id = ?");
+        $stmt->execute([$task_id]);
+        
+        foreach ($assignees as $assignee_id) {
+            $stmt = $pdo->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$task_id, $assignee_id]);
+        }
+
         header("Location: task_detail.php?id=$task_id");
     } else {
         $created_by_id = $_SESSION['user_id'];
-        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, estimated_hours, project_id, assignee_id, created_by_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $assignee_id, $created_by_id]);
+        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, estimated_hours, project_id, created_by_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $created_by_id]);
         $new_task_id = $pdo->lastInsertId();
+
+        // Tambahkan assignee ke tabel pivot
+        foreach ($assignees as $assignee_id) {
+            $stmt = $pdo->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$new_task_id, $assignee_id]);
+        }
+
         header("Location: task_detail.php?id=$new_task_id");
     }
     exit;
@@ -68,6 +92,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Tugas' : 'Tugas Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- PERUBAHAN: Tambahkan CSS Tom Select -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
         .sidebar {
             min-height: 100vh;
@@ -173,12 +200,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="assignee_id" class="form-label">Penanggung Jawab</label>
-                                            <select class="form-select" id="assignee_id" name="assignee_id">
-                                                <option value="">Pilih Penanggung Jawab</option>
+                                            <label for="assignees-select" class="form-label">Penanggung Jawab</label>
+                                            <!-- PERUBAHAN: Ganti dropdown lama dengan select multiple untuk Tom Select -->
+                                            <select id="assignees-select" name="assignees[]" multiple placeholder="Pilih Penanggung Jawab...">
                                                 <?php foreach ($users as $user): ?>
-                                                    <option value="<?php echo $user['id']; ?>" <?php echo ($task['assignee_id'] ?? '') == $user['id'] ? 'selected' : ''; ?>>
-                                                        <?php echo $user['name']; ?>
+                                                    <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $task_assignees) ? 'selected' : ''; ?>>
+                                                        <?php echo htmlspecialchars($user['name']); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
@@ -228,5 +255,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PERUBAHAN: Tambahkan JS Tom Select -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi Tom Select untuk dropdown penanggung jawab
+            new TomSelect('#assignees-select', {
+                plugins: {
+                    'checkbox_options': {},
+                    'remove_button':{
+                        'title':'Hapus item ini',
+                    }
+                },
+                create: false,
+                maxItems: null
+            });
+        });
+    </script>
 </body>
 </html>
