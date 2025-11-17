@@ -9,7 +9,7 @@ if (!isset($_GET['id'])) {
 
  $comment_id = $_GET['id'];
 
-// Get comment data
+// Get comment data, termasuk is_pinned
  $stmt = $pdo->prepare("SELECT * FROM comments WHERE id = ?");
  $stmt->execute([$comment_id]);
  $comment = $stmt->fetch();
@@ -28,9 +28,10 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
+    $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
     
-    $stmt = $pdo->prepare("UPDATE comments SET content = ? WHERE id = ?");
-    $stmt->execute([$content, $comment_id]);
+    $stmt = $pdo->prepare("UPDATE comments SET content = ?, is_pinned = ? WHERE id = ?");
+    $stmt->execute([$content, $is_pinned, $comment_id]);
     
     header("Location: task_detail.php?id=" . $comment['task_id']);
     exit;
@@ -74,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
+                            <a class="nav-link active" href="tasks.php">
                                 <i class="bi bi-check2-square me-2"></i> Tugas
                             </a>
                         </li>
@@ -133,6 +134,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label for="content" class="form-label">Isi Komentar</label>
                                         <textarea class="form-control" id="content" name="content" rows="6" required><?php echo $comment['content']; ?></textarea>
                                     </div>
+                                    
+                                    <!-- --- FITUR BARU: Checkbox Pin di Form Edit --- -->
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned" <?php echo $comment['is_pinned'] ? 'checked' : ''; ?>>
+                                            <label class="form-check-label" for="is_pinned">
+                                                <i class="bi bi-pin-angle-fill text-warning"></i> Pin komentar ini
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div class="d-flex justify-content-end">
                                         <a href="task_detail.php?id=<?php echo $comment['task_id']; ?>" class="btn btn-secondary me-2">Batal</a>
                                         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>

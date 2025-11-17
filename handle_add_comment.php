@@ -8,8 +8,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
     $type = $_POST['type'];
     $privacy = $_POST['privacy'];
+    
+    // --- PERUBAHAN: Ambil status pin dari form ---
+    $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
 
-    // --- PERUBAHAN: Logika untuk Menangani Upload File ---
+    // --- Logika untuk Menangani Upload File (Tidak Berubah) ---
     $file_path = null;
     $file_name = null;
     $file_size = null;
@@ -21,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
 
         if (in_array(strtolower($filetype), $allowed)) {
-            // Buat nama file unik untuk mencegah overwrite
             $new_filename = 'comment_' . uniqid() . '.' . $filetype;
             $upload_path = 'uploads/' . $new_filename;
 
@@ -31,14 +33,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $file_size = $_FILES['attachment']['size'];
                 $file_type = $filetype;
             }
-            // Jika gagal upload, kita abaikan dan lanjutkan tanpa file
         }
-        // Jika tipe file tidak diizinkan, kita abaikan dan lanjutkan tanpa file
     }
 
-    // --- PERUBAHAN: Query INSERT untuk Menyimpan Data Baru ---
-    $stmt = $pdo->prepare("INSERT INTO comments (content, task_id, author_id, type, privacy, file_path, file_name, file_size, file_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$content, $task_id, $author_id, $type, $privacy, $file_path, $file_name, $file_size, $file_type]);
+    // --- PERUBAHAN: Query INSERT untuk Menyimpan Data Baru Termasuk Status Pin ---
+    $stmt = $pdo->prepare("INSERT INTO comments (content, task_id, author_id, type, privacy, file_path, file_name, file_size, file_type, is_pinned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$content, $task_id, $author_id, $type, $privacy, $file_path, $file_name, $file_size, $file_type, $is_pinned]);
 
     header("Location: task_detail.php?id=$task_id");
     exit;

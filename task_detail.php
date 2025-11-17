@@ -9,7 +9,7 @@ if (!isset($_GET['id'])) {
 
  $task_id = $_GET['id'];
 
-// MODIFIKASI: Get task data tanpa join ke assignee, karena sekarang bisa banyak
+// Get task data tanpa join ke assignee, karena sekarang bisa banyak
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $task = $stmt->fetch();
@@ -19,15 +19,15 @@ if (!$task) {
     exit;
 }
 
-// MODIFIKASI: Ambil semua nama assignee dari tabel pivot task_assignees
+// Ambil semua nama assignee dari tabel pivot task_assignees
  $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN task_assignees ta ON u.id = ta.user_id WHERE ta.task_id = ?");
  $stmt->execute([$task_id]);
  $assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
  $task['assignee_names'] = implode(', ', $assignees);
 
-// --- PERUBAHAN: Get comments dengan kolom baru dan filter privasi ---
+// --- PERUBAHAN: Get comments dengan kolom baru dan diurutkan berdasarkan pin ---
 // Kita ambil semua komentar dulu, nanti di-filter di PHP
- $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.created_at ASC");
+ $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.is_pinned DESC, c.created_at ASC");
  $stmt->execute([$task_id]);
  $all_comments = $stmt->fetchAll();
 
@@ -65,6 +65,17 @@ foreach ($all_comments as $comment) {
             border-left: 3px solid #007bff;
             padding-left: 15px;
             margin-bottom: 15px;
+        }
+        /* --- PERUBAHAN: Gaya untuk komentar yang di-pin --- */
+        .comment.pinned {
+            border-left-color: #ffc107; /* Warna kuning untuk menonjolkan */
+            background-color: #fffdf7;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ffeaa7;
+        }
+        .pinned-badge {
+            font-size: 0.75rem;
         }
     </style>
 </head>
@@ -232,7 +243,7 @@ foreach ($all_comments as $comment) {
                                 <h5 class="mb-0">Komentar</h5>
                             </div>
                             <div class="card-body">
-                                <!-- --- PERUBAHAN: Form Tambah Komentar yang Baru --- -->
+                                <!-- --- PERUBAHAN: Form Tambah Komentar dengan Checkbox Pin --- -->
                                 <form action="handle_add_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
                                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
                                     
@@ -260,24 +271,35 @@ foreach ($all_comments as $comment) {
                                         <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
                                     </div>
                                     
-                                    <div class="mb-3">
-                                        <label for="attachment" class="form-label">Lampirkan File (Opsional)</label>
-                                        <input type="file" class="form-control" id="attachment" name="attachment">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="attachment" class="form-label">Lampirkan File (Opsional)</label>
+                                            <input type="file" class="form-control" id="attachment" name="attachment">
+                                        </div>
+                                        <div class="col-md-6 mb-3 d-flex align-items-end">
+                                            <!-- --- FITUR BARU: Checkbox Pin Komentar --- -->
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned">
+                                                <label class="form-check-label" for="is_pinned">
+                                                    <i class="bi bi-pin-angle-fill text-warning"></i> Pin komentar ini
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                     
                                     <button type="submit" class="btn btn-primary">Komentar</button>
                                 </form>
 
-                                <!-- --- PERUBAHAN: Tampilan Komentar dengan Info Baru --- -->
+                                <!-- --- PERUBAHAN: Tampilan Komentar dengan Gaya Pin --- -->
                                 <?php if (empty($comments_to_display)): ?>
                                     <p>Belum ada komentar.</p>
                                 <?php else: ?>
                                     <?php foreach ($comments_to_display as $comment): ?>
-                                    <div class="comment">
+                                    <!-- Tambahkan class 'pinned' jika komentar di-pin -->
+                                    <div class="comment <?php echo $comment['is_pinned'] ? 'pinned' : ''; ?>">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <h6 class="mb-1">
                                                 <?php echo $comment['author_name']; ?>
-                                                <!-- Badge Tipe Komentar -->
                                                 <span class="badge bg-<?php 
                                                     echo match($comment['type']) {
                                                         'Pertanyaan' => 'info',
@@ -287,6 +309,10 @@ foreach ($all_comments as $comment) {
                                                         default => 'secondary'
                                                     };
                                                 ?> ms-2"><?php echo $comment['type']; ?></span>
+                                                <!-- --- FITUR BARU: Tampilkan Badge Pin --- -->
+                                                <?php if ($comment['is_pinned']): ?>
+                                                    <span class="badge bg-warning text-dark pinned-badge ms-2"><i class="bi bi-pin-angle-fill"></i> Di-Pin</span>
+                                                <?php endif; ?>
                                             </h6>
                                             <small><?php echo date('d M Y H:i', strtotime($comment['created_at'])); ?></small>
                                         </div>

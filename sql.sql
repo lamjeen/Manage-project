@@ -139,7 +139,8 @@ CREATE TABLE task_assignees (
 
 ALTER TABLE teams
 ADD COLUMN logo_path VARCHAR(255) NULL AFTER description;
-
+ALTER TABLE comments
+ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT FALSE AFTER file_type;
 
 
 INSERT INTO users (name, email, password_hash, role) VALUES 
