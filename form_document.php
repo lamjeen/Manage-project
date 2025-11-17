@@ -102,6 +102,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Get tasks for dropdown
  $stmt = $pdo->query("SELECT id, title FROM tasks ORDER BY title");
  $tasks = $stmt->fetchAll();
+
+// --- PERUBAHAN LOGIKA: Tentukan ID yang sedang dipilih dengan cara yang aman ---
+ $current_project_id = null;
+ $current_task_id = null;
+
+if ($is_edit) {
+    // Jika mengedit, ambil ID dari data dokumen
+    $current_project_id = $document['project_id'];
+    $current_task_id = $document['task_id'];
+} else {
+    // Jika membuat baru, ambil ID dari URL
+    $current_project_id = $_GET['project_id'] ?? null;
+    $current_task_id = $_GET['task_id'] ?? null;
+}
+// Sekarang $current_project_id dan $current_task_id aman, nilainya adalah integer atau null, tanpa risiko warning.
 ?>
 
 <!DOCTYPE html>
@@ -219,11 +234,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label class="form-label">Terkait Dengan</label>
                                         <div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="related_to" id="relatedProject" value="project" <?php echo ($document['project_id'] || !isset($_GET['task_id'])) ? 'checked' : ''; ?> required>
+                                                <!-- --- PERUBAHAN: Gunakan variabel yang aman untuk menentukan checked --- -->
+                                                <input class="form-check-input" type="radio" name="related_to" id="relatedProject" value="project" <?php echo ($current_project_id) ? 'checked' : ''; ?> required>
                                                 <label class="form-check-label" for="relatedProject">Proyek</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="related_to" id="relatedTask" value="task" <?php echo ($document['task_id'] || isset($_GET['task_id'])) ? 'checked' : ''; ?> required>
+                                                <input class="form-check-input" type="radio" name="related_to" id="relatedTask" value="task" <?php echo ($current_task_id) ? 'checked' : ''; ?> required>
                                                 <label class="form-check-label" for="relatedTask">Tugas</label>
                                             </div>
                                         </div>
@@ -232,9 +248,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label for="project_id" class="form-label">Pilih Proyek</label>
                                         <select class="form-select" id="project_id" name="project_id">
                                             <option value="">Pilih Proyek</option>
-                                            <?php foreach ($projects as $project): ?>
-                                                <option value="<?php echo $project['id']; ?>" <?php echo ($document['project_id'] ?? (isset($_GET['project_id']) ? $_GET['project_id'] : '')) == $project['id'] ? 'selected' : ''; ?>>
-                                                    <?php echo $project['name']; ?>
+                                            <?php foreach ($projects as $project_item): ?>
+                                                <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
+                                                <option value="<?php echo $project_item['id']; ?>" <?php echo ($current_project_id == $project_item['id']) ? 'selected' : ''; ?>>
+                                                    <?php echo $project_item['name']; ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
@@ -243,9 +260,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <label for="task_id" class="form-label">Pilih Tugas</label>
                                         <select class="form-select" id="task_id" name="task_id">
                                             <option value="">Pilih Tugas</option>
-                                            <?php foreach ($tasks as $task): ?>
-                                                <option value="<?php echo $task['id']; ?>" <?php echo ($document['task_id'] ?? (isset($_GET['task_id']) ? $_GET['task_id'] : '')) == $task['id'] ? 'selected' : ''; ?>>
-                                                    <?php echo $task['title']; ?>
+                                            <?php foreach ($tasks as $task_item): ?>
+                                                <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
+                                                <option value="<?php echo $task_item['id']; ?>" <?php echo ($current_task_id == $task_item['id']) ? 'selected' : ''; ?>>
+                                                    <?php echo $task_item['title']; ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
