@@ -9,7 +9,7 @@ if (!isset($_GET['id'])) {
 
  $comment_id = $_GET['id'];
 
-// Get comment data, termasuk is_pinned
+// get comment data, termasuk is_pinned
  $stmt = $pdo->prepare("SELECT * FROM comments WHERE id = ?");
  $stmt->execute([$comment_id]);
  $comment = $stmt->fetch();
@@ -19,13 +19,13 @@ if (!$comment) {
     exit;
 }
 
-// Check if user has permission to edit this comment
+// check if user has permission to edit this comment
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $comment['author_id'] != $_SESSION['user_id']) {
     header("Location: task_detail.php?id=" . $comment['task_id']);
     exit;
 }
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
     $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
@@ -135,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <textarea class="form-control" id="content" name="content" rows="6" required><?php echo $comment['content']; ?></textarea>
                                     </div>
                                     
-                                    <!-- --- FITUR BARU: Checkbox Pin di Form Edit --- -->
+                                    <!-- Fitur pin -->
                                     <div class="mb-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned" <?php echo $comment['is_pinned'] ? 'checked' : ''; ?>>

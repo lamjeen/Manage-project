@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Get documents with uploader and project/task info
+// get documents with uploader and project/task info
  $stmt = $pdo->query("SELECT d.*, u.name as uploader_name, p.name as project_name, t.title as task_title FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id LEFT JOIN projects p ON d.project_id = p.id LEFT JOIN tasks t ON d.task_id = t.id ORDER BY d.uploaded_at DESC");
  $documents = $stmt->fetchAll();
 ?>
@@ -159,7 +159,7 @@ require_once 'db_connect.php';
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -181,7 +181,7 @@ require_once 'db_connect.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete document functionality
+            // delete document functionality
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             

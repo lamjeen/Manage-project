@@ -5,7 +5,7 @@ require_once 'db_connect.php';
  $document = null;
  $is_edit = false;
 
-// Check if editing existing document
+// check if editing existing document
 if (isset($_GET['id'])) {
     $is_edit = true;
     $document_id = $_GET['id'];
@@ -19,14 +19,14 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Check if user has permission to edit this document
+    // check if user has permission to edit this document
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $document['uploaded_by_id'] != $_SESSION['user_id']) {
         header("Location: documents.php");
         exit;
     }
 }
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['title'];
     $description = $_POST['description'];
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $category = $_POST['category'];
     $uploaded_by_id = $_SESSION['user_id'];
     
-    // Handle file upload
+    // handle file upload
     $file_path = '';
     $file_name = '';
     $file_size = 0;
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
         
         if (in_array(strtolower($filetype), $allowed)) {
-            // Create a unique filename to prevent overwriting
+            // create a unique filename to prevent overwriting
             $new_filename = uniqid() . '.' . $filetype;
             $upload_path = 'uploads/' . $new_filename;
             
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Tipe file tidak diizinkan.";
         }
     } elseif ($is_edit) {
-        // Keep old file if no new file is uploaded during edit
+        // keep old file if no new file is uploaded during edit
         $file_path = $document['file_path'];
         $file_name = $document['file_name'];
         $file_size = $document['file_size'];
@@ -95,28 +95,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Get projects for dropdown
+// get projects for dropdown
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 
-// Get tasks for dropdown
+// get tasks for dropdown
  $stmt = $pdo->query("SELECT id, title FROM tasks ORDER BY title");
  $tasks = $stmt->fetchAll();
 
-// --- PERUBAHAN LOGIKA: Tentukan ID yang sedang dipilih dengan cara yang aman ---
+// ---  ---
  $current_project_id = null;
  $current_task_id = null;
 
 if ($is_edit) {
-    // Jika mengedit, ambil ID dari data dokumen
+    // jika mengedit, ambil ID dari data dokumen
     $current_project_id = $document['project_id'];
     $current_task_id = $document['task_id'];
 } else {
-    // Jika membuat baru, ambil ID dari URL
+    // jika membuat baru, ambil ID dari URL
     $current_project_id = $_GET['project_id'] ?? null;
     $current_task_id = $_GET['task_id'] ?? null;
 }
-// Sekarang $current_project_id dan $current_task_id aman, nilainya adalah integer atau null, tanpa risiko warning.
+// sekarang $current_project_id dan $current_task_id aman, nilainya adalah integer atau null.
 ?>
 
 <!DOCTYPE html>
@@ -234,7 +234,7 @@ if ($is_edit) {
                                         <label class="form-label">Terkait Dengan</label>
                                         <div>
                                             <div class="form-check form-check-inline">
-                                                <!-- --- PERUBAHAN: Gunakan variabel yang aman untuk menentukan checked --- -->
+                                            
                                                 <input class="form-check-input" type="radio" name="related_to" id="relatedProject" value="project" <?php echo ($current_project_id) ? 'checked' : ''; ?> required>
                                                 <label class="form-check-label" for="relatedProject">Proyek</label>
                                             </div>
@@ -327,7 +327,6 @@ if ($is_edit) {
             relatedProject.addEventListener('change', toggleSelects);
             relatedTask.addEventListener('change', toggleSelects);
             
-            // Initial state
             toggleSelects();
         });
     </script>

@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Check if user has permission to create/edit project
+// check if user has permission to create/edit project
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
@@ -12,12 +12,12 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
  $project_members = [];
  $is_edit = false;
 
-// Check if editing existing project
+// check if editing existing project
 if (isset($_GET['id'])) {
     $is_edit = true;
     $project_id = $_GET['id'];
     
-    // Get project data
+    // get project data
     $stmt = $pdo->prepare("SELECT * FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);
     $project = $stmt->fetch();
@@ -27,19 +27,19 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Check if user has permission to edit this project
+    // check if user has permission to edit this project
     if ($_SESSION['user_role'] != 'ADMIN' && $project['manager_id'] != $_SESSION['user_id']) {
         header("Location: projects.php");
         exit;
     }
     
-    // Get project members
+    // get project members
     $stmt = $pdo->prepare("SELECT user_id FROM project_members WHERE project_id = ?");
     $stmt->execute([$project_id]);
     $project_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
@@ -48,15 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
     $priority = $_POST['priority'];
     $manager_id = $_POST['manager_id'];
-    // Data dari multi-select dropdown akan diterima sebagai array
+    // data dari multi-select dropdown
     $members = $_POST['members'] ?? [];
     
     if ($is_edit) {
-        // Update project
+        // update project
         $stmt = $pdo->prepare("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ?, priority = ?, manager_id = ? WHERE id = ?");
         $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $project_id]);
         
-        // Update project members (remove all and add new ones)
+        // update project members
         $stmt = $pdo->prepare("DELETE FROM project_members WHERE project_id = ?");
         $stmt->execute([$project_id]);
         
@@ -67,13 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         header("Location: project_detail.php?id=$project_id");
     } else {
-        // Create new project
+        // create new project
         $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, end_date, status, priority, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id]);
         
         $project_id = $pdo->lastInsertId();
         
-        // Add project members
+        // add project members
         foreach ($members as $member_id) {
             $stmt = $pdo->prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)");
             $stmt->execute([$project_id, $member_id]);
@@ -84,11 +84,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// Get all users for member selection
+// get all users for member selection
  $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 
-// Get managers for dropdown
+// get managers for dropdown
  $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
  $managers = $stmt->fetchAll();
 ?>
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Proyek' : 'Proyek Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- PERUBAHAN: Tambahkan CSS Tom Select -->
+
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
@@ -279,11 +279,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- PERUBAHAN: Tambahkan JS Tom Select -->
+
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Tom Select untuk dropdown anggota proyek
+
             new TomSelect('#project-members-select', {
                 plugins: {
                     'checkbox_options': {},

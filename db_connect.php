@@ -1,5 +1,4 @@
 <?php
-// db_connect.php
  $host = 'localhost';
  $dbname = 'project_management';
  $username = 'root';

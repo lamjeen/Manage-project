@@ -2,13 +2,13 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Only Admin and Manager can view teams
+// only Admin and Manager can view teams
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
 }
 
-// Get teams with team head name
+// get teams with team head name
  $stmt = $pdo->query("SELECT t.*, u.name as team_head_name FROM teams t LEFT JOIN users u ON t.team_head_id = u.id ORDER BY t.name");
  $teams = $stmt->fetchAll();
 ?>

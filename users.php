@@ -2,13 +2,13 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Only Admin can view users
+// only Admin can view users
 if ($_SESSION['user_role'] != 'ADMIN') {
     header("Location: dashboard.php");
     exit;
 }
 
-// Get all users
+// get all users
  $stmt = $pdo->query("SELECT * FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 ?>
@@ -176,7 +176,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete user functionality
+            // delete user functionality
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             

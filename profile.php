@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Get current user's data
+// get current user data
  $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
  $stmt->execute([$_SESSION['user_id']]);
  $user = $stmt->fetch();

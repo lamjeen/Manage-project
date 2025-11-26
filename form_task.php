@@ -6,7 +6,7 @@ require_once 'db_connect.php';
  $task_assignees = [];
  $is_edit = false;
 
-// Check if editing existing task
+// check if editing existing task
 if (isset($_GET['id'])) {
     $is_edit = true;
     $task_id = $_GET['id'];
@@ -20,19 +20,19 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Check if user has permission to edit this task
+    // check if user has permission to edit this task
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
         header("Location: tasks.php");
         exit;
     }
 
-    // Ambil data assignee dari tabel pivot task_assignees
+    // ambil data assignee dari tabel pivot task_assignees
     $stmt = $pdo->prepare("SELECT user_id FROM task_assignees WHERE task_id = ?");
     $stmt->execute([$task_id]);
     $task_assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['title'];
     $description = $_POST['description'];
@@ -41,14 +41,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $due_date = $_POST['due_date'];
     $estimated_hours = $_POST['estimated_hours'];
     $project_id = $_POST['project_id'];
-    // Data dari multi-select dropdown akan diterima sebagai array
+    // data dari multi-select dropdown jadi array
     $assignees = $_POST['assignees'] ?? [];
     
     if ($is_edit) {
         $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, estimated_hours = ?, project_id = ? WHERE id = ?");
         $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $task_id]);
 
-        // Hapus assignee lama dan tambahkan yang baru
+        // hapus assignee lama dan tambahkan yang baru
         $stmt = $pdo->prepare("DELETE FROM task_assignees WHERE task_id = ?");
         $stmt->execute([$task_id]);
         
@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $created_by_id]);
         $new_task_id = $pdo->lastInsertId();
 
-        // Tambahkan assignee ke tabel pivot
+        // tambahkan assignee
         foreach ($assignees as $assignee_id) {
             $stmt = $pdo->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
             $stmt->execute([$new_task_id, $assignee_id]);
@@ -75,11 +75,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// Get projects for dropdown
+// get projects for dropdown
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 
-// Get users for assignee dropdown
+// get users for assignee dropdown
  $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 ?>
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Tugas' : 'Tugas Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- PERUBAHAN: Tambahkan CSS Tom Select -->
+
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
@@ -255,11 +255,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- PERUBAHAN: Tambahkan JS Tom Select -->
+
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Tom Select untuk dropdown penanggung jawab
+
             new TomSelect('#assignees-select', {
                 plugins: {
                     'checkbox_options': {},

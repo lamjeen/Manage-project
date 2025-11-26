@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Only Admin and Manager can view team details
+// only Admin and Manager can view team details
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
@@ -15,7 +15,7 @@ if (!isset($_GET['id'])) {
 
  $team_id = $_GET['id'];
 
-// Get team data
+// get team data
  $stmt = $pdo->prepare("SELECT t.*, u.name as team_head_name FROM teams t LEFT JOIN users u ON t.team_head_id = u.id WHERE t.id = ?");
  $stmt->execute([$team_id]);
  $team = $stmt->fetch();
@@ -25,7 +25,7 @@ if (!$team) {
     exit;
 }
 
-// Get team members
+// get team members
  $stmt = $pdo->prepare("SELECT u.* FROM users u JOIN team_members tm ON u.id = tm.user_id WHERE tm.team_id = ?");
  $stmt->execute([$team_id]);
  $team_members = $stmt->fetchAll();
@@ -142,7 +142,6 @@ if (!$team) {
                             </div>
                             <div class="card-body">
                                 <p><strong>Jumlah Anggota:</strong> <?php echo count($team_members); ?> orang</p>
-                                <!-- Add more stats here if needed -->
                             </div>
                         </div>
                     </div>

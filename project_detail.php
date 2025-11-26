@@ -9,7 +9,7 @@ if (!isset($_GET['id'])) {
 
  $project_id = $_GET['id'];
 
-// Get project data
+// get project data
  $stmt = $pdo->prepare("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.id = ?");
  $stmt->execute([$project_id]);
  $project = $stmt->fetch();
@@ -19,29 +19,27 @@ if (!$project) {
     exit;
 }
 
-// Get project members
+// get project members
  $stmt = $pdo->prepare("SELECT u.id, u.name, pm.role_in_project FROM users u JOIN project_members pm ON u.id = pm.user_id WHERE pm.project_id = ?");
  $stmt->execute([$project_id]);
  $project_members = $stmt->fetchAll();
 
-// PERBAIKAN: Get project tasks dengan semua nama assignee menggunakan GROUP_CONCAT
  $stmt = $pdo->prepare("
     SELECT 
         t.*, 
         p.name as project_name, 
-        GROUP_CONCAT(u.name SEPARATOR ', ') as assignee_names
+        u.name as assignee_name  -- Ambil nama user langsung
     FROM tasks t
     LEFT JOIN projects p ON t.project_id = p.id
     LEFT JOIN task_assignees ta ON t.id = ta.task_id
     LEFT JOIN users u ON ta.user_id = u.id
     WHERE t.project_id = ?
-    GROUP BY t.id
     ORDER BY t.status, t.due_date
 ");
  $stmt->execute([$project_id]);
  $tasks = $stmt->fetchAll();
 
-// Count tasks by status
+// count tasks by status
  $task_counts = [
     'TO_DO' => 0,
     'IN_PROGRESS' => 0,
@@ -53,12 +51,12 @@ foreach ($tasks as $task) {
     $task_counts[$task['status']]++;
 }
 
-// Calculate progress
+// calculate progress
  $total_tasks = count($tasks);
  $completed_tasks = $task_counts['DONE'];
  $progress = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
 
-// Get project documents
+// get project documents
  $stmt = $pdo->prepare("SELECT d.*, u.name as uploader_name FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id WHERE d.project_id = ? ORDER BY d.uploaded_at DESC");
  $stmt->execute([$project_id]);
  $documents = $stmt->fetchAll();

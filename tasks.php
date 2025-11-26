@@ -2,29 +2,54 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// PERBAIKAN: Query untuk mendapatkan tugas dengan semua nama assignee menggunakan GROUP_CONCAT
- $stmt = $pdo->query("
+
+$stmt = $pdo->query("
     SELECT 
         t.*, 
         p.name as project_name, 
-        GROUP_CONCAT(u.name SEPARATOR ', ') as assignee_names,
-        GROUP_CONCAT(u.id SEPARATOR ',') as assignee_ids
+        u.id as assignee_id,
+        u.name as assignee_name
     FROM tasks t
     LEFT JOIN projects p ON t.project_id = p.id
     LEFT JOIN task_assignees ta ON t.id = ta.task_id
     LEFT JOIN users u ON ta.user_id = u.id
-    GROUP BY t.id
-    ORDER BY t.due_date ASC
+    ORDER BY t.due_date ASC, t.id
 ");
- $tasks = $stmt->fetchAll();
 
-// Get projects for filter dropdown
- $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
- $projects = $stmt->fetchAll();
+$tasks = [];
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $taskId = $row['id'];
 
-// Get users for assignee filter dropdown
- $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
- $users = $stmt->fetchAll();
+    if (!isset($tasks[$taskId])) {
+        $tasks[$taskId] = [
+            'id'            => $row['id'],
+            'title'         => $row['title'],
+            'project_id'    => $row['project_id'],
+            'project_name'  => $row['project_name'],
+            'priority'      => $row['priority'],
+            'status'        => $row['status'],
+            'due_date'      => $row['due_date'],
+            'created_by_id' => $row['created_by_id'], 
+            'assignees'     => [] 
+        ];
+    }
+
+
+    if ($row['assignee_id']) {
+        $tasks[$taskId]['assignees'][] = [
+            'id'   => $row['assignee_id'],
+            'name' => $row['assignee_name']
+        ];
+    }
+}
+
+// get projects for filter dropdown
+$stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
+$projects = $stmt->fetchAll();
+
+// get users for assignee filter dropdown
+$stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
+$users = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +76,6 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -107,7 +131,6 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Tugas</h1>
@@ -120,7 +143,6 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Filter -->
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <select class="form-select" id="projectFilter">
@@ -149,7 +171,6 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Tasks Table -->
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($tasks)): ?>
@@ -169,15 +190,24 @@ require_once 'db_connect.php';
                                         </tr>
                                     </thead>
                                     <tbody id="tasksTableBody">
-                                        <?php foreach ($tasks as $task): ?>
+                                        <?php foreach ($tasks as $task): 
+                                            
+                                            $idsArray = array_column($task['assignees'], 'id');
+                                            $idsString = implode(',', $idsArray); 
+
+                                            $namesArray = array_column($task['assignees'], 'name');
+                                            $namesString = implode(', ', $namesArray);
+                                        ?>
                                         <tr 
                                             data-project-id="<?php echo $task['project_id']; ?>" 
-                                            data-assignee-ids="<?php echo htmlspecialchars($task['assignee_ids'] ?? ''); ?>" 
+                                            data-assignee-ids="<?php echo htmlspecialchars($idsString); ?>" 
                                             data-status="<?php echo $task['status']; ?>">
-                                            <td><a href="task_detail.php?id=<?php echo $task['id']; ?>"><?php echo $task['title']; ?></a></td>
-                                            <td><a href="project_detail.php?id=<?php echo $task['project_id']; ?>"><?php echo $task['project_name']; ?></a></td>
-                                            <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                            <td><?php echo $task['assignee_names'] ?: 'Tidak ada'; ?></td>
+                                            
+                                            <td><a href="task_detail.php?id=<?php echo $task['id']; ?>"><?php echo htmlspecialchars($task['title']); ?></a></td>
+                                            <td><a href="project_detail.php?id=<?php echo $task['project_id']; ?>"><?php echo htmlspecialchars($task['project_name']); ?></a></td>
+                                            
+                                            <td><?php echo $namesString ?: 'Tidak ada'; ?></td>
+                                            
                                             <td>
                                                 <span class="badge bg-<?php 
                                                     echo match($task['priority']) {
@@ -226,7 +256,6 @@ require_once 'db_connect.php';
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -247,6 +276,7 @@ require_once 'db_connect.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+
         document.addEventListener('DOMContentLoaded', function() {
             // Delete task functionality
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
@@ -278,7 +308,6 @@ require_once 'db_connect.php';
                     
                     const projectMatch = projectValue === '' || projectId === projectValue;
                     const statusMatch = statusValue === '' || status === statusValue;
-                    // PERBAIKAN: Logika filter untuk multi-assignee
                     const assigneeMatch = assigneeValue === '' || assigneeIds.includes(assigneeValue);
                     
                     if (projectMatch && assigneeMatch && statusMatch) {

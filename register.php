@@ -10,14 +10,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
-    // PERUBAHAN: Peran pengguna baru secara otomatis diatur sebagai 'MEMBER'
-    // Tidak lagi mengambil dari form, karena form pemilihan peran sudah dihapus.
     $role = 'MEMBER';
 
     if ($password != $confirm_password) {
         $error = "Password tidak cocok!";
     } else {
-        // Check if email already exists
+
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         
@@ -26,11 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             
-            // PERUBAHAN: Query INSERT menggunakan peran yang sudah ditetapkan ('MEMBER')
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
             $stmt->execute([$name, $email, $password_hash, $role]);
             
-            // Alihkan ke halaman login dengan parameter sukses
             header("Location: login.php?registered=1");
             exit;
         }
@@ -87,8 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
             
-            <!-- PERUBAHAN: Blok HTML untuk pemilihan Peran (Role) DIHAPUS SELURUHNYA -->
-            <!-- Dahulu, ada blok <div> di sini yang berisi <select> untuk memilih role. Sekarang sudah tidak ada. -->
 
             <button type="submit" class="btn btn-primary w-100">Daftar</button>
         </form>

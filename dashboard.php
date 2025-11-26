@@ -2,23 +2,23 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Get projects count
+// get projects count
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
-// Get tasks count
+// get tasks count
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM tasks");
  $tasks_count = $stmt->fetch()['total'];
 
-// Get users count
+// get users count
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
 
-// Get recent projects
+// get recent project
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
-// PERBAIKAN: Get my tasks menggunakan tabel pivot task_assignees
+
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN task_assignees ta ON t.id = ta.task_id LEFT JOIN projects p ON t.project_id = p.id WHERE ta.user_id = ? ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();

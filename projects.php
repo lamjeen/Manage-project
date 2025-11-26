@@ -2,11 +2,11 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Get projects with manager name
+// get projects with manager name
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC");
  $projects = $stmt->fetchAll();
 
-// Get users for manager dropdown
+// get users for manager dropdown
  $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
  $managers = $stmt->fetchAll();
 ?>
@@ -208,7 +208,7 @@ require_once 'db_connect.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete project functionality
+            // delete project functionality
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             
@@ -220,7 +220,7 @@ require_once 'db_connect.php';
                 });
             });
             
-            // Filter functionality
+            // filter functionality
             const statusFilter = document.getElementById('statusFilter');
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');

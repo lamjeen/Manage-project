@@ -2,7 +2,7 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
-// Only Admin and Manager can create/edit teams
+// only admin and manager can create/edit teams
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
@@ -12,7 +12,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
  $team_members = [];
  $is_edit = false;
 
-// Check if editing existing team
+// check if editing existing team
 if (isset($_GET['id'])) {
     $is_edit = true;
     $team_id = $_GET['id'];
@@ -26,18 +26,17 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Get team members
+    // get team members
     $stmt = $pdo->prepare("SELECT user_id FROM team_members WHERE team_id = ?");
     $stmt->execute([$team_id]);
     $team_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Handle form submission
+// handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
     
-    // --- LOGIKA BARU: Penanganan "Jadikan Saya Ketua" ---
     if (isset($_POST['make_me_head']) && $_POST['make_me_head'] == '1') {
         $team_head_id = $_SESSION['user_id'];
     } else {
@@ -46,8 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $members = $_POST['members'] ?? [];
     
-    // --- LOGIKA BARU: Penanganan Upload Logo ---
-    $logo_path = $team['logo_path'] ?? null; // Pertahankan logo lama saat edit
+    $logo_path = $team['logo_path'] ?? null; 
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
         $filename = $_FILES['logo']['name'];
@@ -76,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $pdo->prepare("UPDATE teams SET name = ?, description = ?, team_head_id = ?, logo_path = ? WHERE id = ?");
         $stmt->execute([$name, $description, $team_head_id, $logo_path, $team_id]);
         
-        // Update team members (remove all and add new ones)
+        // Update team members
         $stmt = $pdo->prepare("DELETE FROM team_members WHERE team_id = ?");
         $stmt->execute([$team_id]);
         
@@ -87,13 +85,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         header("Location: team_detail.php?id=$team_id");
     } else {
-        // Create new team
+        // create new team
         $stmt = $pdo->prepare("INSERT INTO teams (name, description, team_head_id, logo_path) VALUES (?, ?, ?, ?)");
         $stmt->execute([$name, $description, $team_head_id, $logo_path]);
         
         $team_id = $pdo->lastInsertId();
         
-        // Add team members
+        // add team members
         foreach ($members as $member_id) {
             $stmt = $pdo->prepare("INSERT INTO team_members (team_id, user_id) VALUES (?, ?)");
             $stmt->execute([$team_id, $member_id]);
@@ -104,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// Get all users for member selection
+// get all users for member selection
  $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 ?>
@@ -221,7 +219,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <textarea class="form-control" id="description" name="description" rows="4"><?php echo $team['description'] ?? ''; ?></textarea>
                                     </div>
                                     
-                                    <!-- --- FITUR BARU: Upload Logo --- -->
                                     <div class="mb-3">
                                         <label for="logo" class="form-label">Logo/Avatar Tim</label>
                                         <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
@@ -282,7 +279,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi Tom Select untuk dropdown anggota tim
             new TomSelect('#members-select', {
                 plugins: {
                     'checkbox_options': {},
@@ -294,19 +290,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 maxItems: null
             });
 
-            // --- LOGIKA BARU: Interaktivitas Checkbox "Jadikan Saya Ketua" ---
+            // Jadikan Saya Ketua 
             const makeMeHeadCheckbox = document.getElementById('make_me_head');
             const teamHeadDropdown = document.getElementById('team_head_id');
             const currentUserId = '<?php echo $_SESSION['user_id']; ?>';
 
             makeMeHeadCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    // Pilih user yang sedang login di dropdown
+                    // pilih user yang sedang login di dropdown
                     teamHeadDropdown.value = currentUserId;
-                    // Opsi: non-aktifkan dropdown untuk mencegah perubahan
                     // teamHeadDropdown.disabled = true;
                 } else {
-                    // Aktifkan kembali dropdown jika checkbox dicentang ulang
+                    // aktifkan kembali dropdown jika checkbox dicentang ulang
                     // teamHeadDropdown.disabled = false;
                 }
             });

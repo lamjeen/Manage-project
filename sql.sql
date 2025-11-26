@@ -16,7 +16,7 @@ CREATE TABLE users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('ADMIN', 'MANAGER', 'MEMBER') NOT NULL DEFAULT 'MEMBER',
+    role ENUM('ADMIN', 'MANAGER', 'MEMBER'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -27,8 +27,8 @@ CREATE TABLE projects (
     description TEXT,
     start_date DATE,
     end_date DATE,
-    status ENUM('PLANNING', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'PLANNING',
-    priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL DEFAULT 'MEDIUM',
+    status ENUM('PLANNING', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED') NOT NULL,
+    priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL,
     manager_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL
@@ -39,11 +39,10 @@ CREATE TABLE tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     description TEXT,
-    priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL DEFAULT 'MEDIUM',
-    status ENUM('TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE') NOT NULL DEFAULT 'TO_DO',
+    priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL,
+    status ENUM('TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE') NOT NULL,
     due_date DATETIME,
     estimated_hours DECIMAL(5,2),
-    actual_hours DECIMAL(5,2),
     project_id INT,
     created_by_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -62,7 +61,7 @@ CREATE TABLE documents (
     file_name VARCHAR(255) NOT NULL,
     file_size INT,
     file_type VARCHAR(50),
-    version VARCHAR(20) DEFAULT '1.0',
+    version VARCHAR(20),
     category VARCHAR(50),
     uploaded_by_id INT,
     project_id INT,
@@ -78,6 +77,7 @@ CREATE TABLE teams (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
+    logo_path VARCHAR(255) NULL,
     team_head_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (team_head_id) REFERENCES users(id) ON DELETE SET NULL
@@ -92,12 +92,13 @@ CREATE TABLE comments (
     author_id INT,
     task_id INT,
     -- Kolom tambahan untuk fitur komentar yang diperluas
-    type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') NOT NULL DEFAULT 'Pertanyaan',
-    privacy ENUM('ALL_MEMBERS', 'MANAGER_AND_ME') NOT NULL DEFAULT 'ALL_MEMBERS',
+    type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') NOT NULL,
+    privacy ENUM('ALL_MEMBERS', 'MANAGER_AND_ME') NOT NULL,
     file_path VARCHAR(255) NULL,
     file_name VARCHAR(255) NULL,
     file_size INT NULL,
     file_type VARCHAR(50) NULL,
+    is_pinned BOOLEAN NOT NULL,
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
@@ -111,7 +112,7 @@ CREATE TABLE comments (
 CREATE TABLE project_members (
     project_id INT,
     user_id INT,
-    role_in_project ENUM('LEADER', 'CONTRIBUTOR', 'VIEWER') NOT NULL DEFAULT 'CONTRIBUTOR',
+    role_in_project ENUM('LEADER', 'CONTRIBUTOR', 'VIEWER') NOT NULL,
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (project_id, user_id),
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
@@ -137,11 +138,6 @@ CREATE TABLE task_assignees (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-ALTER TABLE teams
-ADD COLUMN logo_path VARCHAR(255) NULL AFTER description;
-ALTER TABLE comments
-ADD COLUMN is_pinned BOOLEAN NOT NULL DEFAULT FALSE AFTER file_type;
-
 
 INSERT INTO users (name, email, password_hash, role) VALUES 
-('Admin User', 'admin@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'ADMIN');
+('Admin User', 'admin@example.com', 'pw', 'ADMIN');

@@ -8,11 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
     $type = $_POST['type'];
     $privacy = $_POST['privacy'];
-    
-    // --- PERUBAHAN: Ambil status pin dari form ---
+
     $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
 
-    // --- Logika untuk Menangani Upload File (Tidak Berubah) ---
     $file_path = null;
     $file_name = null;
     $file_size = null;
@@ -36,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // --- PERUBAHAN: Query INSERT untuk Menyimpan Data Baru Termasuk Status Pin ---
     $stmt = $pdo->prepare("INSERT INTO comments (content, task_id, author_id, type, privacy, file_path, file_name, file_size, file_type, is_pinned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$content, $task_id, $author_id, $type, $privacy, $file_path, $file_name, $file_size, $file_type, $is_pinned]);
 
