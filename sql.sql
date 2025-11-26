@@ -1,13 +1,8 @@
--- =================================================================
--- SISTEM MANAJEMEN PROYEK KOLABORATIF: SKEMA DATABASE LENGKAP
--- =================================================================
-
--- 1. Buat Database jika belum ada
 CREATE DATABASE IF NOT EXISTS project_management;
 USE project_management;
 
 -- =================================================================
--- 2. Tabel-Tabel Utama
+-- Tabel-Tabel Utama
 -- =================================================================
 
 -- Tabel Users (Menyimpan data pengguna)
@@ -49,7 +44,6 @@ CREATE TABLE tasks (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by_id) REFERENCES users(id) ON DELETE SET NULL
-    -- NOTE: Kolom 'assignee_id' lama dihapus karena digantikan dengan tabel pivot
 );
 
 -- Tabel Documents (Menyimpan data dokumen)
@@ -91,7 +85,6 @@ CREATE TABLE comments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     author_id INT,
     task_id INT,
-    -- Kolom tambahan untuk fitur komentar yang diperluas
     type ENUM('Pertanyaan', 'Saran', 'Laporan Bug', 'Blocker') NOT NULL,
     privacy ENUM('ALL_MEMBERS', 'MANAGER_AND_ME') NOT NULL,
     file_path VARCHAR(255) NULL,
@@ -103,12 +96,9 @@ CREATE TABLE comments (
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
-
--- =================================================================
--- 3. Tabel Pivot (Hubungan Many-to-Many)
 -- =================================================================
 
--- Tabel Pivot untuk relasi Many-to-Many antara Proyek dan Anggota
+-- Tabel untuk relasi Many-to-Many antara Proyek dan Anggota
 CREATE TABLE project_members (
     project_id INT,
     user_id INT,
@@ -119,7 +109,7 @@ CREATE TABLE project_members (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Tabel Pivot untuk relasi Many-to-Many antara Tim dan Anggota
+-- Tabel untuk relasi Many-to-Many antara Tim dan Anggota
 CREATE TABLE team_members (
     team_id INT,
     user_id INT,
@@ -129,7 +119,7 @@ CREATE TABLE team_members (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Tabel Pivot untuk relasi Many-to-Many antara Tugas dan Penanggung Jawab (Users)
+-- Tabel untuk relasi Many-to-Many antara Tugas dan Penanggung Jawab (Users)
 CREATE TABLE task_assignees (
     task_id INT,
     user_id INT,
