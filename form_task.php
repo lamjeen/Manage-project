@@ -215,10 +215,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col-md-6 mb-3">
                                             <label for="priority" class="form-label">Prioritas</label>
                                             <select class="form-select" id="priority" name="priority" required>
-                                                <option value="LOW" <?php echo ($task['priority'] ?? '') == 'LOW' ? 'selected' : ''; ?>>Rendah</option>
-                                                <option value="MEDIUM" <?php echo ($task['priority'] ?? '') == 'MEDIUM' ? 'selected' : ''; ?>>Sedang</option>
-                                                <option value="HIGH" <?php echo ($task['priority'] ?? '') == 'HIGH' ? 'selected' : ''; ?>>Tinggi</option>
-                                                <option value="CRITICAL" <?php echo ($task['priority'] ?? '') == 'CRITICAL' ? 'selected' : ''; ?>>Kritis</option>
+                                                <option value="LOW" <?php echo ($task['priority'] ?? 'MEDIUM') == 'LOW' ? 'selected' : ''; ?>>Rendah</option>
+                                                <option value="MEDIUM" <?php echo ($task['priority'] ?? 'MEDIUM') == 'MEDIUM' ? 'selected' : ''; ?>>Sedang</option>
+                                                <option value="HIGH" <?php echo ($task['priority'] ?? 'MEDIUM') == 'HIGH' ? 'selected' : ''; ?>>Tinggi</option>
+                                                <option value="CRITICAL" <?php echo ($task['priority'] ?? 'MEDIUM') == 'CRITICAL' ? 'selected' : ''; ?>>Kritis</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
