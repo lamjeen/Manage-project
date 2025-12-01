@@ -15,6 +15,17 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabel Teams (Menyimpan data tim/departemen)
+CREATE TABLE teams (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    logo_path VARCHAR(255) NULL,
+    team_head_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (team_head_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Tabel Projects (Menyimpan data proyek)
 CREATE TABLE projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,8 +36,10 @@ CREATE TABLE projects (
     status ENUM('PLANNING', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED') NOT NULL,
     priority ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL') NOT NULL,
     manager_id INT,
+    team_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL
 );
 
 -- Tabel Tasks (Menyimpan data tugas)
@@ -66,17 +79,6 @@ CREATE TABLE documents (
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
--- Tabel Teams (Menyimpan data tim/departemen)
-CREATE TABLE teams (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    logo_path VARCHAR(255) NULL,
-    team_head_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (team_head_id) REFERENCES users(id) ON DELETE SET NULL
-);
-
 -- Tabel Comments (Menyimpan data komentar pada tugas)
 CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -96,6 +98,8 @@ CREATE TABLE comments (
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
+-- =================================================================
+-- Tabel Relasi Many-to-Many
 -- =================================================================
 
 -- Tabel untuk relasi Many-to-Many antara Proyek dan Anggota
