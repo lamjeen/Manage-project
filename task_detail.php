@@ -166,15 +166,46 @@ foreach ($all_comments as $comment) {
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <strong>Status:</strong>
-                                        <span class="badge bg-<?php 
-                                            echo match($task['status']) {
-                                                'TO_DO' => 'secondary',
-                                                'IN_PROGRESS' => 'primary',
-                                                'REVIEW' => 'warning',
-                                                'DONE' => 'success',
-                                                default => 'secondary'
-                                            };
-                                        ?>"><?php echo $task['status']; ?></span>
+                                        <!-- Status Update Dropdown -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: <?php 
+                                                echo match($task['status']) {
+                                                    'TO_DO' => '#6c757d',
+                                                    'IN_PROGRESS' => '#0d6efd',
+                                                    'REVIEW' => '#ffc107',
+                                                    'DONE' => '#198754',
+                                                    default => '#6c757d'
+                                                };
+                                            ?>;">
+                                                <?php echo str_replace('_', ' ', $task['status']); ?>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form action="handle_update_task_status.php" method="POST">
+                                                        <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                        <button type="submit" name="status" value="TO_DO" class="dropdown-item <?php echo $task['status'] === 'TO_DO' ? 'active' : ''; ?>">TO DO</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="handle_update_task_status.php" method="POST">
+                                                        <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                        <button type="submit" name="status" value="IN_PROGRESS" class="dropdown-item <?php echo $task['status'] === 'IN_PROGRESS' ? 'active' : ''; ?>">IN PROGRESS</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="handle_update_task_status.php" method="POST">
+                                                        <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                        <button type="submit" name="status" value="REVIEW" class="dropdown-item <?php echo $task['status'] === 'REVIEW' ? 'active' : ''; ?>">REVIEW</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="handle_update_task_status.php" method="POST">
+                                                        <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                                        <button type="submit" name="status" value="DONE" class="dropdown-item <?php echo $task['status'] === 'DONE' ? 'active' : ''; ?>">DONE</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                         <strong>Prioritas:</strong>
