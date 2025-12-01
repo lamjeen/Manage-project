@@ -9,7 +9,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
 }
 
  $project = null;
- $project_members = [];
+ $project_team_id = null;
  $is_edit = false;
 
 // check if editing existing project
@@ -33,10 +33,8 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // get project members
-    $stmt = $pdo->prepare("SELECT user_id FROM project_members WHERE project_id = ?");
-    $stmt->execute([$project_id]);
-    $project_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    // get project team
+    $project_team_id = $project['team_id'];
 }
 
 // handle form submission
@@ -48,35 +46,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
     $priority = $_POST['priority'];
     $manager_id = $_POST['manager_id'];
-    // data dari multi-select dropdown
-    $members = $_POST['members'] ?? [];
+    $team_id = $_POST['team_id'] ?? null;
     
     if ($is_edit) {
         // update project
-        $stmt = $pdo->prepare("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ?, priority = ?, manager_id = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $project_id]);
+        $stmt = $pdo->prepare("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ?, priority = ?, manager_id = ?, team_id = ? WHERE id = ?");
+        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $team_id, $project_id]);
         
-        // update project members
+        // update project members based on team
         $stmt = $pdo->prepare("DELETE FROM project_members WHERE project_id = ?");
         $stmt->execute([$project_id]);
         
-        foreach ($members as $member_id) {
-            $stmt = $pdo->prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$project_id, $member_id]);
+        if ($team_id) {
+            // get all members from the selected team
+            $stmt = $pdo->prepare("SELECT user_id FROM team_members WHERE team_id = ?");
+            $stmt->execute([$team_id]);
+            $team_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            // add all team members to project
+            foreach ($team_members as $member_id) {
+                $stmt = $pdo->prepare("INSERT INTO project_members (project_id, user_id, role_in_project) VALUES (?, ?, 'CONTRIBUTOR')");
+                $stmt->execute([$project_id, $member_id]);
+            }
         }
         
         header("Location: project_detail.php?id=$project_id");
     } else {
         // create new project
-        $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, end_date, status, priority, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id]);
+        $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, end_date, status, priority, manager_id, team_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $team_id]);
         
         $project_id = $pdo->lastInsertId();
         
-        // add project members
-        foreach ($members as $member_id) {
-            $stmt = $pdo->prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$project_id, $member_id]);
+        if ($team_id) {
+            // get all members from the selected team
+            $stmt = $pdo->prepare("SELECT user_id FROM team_members WHERE team_id = ?");
+            $stmt->execute([$team_id]);
+            $team_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            // add all team members to project
+            foreach ($team_members as $member_id) {
+                $stmt = $pdo->prepare("INSERT INTO project_members (project_id, user_id, role_in_project) VALUES (?, ?, 'CONTRIBUTOR')");
+                $stmt->execute([$project_id, $member_id]);
+            }
         }
         
         header("Location: project_detail.php?id=$project_id");
@@ -84,9 +96,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// get all users for member selection
- $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
- $users = $stmt->fetchAll();
+// get all teams for team selection
+ $stmt = $pdo->query("SELECT id, name FROM teams ORDER BY name");
+ $teams = $stmt->fetchAll();
 
 // get managers for dropdown
  $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
@@ -101,9 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title><?php echo $is_edit ? 'Edit Proyek' : 'Proyek Baru'; ?> - Sistem Manajemen Proyek</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
     <style>
         .sidebar {
             min-height: 100vh;
@@ -239,15 +248,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="project-members-select" class="form-label">Anggota Tim</label>
-                                        <!-- PERUBAHAN: Ganti select multiple lama dengan select baru untuk Tom Select -->
-                                        <select id="project-members-select" name="members[]" multiple placeholder="Pilih Anggota Tim...">
-                                            <?php foreach ($users as $user): ?>
-                                                <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $project_members) ? 'selected' : ''; ?>>
-                                                    <?php echo htmlspecialchars($user['name']); ?>
+                                        <label for="team_id" class="form-label">Pilih Tim</label>
+                                        <select class="form-select" id="team_id" name="team_id">
+                                            <option value="">Tidak ada tim (opsional)</option>
+                                            <?php foreach ($teams as $team): ?>
+                                                <option value="<?php echo $team['id']; ?>" <?php echo ($project_team_id ?? '') == $team['id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($team['name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <div class="form-text">Semua anggota dari tim yang dipilih akan otomatis ditambahkan ke proyek ini.</div>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <a href="projects.php" class="btn btn-secondary me-2">Batal</a>
@@ -267,7 +277,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <li>Berikan nama yang jelas dan deskriptif untuk proyek Anda</li>
                                     <li>Tentukan tanggal mulai dan selesai yang realistis</li>
                                     <li>Pilih manajer proyek yang bertanggung jawab</li>
-                                    <li>Tambahkan anggota tim yang relevan dengan proyek</li>
+                                    <li>Pilih tim yang akan bekerja pada proyek ini</li>
+                                    <li>Semua anggota tim akan otomatis ditambahkan ke proyek</li>
                                     <li>Perbarui status proyek secara berkala</li>
                                 </ul>
                             </div>
@@ -279,22 +290,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            new TomSelect('#project-members-select', {
-                plugins: {
-                    'checkbox_options': {},
-                    'remove_button':{
-                        'title':'Hapus item ini',
-                    }
-                },
-                create: false,
-                maxItems: null
-            });
-        });
-    </script>
 </body>
 </html>

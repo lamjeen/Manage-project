@@ -19,10 +19,23 @@ if (!$project) {
     exit;
 }
 
-// get project members
- $stmt = $pdo->prepare("SELECT u.id, u.name, pm.role_in_project FROM users u JOIN project_members pm ON u.id = pm.user_id WHERE pm.project_id = ?");
- $stmt->execute([$project_id]);
- $project_members = $stmt->fetchAll();
+// get project members - filter berdasarkan tim jika proyek punya tim
+if (!empty($project['team_id'])) {
+    // Jika proyek punya tim, hanya tampilkan member yang masih aktif di tim
+    $stmt = $pdo->prepare("
+        SELECT u.id, u.name, pm.role_in_project 
+        FROM users u 
+        JOIN project_members pm ON u.id = pm.user_id 
+        JOIN team_members tm ON tm.user_id = u.id AND tm.team_id = ?
+        WHERE pm.project_id = ?
+    ");
+    $stmt->execute([$project['team_id'], $project_id]);
+} else {
+    // Jika proyek tidak punya tim, tampilkan semua member
+    $stmt = $pdo->prepare("SELECT u.id, u.name, pm.role_in_project FROM users u JOIN project_members pm ON u.id = pm.user_id WHERE pm.project_id = ?");
+    $stmt->execute([$project_id]);
+}
+$project_members = $stmt->fetchAll();
 
  $stmt = $pdo->prepare("
     SELECT 
