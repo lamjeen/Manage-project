@@ -19,23 +19,17 @@ if (!$project) {
     exit;
 }
 
-// get project members - filter berdasarkan tim jika proyek punya tim
-if (!empty($project['team_id'])) {
-    // Jika proyek punya tim, hanya tampilkan member yang masih aktif di tim
-    $stmt = $pdo->prepare("
-        SELECT u.id, u.name, pm.role_in_project 
-        FROM users u 
-        JOIN project_members pm ON u.id = pm.user_id 
-        JOIN team_members tm ON tm.user_id = u.id AND tm.team_id = ?
-        WHERE pm.project_id = ?
-    ");
-    $stmt->execute([$project['team_id'], $project_id]);
-} else {
-    // Jika proyek tidak punya tim, tampilkan semua member
-    $stmt = $pdo->prepare("SELECT u.id, u.name, pm.role_in_project FROM users u JOIN project_members pm ON u.id = pm.user_id WHERE pm.project_id = ?");
-    $stmt->execute([$project_id]);
-}
-$project_members = $stmt->fetchAll();
+// get project members from project_team -> team_members
+ $stmt = $pdo->prepare("
+    SELECT DISTINCT u.name
+    FROM users u
+    JOIN team_members tm ON u.id = tm.user_id
+    JOIN project_team pt ON tm.team_id = pt.team_id
+    WHERE pt.project_id = ?
+    ORDER BY u.name
+");
+ $stmt->execute([$project_id]);
+ $project_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
  $stmt = $pdo->prepare("
     SELECT 
@@ -44,8 +38,7 @@ $project_members = $stmt->fetchAll();
         u.name as assignee_name  -- Ambil nama user langsung
     FROM tasks t
     LEFT JOIN projects p ON t.project_id = p.id
-    LEFT JOIN task_assignees ta ON t.id = ta.task_id
-    LEFT JOIN users u ON ta.user_id = u.id
+    LEFT JOIN users u ON t.assignee = u.id
     WHERE t.project_id = ?
     ORDER BY t.status, t.due_date
 ");
@@ -242,10 +235,9 @@ foreach ($tasks as $task) {
                                     <p>Belum ada anggota tim.</p>
                                 <?php else: ?>
                                     <ul class="list-group list-group-flush">
-                                        <?php foreach ($project_members as $member): ?>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <?php echo $member['name']; ?>
-                                            <span class="badge bg-primary rounded-pill"><?php echo $member['role_in_project']; ?></span>
+                                        <?php foreach ($project_members as $member_name): ?>
+                                        <li class="list-group-item">
+                                            <?php echo htmlspecialchars($member_name); ?>
                                         </li>
                                         <?php endforeach; ?>
                                     </ul>

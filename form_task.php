@@ -3,7 +3,6 @@ require_once 'auth_check.php';
 require_once 'db_connect.php';
 
  $task = null;
- $task_assignees = [];
  $is_edit = false;
 
 // check if editing existing task
@@ -26,62 +25,69 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-    // ambil data assignee dari tabel pivot task_assignees
-    $stmt = $pdo->prepare("SELECT user_id FROM task_assignees WHERE task_id = ?");
-    $stmt->execute([$task_id]);
-    $task_assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
 }
 
 // handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_task'])) {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $priority = $_POST['priority'];
     $status = $_POST['status'];
     $due_date = $_POST['due_date'];
-    $estimated_hours = $_POST['estimated_hours'];
+
     $project_id = $_POST['project_id'];
-    // data dari multi-select dropdown jadi array
-    $assignees = $_POST['assignees'] ?? [];
+    $assignee = $_POST['assignee'] ?? null;
     
     if ($is_edit) {
-        $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, estimated_hours = ?, project_id = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $task_id]);
-
-        // hapus assignee lama dan tambahkan yang baru
-        $stmt = $pdo->prepare("DELETE FROM task_assignees WHERE task_id = ?");
-        $stmt->execute([$task_id]);
-        
-        foreach ($assignees as $assignee_id) {
-            $stmt = $pdo->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$task_id, $assignee_id]);
-        }
+        $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, project_id = ?, assignee = ? WHERE id = ?");
+        $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $assignee, $task_id]);
 
         header("Location: task_detail.php?id=$task_id");
     } else {
         $created_by_id = $_SESSION['user_id'];
-        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, estimated_hours, project_id, created_by_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $estimated_hours, $project_id, $created_by_id]);
+        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
         $new_task_id = $pdo->lastInsertId();
-
-        // tambahkan assignee
-        foreach ($assignees as $assignee_id) {
-            $stmt = $pdo->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$new_task_id, $assignee_id]);
-        }
 
         header("Location: task_detail.php?id=$new_task_id");
     }
     exit;
 }
 
+// Prepare data for form (priority: POST > DB > Default)
+$form_data = [
+    'title' => $_POST['title'] ?? ($task['title'] ?? ''),
+    'description' => $_POST['description'] ?? ($task['description'] ?? ''),
+    'priority' => $_POST['priority'] ?? ($task['priority'] ?? 'MEDIUM'),
+    'status' => $_POST['status'] ?? ($task['status'] ?? 'TO_DO'),
+    'due_date' => $_POST['due_date'] ?? ($task['due_date'] ?? ''),
+    'project_id' => $_POST['project_id'] ?? ($task['project_id'] ?? ($_GET['project_id'] ?? '')),
+    'assignee' => $_POST['assignee'] ?? ($task['assignee'] ?? '')
+];
+
 // get projects for dropdown
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 
 // get users for assignee dropdown
- $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
- $users = $stmt->fetchAll();
+$selected_project_id = $form_data['project_id'];
+
+if ($selected_project_id) {
+    $stmt = $pdo->prepare("
+        SELECT DISTINCT u.id, u.name 
+        FROM users u
+        JOIN team_members tm ON u.id = tm.user_id
+        JOIN project_team pt ON tm.team_id = pt.team_id
+        WHERE pt.project_id = ?
+        ORDER BY u.name
+    ");
+    $stmt->execute([$selected_project_id]);
+    $users = $stmt->fetchAll();
+} else {
+    $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
+    $users = $stmt->fetchAll();
+}
 ?>
 
 <!DOCTYPE html>
@@ -181,19 +187,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <form action="form_task.php<?php echo $is_edit ? '?id=' . $task['id'] : ''; ?>" method="post">
                                     <div class="mb-3">
                                         <label for="title" class="form-label">Judul Tugas</label>
-                                        <input type="text" class="form-control" id="title" name="title" value="<?php echo $task['title'] ?? ''; ?>" required>
+                                        <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($form_data['title']); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Deskripsi Tugas</label>
-                                        <textarea class="form-control" id="description" name="description" rows="4"><?php echo $task['description'] ?? ''; ?></textarea>
+                                        <textarea class="form-control" id="description" name="description" rows="4"><?php echo htmlspecialchars($form_data['description']); ?></textarea>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="project_id" class="form-label">Proyek Terkait</label>
-                                            <select class="form-select" id="project_id" name="project_id" required>
+                                            <select class="form-select" id="project_id" name="project_id" required onchange="this.form.submit()">
                                                 <option value="">Pilih Proyek</option>
                                                 <?php foreach ($projects as $project): ?>
-                                                    <option value="<?php echo $project['id']; ?>" <?php echo ($task['project_id'] ?? '') == $project['id'] ? 'selected' : ''; ?>>
+                                                    <option value="<?php echo $project['id']; ?>" <?php echo $form_data['project_id'] == $project['id'] ? 'selected' : ''; ?>>
                                                         <?php echo $project['name']; ?>
                                                     </option>
                                                 <?php endforeach; ?>
@@ -201,10 +207,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="assignees-select" class="form-label">Penanggung Jawab</label>
-                                            <!-- PERUBAHAN: Ganti dropdown lama dengan select multiple untuk Tom Select -->
-                                            <select id="assignees-select" name="assignees[]" multiple placeholder="Pilih Penanggung Jawab...">
+                                            <select class="form-select" id="assignee" name="assignee">
+                                                <option value="">Pilih Penanggung Jawab</option>
                                                 <?php foreach ($users as $user): ?>
-                                                    <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $task_assignees) ? 'selected' : ''; ?>>
+                                                    <option value="<?php echo $user['id']; ?>" <?php echo $form_data['assignee'] == $user['id'] ? 'selected' : ''; ?>>
                                                         <?php echo htmlspecialchars($user['name']); ?>
                                                     </option>
                                                 <?php endforeach; ?>
@@ -215,35 +221,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <div class="col-md-6 mb-3">
                                             <label for="priority" class="form-label">Prioritas</label>
                                             <select class="form-select" id="priority" name="priority" required>
-                                                <option value="LOW" <?php echo ($task['priority'] ?? 'MEDIUM') == 'LOW' ? 'selected' : ''; ?>>Rendah</option>
-                                                <option value="MEDIUM" <?php echo ($task['priority'] ?? 'MEDIUM') == 'MEDIUM' ? 'selected' : ''; ?>>Sedang</option>
-                                                <option value="HIGH" <?php echo ($task['priority'] ?? 'MEDIUM') == 'HIGH' ? 'selected' : ''; ?>>Tinggi</option>
-                                                <option value="CRITICAL" <?php echo ($task['priority'] ?? 'MEDIUM') == 'CRITICAL' ? 'selected' : ''; ?>>Kritis</option>
+                                                <option value="LOW" <?php echo $form_data['priority'] == 'LOW' ? 'selected' : ''; ?>>Rendah</option>
+                                                <option value="MEDIUM" <?php echo $form_data['priority'] == 'MEDIUM' ? 'selected' : ''; ?>>Sedang</option>
+                                                <option value="HIGH" <?php echo $form_data['priority'] == 'HIGH' ? 'selected' : ''; ?>>Tinggi</option>
+                                                <option value="CRITICAL" <?php echo $form_data['priority'] == 'CRITICAL' ? 'selected' : ''; ?>>Kritis</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="TO_DO" <?php echo ($task['status'] ?? '') == 'TO_DO' ? 'selected' : ''; ?>>To-Do</option>
-                                                <option value="IN_PROGRESS" <?php echo ($task['status'] ?? '') == 'IN_PROGRESS' ? 'selected' : ''; ?>>In Progress</option>
-                                                <option value="REVIEW" <?php echo ($task['status'] ?? '') == 'REVIEW' ? 'selected' : ''; ?>>Review</option>
-                                                <option value="DONE" <?php echo ($task['status'] ?? '') == 'DONE' ? 'selected' : ''; ?>>Done</option>
+                                                <option value="TO_DO" <?php echo $form_data['status'] == 'TO_DO' ? 'selected' : ''; ?>>To-Do</option>
+                                                <option value="IN_PROGRESS" <?php echo $form_data['status'] == 'IN_PROGRESS' ? 'selected' : ''; ?>>In Progress</option>
+                                                <option value="REVIEW" <?php echo $form_data['status'] == 'REVIEW' ? 'selected' : ''; ?>>Review</option>
+                                                <option value="DONE" <?php echo $form_data['status'] == 'DONE' ? 'selected' : ''; ?>>Done</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="due_date" class="form-label">Tenggat Waktu</label>
-                                            <input type="datetime-local" class="form-control" id="due_date" name="due_date" value="<?php echo $task['due_date'] ? date('Y-m-d\TH:i', strtotime($task['due_date'])) : ''; ?>">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="estimated_hours" class="form-label">Perkiraan Waktu (Jam)</label>
-                                            <input type="number" step="0.5" class="form-control" id="estimated_hours" name="estimated_hours" value="<?php echo $task['estimated_hours'] ?? ''; ?>">
+                                            <input type="datetime-local" class="form-control" id="due_date" name="due_date" value="<?php echo $form_data['due_date'] ? date('Y-m-d\TH:i', strtotime($form_data['due_date'])) : ''; ?>">
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end">
                                         <a href="tasks.php" class="btn btn-secondary me-2">Batal</a>
-                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Simpan Perubahan' : 'Buat Tugas'; ?></button>
+                                        <button type="submit" name="save_task" class="btn btn-primary"><?php echo $is_edit ? 'Simpan Perubahan' : 'Buat Tugas'; ?></button>
                                     </div>
                                 </form>
                             </div>
@@ -260,16 +261,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            new TomSelect('#assignees-select', {
-                plugins: {
-                    'checkbox_options': {},
-                    'remove_button':{
-                        'title':'Hapus item ini',
-                    }
-                },
-                create: false,
-                maxItems: null
-            });
+
         });
     </script>
 </body>

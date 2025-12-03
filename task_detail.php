@@ -19,11 +19,11 @@ if (!$task) {
     exit;
 }
 
-// ambil semua nama assignee dari tabel task_assignees
- $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN task_assignees ta ON u.id = ta.user_id WHERE ta.task_id = ?");
+// get assignee name
+ $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN tasks t ON u.id = t.assignee WHERE t.id = ?");
  $stmt->execute([$task_id]);
- $assignees = $stmt->fetchAll(PDO::FETCH_COLUMN);
- $task['assignee_names'] = implode(', ', $assignees);
+ $assignee_name = $stmt->fetchColumn();
+ $task['assignee_names'] = $assignee_name ?: 'Tidak ada';
 
 // kita ambil semua komentar dulu, nanti di-filter di PHP
  $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.is_pinned DESC, c.created_at ASC");
@@ -231,7 +231,6 @@ foreach ($all_comments as $comment) {
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Tenggat Waktu:</strong> <?php echo $task['due_date'] ? date('d M Y H:i', strtotime($task['due_date'])) : '-'; ?></p>
-                                        <p><strong>Perkiraan Waktu:</strong> <?php echo $task['estimated_hours'] ?? '-'; ?> jam</p>
                                     </div>
                                 </div>
                             </div>

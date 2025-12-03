@@ -25,6 +25,7 @@ if (!$team) {
     exit;
 }
 
+
 // get team members
  $stmt = $pdo->prepare("SELECT u.* FROM users u JOIN team_members tm ON u.id = tm.user_id WHERE tm.team_id = ?");
  $stmt->execute([$team_id]);
@@ -54,7 +55,7 @@ if (!$team) {
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
-                        <h5 class="mb-0">ProyekKu</h5>
+                        <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -135,6 +136,7 @@ if (!$team) {
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
@@ -183,6 +185,8 @@ if (!$team) {
                         </div>
                     </div>
                 </div>
+
+
             </main>
         </div>
     </div>

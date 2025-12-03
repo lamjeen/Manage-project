@@ -11,8 +11,7 @@ $stmt = $pdo->query("
         u.name as assignee_name
     FROM tasks t
     LEFT JOIN projects p ON t.project_id = p.id
-    LEFT JOIN task_assignees ta ON t.id = ta.task_id
-    LEFT JOIN users u ON ta.user_id = u.id
+    LEFT JOIN users u ON t.assignee = u.id
     ORDER BY t.due_date ASC, t.id
 ");
 
