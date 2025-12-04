@@ -21,7 +21,7 @@ if (!$project) {
 
 // get project members from project_team -> team_members
  $stmt = $pdo->prepare("
-    SELECT DISTINCT u.name
+    SELECT DISTINCT u.id, u.name
     FROM users u
     JOIN team_members tm ON u.id = tm.user_id
     JOIN project_team pt ON tm.team_id = pt.team_id
@@ -29,7 +29,7 @@ if (!$project) {
     ORDER BY u.name
 ");
  $stmt->execute([$project_id]);
- $project_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
+ $project_members = $stmt->fetchAll();
 
  $stmt = $pdo->prepare("
     SELECT 
@@ -91,6 +91,23 @@ foreach ($tasks as $task) {
         .task-card:hover {
             transform: translateY(-3px);
         }
+        .create-task-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+        }
+        .create-task-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+            color: #0d6efd;
+        }
+        .task-column:hover .create-task-btn {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -111,28 +128,28 @@ foreach ($tasks as $task) {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -144,7 +161,7 @@ foreach ($tasks as $task) {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -159,7 +176,7 @@ foreach ($tasks as $task) {
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="projects.php" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                             <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $project['manager_id'] == $_SESSION['user_id']): ?>
                             <a href="form_project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-secondary">
@@ -175,7 +192,7 @@ foreach ($tasks as $task) {
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Informasi Proyek</h5>
+                                <h5 class="mb-0">Project Information</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row mb-3">
@@ -193,7 +210,7 @@ foreach ($tasks as $task) {
                                         ?>"><?php echo $project['status']; ?></span>
                                     </div>
                                     <div class="col-md-4">
-                                        <strong>Prioritas:</strong>
+                                        <strong>Priority:</strong>
                                         <span class="badge bg-<?php 
                                             echo match($project['priority']) {
                                                 'LOW' => 'success',
@@ -211,15 +228,15 @@ foreach ($tasks as $task) {
                                 <div class="progress mb-3">
                                     <div class="progress-bar" role="progressbar" style="width: <?php echo $progress; ?>%;" aria-valuenow="<?php echo $progress; ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $progress; ?>%</div>
                                 </div>
-                                <p><strong>Deskripsi:</strong> <?php echo $project['description'] ?? 'Tidak ada deskripsi'; ?></p>
+                                <p><strong>Description:</strong> <?php echo $project['description'] ?? 'No description'; ?></p>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p><strong>Manajer Proyek:</strong> <?php echo $project['manager_name'] ?? 'Tidak ada'; ?></p>
-                                        <p><strong>Tanggal Mulai:</strong> <?php echo date('d M Y', strtotime($project['start_date'])); ?></p>
+                                        <p><strong>Project Manager:</strong> <?php echo $project['manager_name'] ?? 'None'; ?></p>
+                                        <p><strong>Start Date:</strong> <?php echo date('d M Y', strtotime($project['start_date'])); ?></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Tanggal Selesai:</strong> <?php echo date('d M Y', strtotime($project['end_date'])); ?></p>
-                                        <p><strong>Dibuat:</strong> <?php echo date('d M Y', strtotime($project['created_at'])); ?></p>
+                                        <p><strong>Created At:</strong> <?php echo date('d M Y', strtotime($project['created_at'])); ?></p>
+                                        <p><strong>End Date:</strong> <?php echo date('d M Y', strtotime($project['end_date'])); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -228,16 +245,16 @@ foreach ($tasks as $task) {
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Anggota Tim</h5>
+                                <h5 class="mb-0">Team Members</h5>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($project_members)): ?>
-                                    <p>Belum ada anggota tim.</p>
+                                    <p>No team members yet.</p>
                                 <?php else: ?>
                                     <ul class="list-group list-group-flush">
-                                        <?php foreach ($project_members as $member_name): ?>
+                                        <?php foreach ($project_members as $member): ?>
                                         <li class="list-group-item">
-                                            <?php echo htmlspecialchars($member_name); ?>
+                                            <?php echo htmlspecialchars($member['name']); ?>
                                         </li>
                                         <?php endforeach; ?>
                                     </ul>
@@ -252,14 +269,14 @@ foreach ($tasks as $task) {
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Tugas</h5>
+                                <h5 class="mb-0">Tasks</h5>
                                 <a href="form_task.php?project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-plus-circle me-1"></i> Tugas Baru
+                                    <i class="bi bi-plus-circle me-1"></i> New Task
                                 </a>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($tasks)): ?>
-                                    <p>Belum ada tugas untuk proyek ini.</p>
+                                    <p>No tasks for this project yet.</p>
                                 <?php else: ?>
                                     <div class="row">
                                         <div class="col-md-3 mb-4">
@@ -268,6 +285,9 @@ foreach ($tasks as $task) {
                                                     <h6 class="mb-0">To Do (<?php echo $task_counts['TO_DO']; ?>)</h6>
                                                 </div>
                                                 <div class="card-body p-2">
+                                                    <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-TO_DO">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </button>
                                                     <?php foreach ($tasks as $task): ?>
                                                         <?php if ($task['status'] == 'TO_DO'): ?>
                                                         <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -275,7 +295,7 @@ foreach ($tasks as $task) {
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
                                                                     <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'Tidak ada'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -302,6 +322,9 @@ foreach ($tasks as $task) {
                                                     <h6 class="mb-0">In Progress (<?php echo $task_counts['IN_PROGRESS']; ?>)</h6>
                                                 </div>
                                                 <div class="card-body p-2">
+                                                    <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-IN_PROGRESS">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </button>
                                                     <?php foreach ($tasks as $task): ?>
                                                         <?php if ($task['status'] == 'IN_PROGRESS'): ?>
                                                         <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -309,7 +332,7 @@ foreach ($tasks as $task) {
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
                                                                     <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'Tidak ada'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -336,6 +359,9 @@ foreach ($tasks as $task) {
                                                     <h6 class="mb-0">Review (<?php echo $task_counts['REVIEW']; ?>)</h6>
                                                 </div>
                                                 <div class="card-body p-2">
+                                                    <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-REVIEW">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </button>
                                                     <?php foreach ($tasks as $task): ?>
                                                         <?php if ($task['status'] == 'REVIEW'): ?>
                                                         <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -343,7 +369,7 @@ foreach ($tasks as $task) {
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
                                                                     <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'Tidak ada'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -370,6 +396,9 @@ foreach ($tasks as $task) {
                                                     <h6 class="mb-0">Done (<?php echo $task_counts['DONE']; ?>)</h6>
                                                 </div>
                                                 <div class="card-body p-2">
+                                                    <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-DONE">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </button>
                                                     <?php foreach ($tasks as $task): ?>
                                                         <?php if ($task['status'] == 'DONE'): ?>
                                                         <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -377,7 +406,7 @@ foreach ($tasks as $task) {
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
                                                                     <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'Tidak ada'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -410,25 +439,25 @@ foreach ($tasks as $task) {
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Dokumen</h5>
+                                <h5 class="mb-0">Documents</h5>
                                 <a href="form_document.php?project_id=<?php echo $project_id; ?>" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-upload me-1"></i> Unggah Dokumen
+                                    <i class="bi bi-upload me-1"></i> Upload Document
                                 </a>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($documents)): ?>
-                                    <p>Belum ada dokumen untuk proyek ini.</p>
+                                    <p>No documents for this project yet.</p>
                                 <?php else: ?>
                                     <div class="table-responsive">
                                         <table class="table table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Nama Dokumen</th>
-                                                    <th>Kategori</th>
-                                                    <th>Versi</th>
-                                                    <th>Diunggah Oleh</th>
-                                                    <th>Tanggal</th>
-                                                    <th>Aksi</th>
+                                                    <th>Document Name</th>
+                                                    <th>Category</th>
+                                                    <th>Version</th>
+                                                    <th>Uploaded By</th>
+                                                    <th>Date</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -439,7 +468,7 @@ foreach ($tasks as $task) {
                                                             <?php echo $document['title']; ?>
                                                         </a>
                                                     </td>
-                                                    <td><?php echo $document['category'] ?? 'Tidak ada'; ?></td>
+                                                    <td><?php echo $document['category'] ?? 'None'; ?></td>
                                                     <td><?php echo $document['version']; ?></td>
                                                     <td><?php echo $document['uploader_name']; ?></td>
                                                     <td><?php echo date('d M Y', strtotime($document['uploaded_at'])); ?></td>
@@ -470,20 +499,88 @@ foreach ($tasks as $task) {
         </div>
     </div>
 
+    <!-- Create Task Modals -->
+    <?php 
+    $statuses = [
+        'TO_DO' => 'To Do', 
+        'IN_PROGRESS' => 'In Progress', 
+        'REVIEW' => 'Review', 
+        'DONE' => 'Done'
+    ];
+    foreach ($statuses as $status_key => $status_label): 
+    ?>
+    <div class="modal fade" id="createTaskModal-<?php echo $status_key; ?>" tabindex="-1" aria-labelledby="createTaskModalLabel-<?php echo $status_key; ?>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTaskModalLabel-<?php echo $status_key; ?>">New Task (<?php echo $status_label; ?>)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="handle_create_task.php" method="POST" id="createTaskForm-<?php echo $status_key; ?>">
+                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                        <input type="hidden" name="status" value="<?php echo $status_key; ?>">
+                        
+                        <div class="mb-3">
+                            <label for="modalTaskTitle-<?php echo $status_key; ?>" class="form-label">Task Title</label>
+                            <input type="text" class="form-control" id="modalTaskTitle-<?php echo $status_key; ?>" name="title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="modalTaskDescription-<?php echo $status_key; ?>" class="form-label">Description</label>
+                            <textarea class="form-control" id="modalTaskDescription-<?php echo $status_key; ?>" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="modalTaskPriority-<?php echo $status_key; ?>" class="form-label">Priority</label>
+                                <select class="form-select" id="modalTaskPriority-<?php echo $status_key; ?>" name="priority" required>
+                                    <option value="LOW">Low</option>
+                                    <option value="MEDIUM" selected>Medium</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="CRITICAL">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="modalTaskAssignee-<?php echo $status_key; ?>" class="form-label">Assignee</label>
+                                <select class="form-select" id="modalTaskAssignee-<?php echo $status_key; ?>" name="assignee">
+                                    <option value="">Select...</option>
+                                    <?php foreach ($project_members as $member): ?>
+                                        <option value="<?php echo $member['id']; ?>"><?php echo htmlspecialchars($member['name']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="modalTaskDueDate-<?php echo $status_key; ?>" class="form-label">Due Date</label>
+                            <input type="datetime-local" class="form-control" id="modalTaskDueDate-<?php echo $status_key; ?>" name="due_date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="createTaskForm-<?php echo $status_key; ?>" class="btn btn-primary">Create Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+
     <!-- Delete Document Modal -->
     <div class="modal fade" id="deleteDocumentModal" tabindex="-1" aria-labelledby="deleteDocumentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteDocumentModalLabel">Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteDocumentModalLabel">Delete Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus dokumen ini? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to delete this document? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteDocumentBtn" class="btn btn-danger">Hapus</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteDocumentBtn" class="btn btn-danger">Delete</a>
                 </div>
             </div>
         </div>

@@ -52,11 +52,11 @@ $users = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tugas - Sistem Manajemen Proyek</title>
+    <title>Tasks - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -89,28 +89,28 @@ $users = $stmt->fetchAll();
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -122,7 +122,7 @@ $users = $stmt->fetchAll();
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -132,11 +132,11 @@ $users = $stmt->fetchAll();
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Tugas</h1>
+                    <h1 class="h2">Tasks</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="form_task.php" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-circle me-1"></i> Tugas Baru
+                                <i class="bi bi-plus-circle me-1"></i> New Task
                             </a>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ $users = $stmt->fetchAll();
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <select class="form-select" id="projectFilter">
-                            <option value="">Semua Proyek</option>
+                            <option value="">All Projects</option>
                             <?php foreach ($projects as $project): ?>
                                 <option value="<?php echo $project['id']; ?>"><?php echo $project['name']; ?></option>
                             <?php endforeach; ?>
@@ -153,7 +153,7 @@ $users = $stmt->fetchAll();
                     </div>
                     <div class="col-md-4">
                         <select class="form-select" id="assigneeFilter">
-                            <option value="">Semua Penanggung Jawab</option>
+                            <option value="">All Assignees</option>
                             <?php foreach ($users as $user): ?>
                                 <option value="<?php echo $user['id']; ?>"><?php echo $user['name']; ?></option>
                             <?php endforeach; ?>
@@ -161,7 +161,7 @@ $users = $stmt->fetchAll();
                     </div>
                     <div class="col-md-4">
                         <select class="form-select" id="statusFilter">
-                            <option value="">Semua Status</option>
+                            <option value="">All Statuses</option>
                             <option value="TO_DO">To Do</option>
                             <option value="IN_PROGRESS">In Progress</option>
                             <option value="REVIEW">Review</option>
@@ -173,19 +173,19 @@ $users = $stmt->fetchAll();
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($tasks)): ?>
-                            <div class="alert alert-info">Belum ada tugas.</div>
+                            <div class="alert alert-info">No tasks yet.</div>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Judul Tugas</th>
-                                            <th>Proyek</th>
-                                            <th>Penanggung Jawab</th>
-                                            <th>Prioritas</th>
+                                            <th>Task Title</th>
+                                            <th>Project</th>
+                                            <th>Assignee</th>
+                                            <th>Priority</th>
                                             <th>Status</th>
-                                            <th>Tenggat Waktu</th>
-                                            <th>Aksi</th>
+                                            <th>Due Date</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tasksTableBody">
@@ -205,7 +205,7 @@ $users = $stmt->fetchAll();
                                             <td><a href="task_detail.php?id=<?php echo $task['id']; ?>"><?php echo htmlspecialchars($task['title']); ?></a></td>
                                             <td><a href="project_detail.php?id=<?php echo $task['project_id']; ?>"><?php echo htmlspecialchars($task['project_name']); ?></a></td>
                                             
-                                            <td><?php echo $namesString ?: 'Tidak ada'; ?></td>
+                                            <td><?php echo $namesString ?: 'None'; ?></td>
                                             
                                             <td>
                                                 <span class="badge bg-<?php 
@@ -259,15 +259,15 @@ $users = $stmt->fetchAll();
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to delete this task? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Hapus</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
                 </div>
             </div>
         </div>

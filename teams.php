@@ -14,11 +14,11 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tim - Sistem Manajemen Proyek</title>
+    <title>Teams - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -52,28 +52,28 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -85,7 +85,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -96,11 +96,11 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Tim</h1>
+                    <h1 class="h2">Teams</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="form_team.php" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-circle me-1"></i> Tim Baru
+                                <i class="bi bi-plus-circle me-1"></i> New Team
                             </a>
                         </div>
                     </div>
@@ -110,7 +110,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                 <div class="row">
                     <?php if (empty($teams)): ?>
                         <div class="col-12">
-                            <div class="alert alert-info">Belum ada tim.</div>
+                            <div class="alert alert-info">No teams yet.</div>
                         </div>
                     <?php else: ?>
                         <?php foreach ($teams as $team): ?>
@@ -122,7 +122,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                                 <div class="card-body">
                                     <p class="card-text"><?php echo substr($team['description'], 0, 100) . (strlen($team['description']) > 100 ? '...' : ''); ?></p>
                                     <small class="text-muted">
-                                        <i class="bi bi-person-badge"></i> Kepala Tim: <?php echo $team['team_head_name'] ?? 'Tidak ada'; ?>
+                                        <i class="bi bi-person-badge"></i> Team Head: <?php echo $team['team_head_name'] ?? 'None'; ?>
                                     </small>
                                 </div>
                                 <div class="card-footer bg-transparent">
@@ -156,15 +156,15 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus tim ini? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to delete this team? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Hapus</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
                 </div>
             </div>
         </div>

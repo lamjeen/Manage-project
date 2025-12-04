@@ -50,28 +50,28 @@ require_once 'db_connect.php';
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -83,7 +83,7 @@ require_once 'db_connect.php';
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -94,11 +94,11 @@ require_once 'db_connect.php';
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Proyek</h1>
+                    <h1 class="h2">Projects</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="form_project.php" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-circle me-1"></i> Proyek Baru
+                                <i class="bi bi-plus-circle me-1"></i> New Project
                             </a>
                         </div>
                     </div>
@@ -108,7 +108,7 @@ require_once 'db_connect.php';
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Cari proyek..." id="searchInput">
+                            <input type="text" class="form-control" placeholder="Search projects..." id="searchInput">
                             <button class="btn btn-outline-secondary" type="button" id="searchButton">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -116,12 +116,12 @@ require_once 'db_connect.php';
                     </div>
                     <div class="col-md-6">
                         <select class="form-select" id="statusFilter">
-                            <option value="">Semua Status</option>
-                            <option value="PLANNING">Perencanaan</option>
-                            <option value="ACTIVE">Aktif</option>
-                            <option value="ON_HOLD">Ditunda</option>
-                            <option value="COMPLETED">Selesai</option>
-                            <option value="CANCELLED">Dibatalkan</option>
+                            <option value="">All Statuses</option>
+                            <option value="PLANNING">Planning</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="ON_HOLD">On Hold</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -130,7 +130,7 @@ require_once 'db_connect.php';
                 <div class="row" id="projectsContainer">
                     <?php if (empty($projects)): ?>
                         <div class="col-12">
-                            <div class="alert alert-info">Belum ada proyek.</div>
+                            <div class="alert alert-info">No projects yet.</div>
                         </div>
                     <?php else: ?>
                         <?php foreach ($projects as $project): ?>
@@ -153,7 +153,7 @@ require_once 'db_connect.php';
                                     <p class="card-text"><?php echo substr($project['description'], 0, 100) . (strlen($project['description']) > 100 ? '...' : ''); ?></p>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <small class="text-muted">
-                                            <i class="bi bi-person"></i> <?php echo $project['manager_name'] ?? 'Tidak ada'; ?>
+                                            <i class="bi bi-person"></i> <?php echo $project['manager_name'] ?? 'None'; ?>
                                         </small>
                                         <small class="text-muted">
                                             <i class="bi bi-calendar"></i> <?php echo date('d M Y', strtotime($project['start_date'])); ?>
@@ -191,15 +191,15 @@ require_once 'db_connect.php';
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus proyek ini? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to delete this project? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Hapus</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
                 </div>
             </div>
         </div>

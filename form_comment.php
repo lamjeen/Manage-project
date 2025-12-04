@@ -39,11 +39,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Komentar - Sistem Manajemen Proyek</title>
+    <title>Edit Comment - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
-                        <h5 class="mb-0">ProyekKu</h5>
+                        <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -71,28 +71,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -115,11 +115,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Edit Komentar</h1>
+                    <h1 class="h2">Edit Comment</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="task_detail.php?id=<?php echo $comment['task_id']; ?>" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
                     </div>
@@ -131,23 +131,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="card-body">
                                 <form action="form_comment.php?id=<?php echo $comment_id; ?>" method="post">
                                     <div class="mb-3">
-                                        <label for="content" class="form-label">Isi Komentar</label>
+                                        <label for="content" class="form-label">Comment Content</label>
                                         <textarea class="form-control" id="content" name="content" rows="6" required><?php echo $comment['content']; ?></textarea>
                                     </div>
                                     
-                                    <!-- Fitur pin -->
+                                    <!-- Pin feature -->
                                     <div class="mb-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned" <?php echo $comment['is_pinned'] ? 'checked' : ''; ?>>
                                             <label class="form-check-label" for="is_pinned">
-                                                <i class="bi bi-pin-angle-fill text-warning"></i> Pin komentar ini
+                                                <i class="bi bi-pin-angle-fill text-warning"></i> Pin this comment
                                             </label>
                                         </div>
                                     </div>
 
                                     <div class="d-flex justify-content-end">
-                                        <a href="task_detail.php?id=<?php echo $comment['task_id']; ?>" class="btn btn-secondary me-2">Batal</a>
-                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                        <a href="task_detail.php?id=<?php echo $comment['task_id']; ?>" class="btn btn-secondary me-2">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form>
                             </div>

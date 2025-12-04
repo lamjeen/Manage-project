@@ -33,11 +33,11 @@ if (!$team) {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $team['name']; ?> - Sistem Manajemen Proyek</title>
+    <title><?php echo $team['name']; ?> - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -65,28 +65,28 @@ if (!$team) {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -98,7 +98,7 @@ if (!$team) {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -113,7 +113,7 @@ if (!$team) {
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="teams.php" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                             <a href="form_team.php?id=<?php echo $team['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-pencil me-1"></i> Edit
@@ -127,12 +127,12 @@ if (!$team) {
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Informasi Tim</h5>
+                                <h5 class="mb-0">Team Information</h5>
                             </div>
                             <div class="card-body">
-                                <p><strong>Deskripsi:</strong> <?php echo nl2br($team['description'] ?? 'Tidak ada deskripsi'); ?></p>
-                                <p><strong>Kepala Tim:</strong> <?php echo $team['team_head_name'] ?? 'Tidak ada'; ?></p>
-                                <p><strong>Dibuat:</strong> <?php echo date('d M Y', strtotime($team['created_at'])); ?></p>
+                                <p><strong>Description:</strong> <?php echo nl2br($team['description'] ?? 'No description'); ?></p>
+                                <p><strong>Team Head:</strong> <?php echo $team['team_head_name'] ?? 'None'; ?></p>
+                                <p><strong>Created At:</strong> <?php echo date('d M Y', strtotime($team['created_at'])); ?></p>
                             </div>
                         </div>
                     </div>
@@ -140,10 +140,10 @@ if (!$team) {
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Statistik</h5>
+                                <h5 class="mb-0">Statistics</h5>
                             </div>
                             <div class="card-body">
-                                <p><strong>Jumlah Anggota:</strong> <?php echo count($team_members); ?> orang</p>
+                                <p><strong>Number of Members:</strong> <?php echo count($team_members); ?> people</p>
                             </div>
                         </div>
                     </div>
@@ -154,19 +154,19 @@ if (!$team) {
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Anggota Tim</h5>
+                                <h5 class="mb-0">Team Members</h5>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($team_members)): ?>
-                                    <p>Tim ini tidak memiliki anggota.</p>
+                                    <p>This team has no members.</p>
                                 <?php else: ?>
                                     <div class="table-responsive">
                                         <table class="table table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Nama</th>
+                                                    <th>Name</th>
                                                     <th>Email</th>
-                                                    <th>Peran</th>
+                                                    <th>Role</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

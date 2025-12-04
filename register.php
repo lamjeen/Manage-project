@@ -13,14 +13,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = 'MEMBER';
 
     if ($password != $confirm_password) {
-        $error = "Password tidak cocok!";
+        $error = "Passwords do not match!";
     } else {
 
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         
         if ($stmt->fetch()) {
-            $error = "Email sudah digunakan!";
+            $error = "Email already registered!";
         } else {
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             
@@ -35,11 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Sistem Manajemen Proyek</title>
+    <title>Register - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -61,13 +61,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="register-container">
-        <h2 class="text-center mb-4">Daftar</h2>
+        <h2 class="text-center mb-4">Register</h2>
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger"><?php echo $error; ?></div>
         <?php endif; ?>
         <form action="register.php" method="post">
             <div class="mb-3">
-                <label for="name" class="form-label">Nama Lengkap</label>
+                <label for="name" class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
             <div class="mb-3">
@@ -79,15 +79,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <div class="mb-3">
-                <label for="confirm_password" class="form-label">Konfirmasi Password</label>
+                <label for="confirm_password" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
             
 
-            <button type="submit" class="btn btn-primary w-100">Daftar</button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
         <div class="text-center mt-3">
-            <p>Sudah punya akun? <a href="login.php">Login</a></p>
+            <p>Already have an account? <a href="login.php">Login</a></p>
         </div>
     </div>
     

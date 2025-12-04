@@ -8,11 +8,11 @@ require_once 'db_connect.php';
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dokumen - Sistem Manajemen Proyek</title>
+    <title>Documents - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -40,28 +40,28 @@ require_once 'db_connect.php';
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -73,7 +73,7 @@ require_once 'db_connect.php';
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -84,11 +84,11 @@ require_once 'db_connect.php';
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dokumen</h1>
+                    <h1 class="h2">Documents</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="form_document.php" class="btn btn-sm btn-primary">
-                                <i class="bi bi-upload me-1"></i> Unggah Dokumen
+                                <i class="bi bi-upload me-1"></i> Upload Document
                             </a>
                         </div>
                     </div>
@@ -98,19 +98,19 @@ require_once 'db_connect.php';
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($documents)): ?>
-                            <div class="alert alert-info">Belum ada dokumen.</div>
+                            <div class="alert alert-info">No documents yet.</div>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Nama Dokumen</th>
-                                            <th>Deskripsi</th>
-                                            <th>Terhubung ke</th>
-                                            <th>Kategori</th>
-                                            <th>Diunggah Oleh</th>
-                                            <th>Tanggal</th>
-                                            <th>Aksi</th>
+                                            <th>Document Name</th>
+                                            <th>Description</th>
+                                            <th>Project</th>
+                                            <th>Category</th>
+                                            <th>Uploaded By</th>
+                                            <th>Date</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -135,7 +135,10 @@ require_once 'db_connect.php';
                                             <td><?php echo $document['uploader_name']; ?></td>
                                             <td><?php echo date('d M Y', strtotime($document['uploaded_at'])); ?></td>
                                             <td>
-                                                <a href="uploads/<?php echo $document['file_path']; ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                <a href="document_detail.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-info" title="View Detail">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="uploads/<?php echo $document['file_path']; ?>" class="btn btn-sm btn-outline-primary" target="_blank" title="Download">
                                                     <i class="bi bi-download"></i>
                                                 </a>
                                                 <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $document['uploaded_by_id'] == $_SESSION['user_id']): ?>
@@ -164,15 +167,15 @@ require_once 'db_connect.php';
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus dokumen ini? Tindakan ini tidak dapat dibatalkan.
+                    Are you sure you want to delete this document? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Hapus</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
                 </div>
             </div>
         </div>

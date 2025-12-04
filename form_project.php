@@ -96,11 +96,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $is_edit ? 'Edit Proyek' : 'Proyek Baru'; ?> - Sistem Manajemen Proyek</title>
+    <title><?php echo $is_edit ? 'Edit Project' : 'New Project'; ?> - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
-                        <h5 class="mb-0">ProyekKu</h5>
+                        <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -129,28 +129,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -162,7 +162,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -173,11 +173,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2"><?php echo $is_edit ? 'Edit Proyek' : 'Proyek Baru'; ?></h1>
+                    <h1 class="h2"><?php echo $is_edit ? 'Edit Project' : 'New Project'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="projects.php" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
                     </div>
@@ -189,48 +189,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="card-body">
                                 <form action="form_project.php<?php echo $is_edit ? '?id=' . $project['id'] : ''; ?>" method="post">
                                     <div class="mb-3">
-                                        <label for="name" class="form-label">Nama Proyek</label>
+                                        <label for="name" class="form-label">Project Name</label>
                                         <input type="text" class="form-control" id="name" name="name" value="<?php echo $project['name'] ?? ''; ?>" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="description" class="form-label">Deskripsi Proyek</label>
+                                        <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="4"><?php echo $project['description'] ?? ''; ?></textarea>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="start_date" class="form-label">Tanggal Mulai</label>
+                                            <label for="start_date" class="form-label">Start Date</label>
                                             <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo $project['start_date'] ?? ''; ?>" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="end_date" class="form-label">Tanggal Selesai</label>
+                                            <label for="end_date" class="form-label">End Date</label>
                                             <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo $project['end_date'] ?? ''; ?>" required>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="status" class="form-label">Status Proyek</label>
+                                            <label for="status" class="form-label">Status</label>
                                             <select class="form-select" id="status" name="status" required>
-                                                <option value="PLANNING" <?php echo ($project['status'] ?? '') == 'PLANNING' ? 'selected' : ''; ?>>Perencanaan</option>
-                                                <option value="ACTIVE" <?php echo ($project['status'] ?? '') == 'ACTIVE' ? 'selected' : ''; ?>>Aktif</option>
-                                                <option value="ON_HOLD" <?php echo ($project['status'] ?? '') == 'ON_HOLD' ? 'selected' : ''; ?>>Ditunda</option>
-                                                <option value="COMPLETED" <?php echo ($project['status'] ?? '') == 'COMPLETED' ? 'selected' : ''; ?>>Selesai</option>
-                                                <option value="CANCELLED" <?php echo ($project['status'] ?? '') == 'CANCELLED' ? 'selected' : ''; ?>>Dibatalkan</option>
+                                                <option value="PLANNING" <?php echo ($project['status'] ?? '') == 'PLANNING' ? 'selected' : ''; ?>>Planning</option>
+                                                <option value="ACTIVE" <?php echo ($project['status'] ?? '') == 'ACTIVE' ? 'selected' : ''; ?>>Active</option>
+                                                <option value="ON_HOLD" <?php echo ($project['status'] ?? '') == 'ON_HOLD' ? 'selected' : ''; ?>>On Hold</option>
+                                                <option value="COMPLETED" <?php echo ($project['status'] ?? '') == 'COMPLETED' ? 'selected' : ''; ?>>Completed</option>
+                                                <option value="CANCELLED" <?php echo ($project['status'] ?? '') == 'CANCELLED' ? 'selected' : ''; ?>>Cancelled</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="priority" class="form-label">Prioritas</label>
+                                            <label for="priority" class="form-label">Priority</label>
                                             <select class="form-select" id="priority" name="priority" required>
-                                                <option value="LOW" <?php echo ($project['priority'] ?? 'MEDIUM') == 'LOW' ? 'selected' : ''; ?>>Rendah</option>
-                                                <option value="MEDIUM" <?php echo ($project['priority'] ?? 'MEDIUM') == 'MEDIUM' ? 'selected' : ''; ?>>Sedang</option>
-                                                <option value="HIGH" <?php echo ($project['priority'] ?? 'MEDIUM') == 'HIGH' ? 'selected' : ''; ?>>Tinggi</option>
-                                                <option value="CRITICAL" <?php echo ($project['priority'] ?? 'MEDIUM') == 'CRITICAL' ? 'selected' : ''; ?>>Kritis</option>
+                                                <option value="LOW" <?php echo ($project['priority'] ?? 'MEDIUM') == 'LOW' ? 'selected' : ''; ?>>Low</option>
+                                                <option value="MEDIUM" <?php echo ($project['priority'] ?? 'MEDIUM') == 'MEDIUM' ? 'selected' : ''; ?>>Medium</option>
+                                                <option value="HIGH" <?php echo ($project['priority'] ?? 'MEDIUM') == 'HIGH' ? 'selected' : ''; ?>>High</option>
+                                                <option value="CRITICAL" <?php echo ($project['priority'] ?? 'MEDIUM') == 'CRITICAL' ? 'selected' : ''; ?>>Critical</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="manager_id" class="form-label">Manajer Proyek</label>
+                                        <label for="manager_id" class="form-label">Project Manager</label>
                                         <select class="form-select" id="manager_id" name="manager_id" required>
-                                            <option value="">Pilih Manajer</option>
+                                            <option value="">Select Manager</option>
                                             <?php foreach ($managers as $manager): ?>
                                                 <option value="<?php echo $manager['id']; ?>" <?php echo ($project['manager_id'] ?? '') == $manager['id'] ? 'selected' : ''; ?>>
                                                     <?php echo $manager['name']; ?>
@@ -239,9 +239,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="team_ids" class="form-label">Pilih Tim</label>
+                                        <label for="team_ids" class="form-label">Select Teams</label>
                                         <select class="form-select" id="team_ids" name="team_ids[]" multiple>
-                                            <option value="">Pilih Tim...</option>
+                                            <option value="">Select Teams...</option>
                                             <?php foreach ($teams as $team): ?>
                                                 <option value="<?php echo $team['id']; ?>" <?php echo in_array($team['id'], $project_team_ids) ? 'selected' : ''; ?>>
                                                     <?php echo htmlspecialchars($team['name']); ?>
@@ -250,8 +250,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="projects.php" class="btn btn-secondary me-2">Batal</a>
-                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Simpan Perubahan' : 'Buat Proyek'; ?></button>
+                                        <a href="projects.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Create Project'; ?></button>
                                     </div>
                                 </form>
                             </div>
@@ -264,12 +264,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <div class="card-body">
                                 <ul>
-                                    <li>Berikan nama yang jelas dan deskriptif untuk proyek Anda</li>
-                                    <li>Tentukan tanggal mulai dan selesai yang realistis</li>
-                                    <li>Pilih manajer proyek yang bertanggung jawab</li>
-                                    <li>Pilih tim yang akan bekerja pada proyek ini</li>
-
-                                    <li>Perbarui status proyek secara berkala</li>
+                                    <li>Give your project a clear and descriptive name</li>
+                                    <li>Set realistic start and end dates</li>
+                                    <li>Choose a responsible project manager</li>
+                                    <li>Select the teams that will work on this project</li>
+                                    <li>Update the project status regularly</li>
                                 </ul>
                             </div>
                         </div>
@@ -285,7 +284,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         new TomSelect("#team_ids",{
             plugins: ['remove_button'],
             create: false,
-            placeholder: "Pilih Tim..."
+            placeholder: "Select Teams..."
         });
     </script>
 </body>

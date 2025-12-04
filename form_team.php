@@ -108,11 +108,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $is_edit ? 'Edit Tim' : 'Tim Baru'; ?> - Sistem Manajemen Proyek</title>
+    <title><?php echo $is_edit ? 'Edit Team' : 'New Team'; ?> - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- Tambahkan CSS Tom Select -->
@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
-                        <h5 class="mb-0">ProyekKu</h5>
+                        <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -151,28 +151,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -184,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -195,11 +195,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2"><?php echo $is_edit ? 'Edit Tim' : 'Tim Baru'; ?></h1>
+                    <h1 class="h2"><?php echo $is_edit ? 'Edit Team' : 'New Team'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="teams.php" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
                     </div>
@@ -211,30 +211,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="card-body">
                                 <form action="form_team.php<?php echo $is_edit ? '?id=' . $team['id'] : ''; ?>" method="post" enctype="multipart/form-data">
                                     <div class="mb-3">
-                                        <label for="name" class="form-label">Nama Tim</label>
+                                        <label for="name" class="form-label">Team Name</label>
                                         <input type="text" class="form-control" id="name" name="name" value="<?php echo $team['name'] ?? ''; ?>" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="description" class="form-label">Deskripsi Tim</label>
+                                        <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="4"><?php echo $team['description'] ?? ''; ?></textarea>
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="logo" class="form-label">Logo/Avatar Tim</label>
+                                        <label for="logo" class="form-label">Team Logo/Avatar</label>
                                         <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
                                         <?php if ($is_edit && !empty($team['logo_path'])): ?>
                                             <div class="mt-2">
-                                                <small class="text-muted">Logo saat ini:</small><br>
-                                                <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Logo Tim" class="logo-preview">
+                                                <small class="text-muted">Current Logo:</small><br>
+                                                <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Team Logo" class="logo-preview">
                                             </div>
                                         <?php endif; ?>
                                     </div>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="team_head_id" class="form-label">Kepala Tim</label>
+                                            <label for="team_head_id" class="form-label">Team Head</label>
                                             <select class="form-select" id="team_head_id" name="team_head_id">
-                                                <option value="">Pilih Kepala Tim</option>
+                                                <option value="">Select Team Head</option>
                                                 <?php foreach ($users as $user): ?>
                                                     <option value="<?php echo $user['id']; ?>" <?php echo ($team['team_head_id'] ?? '') == $user['id'] ? 'selected' : ''; ?>>
                                                         <?php echo $user['name']; ?>
@@ -246,15 +246,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" value="1" id="make_me_head" name="make_me_head">
                                                 <label class="form-check-label" for="make_me_head">
-                                                    Jadikan Saya Ketua
+                                                    Make Me Head
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="members-select" class="form-label">Daftar Anggota</label>
-                                        <select id="members-select" name="members[]" multiple placeholder="Pilih Anggota Tim...">
+                                        <label for="members-select" class="form-label">Members List</label>
+                                        <select id="members-select" name="members[]" multiple placeholder="Select Team Members...">
                                             <?php foreach ($users as $user): ?>
                                                 <option value="<?php echo $user['id']; ?>" <?php echo in_array($user['id'], $team_members) ? 'selected' : ''; ?>>
                                                     <?php echo htmlspecialchars($user['name']); ?>
@@ -263,8 +263,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="teams.php" class="btn btn-secondary me-2">Batal</a>
-                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Simpan Perubahan' : 'Buat Tim'; ?></button>
+                                        <a href="teams.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Create Team'; ?></button>
                                     </div>
                                 </form>
                             </div>
@@ -283,25 +283,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 plugins: {
                     'checkbox_options': {},
                     'remove_button':{
-                        'title':'Hapus item ini',
+                        'title':'Remove this item',
                     }
                 },
                 create: false,
                 maxItems: null
             });
 
-            // Jadikan Saya Ketua 
+            // Make Me Head 
             const makeMeHeadCheckbox = document.getElementById('make_me_head');
             const teamHeadDropdown = document.getElementById('team_head_id');
             const currentUserId = '<?php echo $_SESSION['user_id']; ?>';
 
             makeMeHeadCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    // pilih user yang sedang login di dropdown
+                    // select current user in dropdown
                     teamHeadDropdown.value = currentUserId;
                     // teamHeadDropdown.disabled = true;
                 } else {
-                    // aktifkan kembali dropdown jika checkbox dicentang ulang
+                    // re-enable dropdown if checkbox is unchecked
                     // teamHeadDropdown.disabled = false;
                 }
             });

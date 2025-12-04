@@ -120,11 +120,11 @@ if ($is_edit) {
 ?>
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $is_edit ? 'Edit Dokumen' : 'Unggah Dokumen Baru'; ?> - Sistem Manajemen Proyek</title>
+    <title><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?> - WeProject</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -142,7 +142,7 @@ if ($is_edit) {
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
-                        <h5 class="mb-0">ProyekKu</h5>
+                        <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -152,28 +152,28 @@ if ($is_edit) {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
-                                <i class="bi bi-folder me-2"></i> Proyek
+                                <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tugas
+                                <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Dokumen
+                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="teams.php">
-                                <i class="bi bi-people me-2"></i> Tim
+                                <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
                         <?php if ($_SESSION['user_role'] == 'ADMIN'): ?>
                         <li class="nav-item">
                             <a class="nav-link" href="users.php">
-                                <i class="bi bi-person-gear me-2"></i> Pengguna
+                                <i class="bi bi-person-gear me-2"></i> Users
                             </a>
                         </li>
                         <?php endif; ?>
@@ -185,7 +185,7 @@ if ($is_edit) {
                             <strong><?php echo $_SESSION['user_name']; ?></strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="profile.php">Profil</a></li>
+                            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
@@ -196,11 +196,11 @@ if ($is_edit) {
             <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2"><?php echo $is_edit ? 'Edit Dokumen' : 'Unggah Dokumen Baru'; ?></h1>
+                    <h1 class="h2"><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="documents.php" class="btn btn-sm btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-1"></i> Kembali
+                                <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
                     </div>
@@ -216,38 +216,38 @@ if ($is_edit) {
                             <div class="card-body">
                                 <form action="form_document.php<?php echo $is_edit ? '?id=' . $document['id'] : ''; ?>" method="post" enctype="multipart/form-data">
                                     <div class="mb-3">
-                                        <label for="title" class="form-label">Judul Dokumen</label>
+                                        <label for="title" class="form-label">Document Title</label>
                                         <input type="text" class="form-control" id="title" name="title" value="<?php echo $document['title'] ?? ''; ?>" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="file" class="form-label">Pilih Berkas</label>
+                                        <label for="file" class="form-label">Select File</label>
                                         <input type="file" class="form-control" id="file" name="file" <?php echo !$is_edit ? 'required' : ''; ?>>
                                         <?php if ($is_edit && $document['file_name']): ?>
-                                            <div class="form-text">File saat ini: <?php echo $document['file_name']; ?></div>
+                                            <div class="form-text">Current file: <?php echo $document['file_name']; ?></div>
                                         <?php endif; ?>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="description" class="form-label">Deskripsi</label>
+                                        <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="3"><?php echo $document['description'] ?? ''; ?></textarea>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Terkait Dengan</label>
+                                        <label class="form-label">Related To</label>
                                         <div>
                                             <div class="form-check form-check-inline">
                                             
                                                 <input class="form-check-input" type="radio" name="related_to" id="relatedProject" value="project" <?php echo ($current_project_id) ? 'checked' : ''; ?> required>
-                                                <label class="form-check-label" for="relatedProject">Proyek</label>
+                                                <label class="form-check-label" for="relatedProject">Project</label>
                                             </div>
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="related_to" id="relatedTask" value="task" <?php echo ($current_task_id) ? 'checked' : ''; ?> required>
-                                                <label class="form-check-label" for="relatedTask">Tugas</label>
+                                                <label class="form-check-label" for="relatedTask">Task</label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mb-3" id="projectSelectContainer">
-                                        <label for="project_id" class="form-label">Pilih Proyek</label>
+                                        <label for="project_id" class="form-label">Select Project</label>
                                         <select class="form-select" id="project_id" name="project_id">
-                                            <option value="">Pilih Proyek</option>
+                                            <option value="">Select Project</option>
                                             <?php foreach ($projects as $project_item): ?>
                                                 <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
                                                 <option value="<?php echo $project_item['id']; ?>" <?php echo ($current_project_id == $project_item['id']) ? 'selected' : ''; ?>>
@@ -257,9 +257,9 @@ if ($is_edit) {
                                         </select>
                                     </div>
                                     <div class="mb-3 d-none" id="taskSelectContainer">
-                                        <label for="task_id" class="form-label">Pilih Tugas</label>
+                                        <label for="task_id" class="form-label">Select Task</label>
                                         <select class="form-select" id="task_id" name="task_id">
-                                            <option value="">Pilih Tugas</option>
+                                            <option value="">Select Task</option>
                                             <?php foreach ($tasks as $task_item): ?>
                                                 <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
                                                 <option value="<?php echo $task_item['id']; ?>" <?php echo ($current_task_id == $task_item['id']) ? 'selected' : ''; ?>>
@@ -270,26 +270,26 @@ if ($is_edit) {
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="version" class="form-label">Versi</label>
+                                            <label for="version" class="form-label">Version</label>
                                             <input type="text" class="form-control" id="version" name="version" value="<?php echo $document['version'] ?? '1.0'; ?>">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="category" class="form-label">Kategori</label>
+                                            <label for="category" class="form-label">Category</label>
                                             <select class="form-select" id="category" name="category">
-                                                <option value="Desain" <?php echo ($document['category'] ?? '') == 'Desain' ? 'selected' : ''; ?>>Desain</option>
-                                                <option value="Dokumen" <?php echo ($document['category'] ?? '') == 'Dokumen' ? 'selected' : ''; ?>>Dokumen</option>
-                                                <option value="Laporan" <?php echo ($document['category'] ?? '') == 'Laporan' ? 'selected' : ''; ?>>Laporan</option>
-                                                <option value="Lainnya" <?php echo ($document['category'] ?? '') == 'Lainnya' ? 'selected' : ''; ?>>Lainnya</option>
+                                                <option value="Desain" <?php echo ($document['category'] ?? '') == 'Desain' ? 'selected' : ''; ?>>Design</option>
+                                                <option value="Dokumen" <?php echo ($document['category'] ?? '') == 'Dokumen' ? 'selected' : ''; ?>>Document</option>
+                                                <option value="Laporan" <?php echo ($document['category'] ?? '') == 'Laporan' ? 'selected' : ''; ?>>Report</option>
+                                                <option value="Lainnya" <?php echo ($document['category'] ?? '') == 'Lainnya' ? 'selected' : ''; ?>>Other</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="uploaded_by" class="form-label">Diunggah Oleh</label>
+                                        <label for="uploaded_by" class="form-label">Uploaded By</label>
                                         <input type="text" class="form-control" id="uploaded_by" name="uploaded_by" value="<?php echo $_SESSION['user_name']; ?>" readonly>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="documents.php" class="btn btn-secondary me-2">Batal</a>
-                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Simpan Perubahan' : 'Unggah Dokumen'; ?></button>
+                                        <a href="documents.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Upload Document'; ?></button>
                                     </div>
                                 </form>
                             </div>
