@@ -454,7 +454,7 @@ foreach ($tasks as $task) {
                                                 <tr>
                                                     <th>Document Name</th>
                                                     <th>Category</th>
-                                                    <th>Version</th>
+
                                                     <th>Uploaded By</th>
                                                     <th>Date</th>
                                                     <th>Action</th>
@@ -469,10 +469,13 @@ foreach ($tasks as $task) {
                                                         </a>
                                                     </td>
                                                     <td><?php echo $document['category'] ?? 'None'; ?></td>
-                                                    <td><?php echo $document['version']; ?></td>
+
                                                     <td><?php echo $document['uploader_name']; ?></td>
                                                     <td><?php echo date('d M Y', strtotime($document['uploaded_at'])); ?></td>
                                                     <td>
+                                                        <a href="document_detail.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-info">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
                                                         <a href="uploads/<?php echo $document['file_path']; ?>" class="btn btn-sm btn-outline-primary" target="_blank">
                                                             <i class="bi bi-download"></i>
                                                         </a>

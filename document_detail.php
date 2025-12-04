@@ -139,7 +139,7 @@ if (!$document) {
                                         <h6 class="card-title">File Information</h6>
                                         <ul class="list-unstyled mb-0">
                                             <li class="mb-2"><strong>Category:</strong> <?php echo htmlspecialchars($document['category'] ?? '-'); ?></li>
-                                            <li class="mb-2"><strong>Version:</strong> <?php echo htmlspecialchars($document['version'] ?? '1.0'); ?></li>
+
                                             <li class="mb-2"><strong>Uploaded By:</strong> <?php echo htmlspecialchars($document['uploader_name']); ?></li>
                                             <li class="mb-2"><strong>Date:</strong> <?php echo date('d M Y H:i', strtotime($document['uploaded_at'])); ?></li>
                                         </ul>

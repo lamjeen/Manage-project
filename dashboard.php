@@ -19,7 +19,7 @@ require_once 'db_connect.php';
  $recent_projects = $stmt->fetchAll();
 
 
- $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? ORDER BY t.due_date ASC LIMIT 5");
+ $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
 ?>

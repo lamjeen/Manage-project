@@ -279,9 +279,9 @@ foreach ($all_comments as $comment) {
                                         <div class="col-md-6 mb-3">
                                             <label for="type" class="form-label">Comment Type</label>
                                             <select class="form-select" id="type" name="type" required>
-                                                <option value="Pertanyaan">Question</option>
-                                                <option value="Saran">Suggestion</option>
-                                                <option value="Laporan Bug">Bug Report</option>
+                                                <option value="Question">Question</option>
+                                                <option value="Suggestion">Suggestion</option>
+                                                <option value="Bug Report">Bug Report</option>
                                                 <option value="Blocker">Blocker</option>
                                             </select>
                                         </div>
@@ -329,9 +329,9 @@ foreach ($all_comments as $comment) {
                                                 <?php echo $comment['author_name']; ?>
                                                 <span class="badge bg-<?php 
                                                     echo match($comment['type']) {
-                                                        'Pertanyaan' => 'info',
-                                                        'Saran' => 'success',
-                                                        'Laporan Bug' => 'danger',
+                                                        'Question' => 'info',
+                                                        'Suggestion' => 'success',
+                                                        'Bug Report' => 'danger',
                                                         'Blocker' => 'dark',
                                                         default => 'secondary'
                                                     };

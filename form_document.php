@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $related_to = $_POST['related_to'];
     $project_id = $related_to == 'project' ? $_POST['project_id'] : null;
     $task_id = $related_to == 'task' ? $_POST['task_id'] : null;
-    $version = $_POST['version'];
+
     $category = $_POST['category'];
     $uploaded_by_id = $_SESSION['user_id'];
     
@@ -76,12 +76,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (!isset($error)) {
         if ($is_edit) {
-            $stmt = $pdo->prepare("UPDATE documents SET title = ?, description = ?, file_path = ?, file_name = ?, file_size = ?, file_type = ?, version = ?, category = ?, project_id = ?, task_id = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $version, $category, $project_id, $task_id, $document_id]);
+            $stmt = $pdo->prepare("UPDATE documents SET title = ?, description = ?, file_path = ?, file_name = ?, file_size = ?, file_type = ?, category = ?, project_id = ?, task_id = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $project_id, $task_id, $document_id]);
             header("Location: project_detail.php?id=" . ($document['project_id'] ?: '#documents'));
         } else {
-            $stmt = $pdo->prepare("INSERT INTO documents (title, description, file_path, file_name, file_size, file_type, version, category, uploaded_by_id, project_id, task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $version, $category, $uploaded_by_id, $project_id, $task_id]);
+            $stmt = $pdo->prepare("INSERT INTO documents (title, description, file_path, file_name, file_size, file_type, category, uploaded_by_id, project_id, task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $uploaded_by_id, $project_id, $task_id]);
             
             if ($project_id) {
                 header("Location: project_detail.php?id=$project_id#documents");
@@ -269,17 +269,14 @@ if ($is_edit) {
                                         </select>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="version" class="form-label">Version</label>
-                                            <input type="text" class="form-control" id="version" name="version" value="<?php echo $document['version'] ?? '1.0'; ?>">
-                                        </div>
+
                                         <div class="col-md-6 mb-3">
                                             <label for="category" class="form-label">Category</label>
                                             <select class="form-select" id="category" name="category">
-                                                <option value="Desain" <?php echo ($document['category'] ?? '') == 'Desain' ? 'selected' : ''; ?>>Design</option>
-                                                <option value="Dokumen" <?php echo ($document['category'] ?? '') == 'Dokumen' ? 'selected' : ''; ?>>Document</option>
-                                                <option value="Laporan" <?php echo ($document['category'] ?? '') == 'Laporan' ? 'selected' : ''; ?>>Report</option>
-                                                <option value="Lainnya" <?php echo ($document['category'] ?? '') == 'Lainnya' ? 'selected' : ''; ?>>Other</option>
+                                                <option value="Design" <?php echo ($document['category'] ?? '') == 'Design' ? 'selected' : ''; ?>>Design</option>
+                                                <option value="Document" <?php echo ($document['category'] ?? '') == 'Document' ? 'selected' : ''; ?>>Document</option>
+                                                <option value="Report" <?php echo ($document['category'] ?? '') == 'Report' ? 'selected' : ''; ?>>Report</option>
+                                                <option value="Other" <?php echo ($document['category'] ?? '') == 'Other' ? 'selected' : ''; ?>>Other</option>
                                             </select>
                                         </div>
                                     </div>

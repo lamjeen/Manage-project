@@ -133,6 +133,12 @@ if (!$team) {
                                 <p><strong>Description:</strong> <?php echo nl2br($team['description'] ?? 'No description'); ?></p>
                                 <p><strong>Team Head:</strong> <?php echo $team['team_head_name'] ?? 'None'; ?></p>
                                 <p><strong>Created At:</strong> <?php echo date('d M Y', strtotime($team['created_at'])); ?></p>
+                                <?php if (!empty($team['logo_path'])): ?>
+                                    <div class="mt-3">
+                                        <strong>Logo:</strong><br>
+                                        <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Team Logo" class="img-thumbnail" style="max-width: 200px;">
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
