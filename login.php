@@ -1,24 +1,34 @@
 <?php
+// Memulai sesi untuk manajemen login
 session_start();
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
  $error = '';
 
+// Memproses login jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
     
+    // Mencari pengguna berdasarkan email
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     
+    // Verifikasi password jika pengguna ditemukan
     if ($user && password_verify($password, $user['password_hash'])) {
+        // Jika login berhasil, simpan data penting ke sesi
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
+        
+        // Arahkan ke dashboard
         header("Location: dashboard.php");
         exit;
     } else {
+        // Jika login gagal, tampilkan pesan error
         $error = "Invalid email or password!";
     }
 }
@@ -30,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 untuk styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {

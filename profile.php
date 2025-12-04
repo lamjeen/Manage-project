@@ -1,20 +1,23 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// get current user data
+// Mengambil data pengguna saat ini dari database
  $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
  $stmt->execute([$_SESSION['user_id']]);
  $user = $stmt->fetch();
 ?>
 
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -27,7 +30,7 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -83,7 +86,7 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">My Profile</h1>

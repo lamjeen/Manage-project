@@ -1,7 +1,11 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
+// Memeriksa apakah ID proyek tersedia di URL
 if (!isset($_GET['id'])) {
     header("Location: projects.php");
     exit;
@@ -9,7 +13,7 @@ if (!isset($_GET['id'])) {
 
  $project_id = $_GET['id'];
 
-// get project data
+// Mengambil data proyek beserta nama manajernya
  $stmt = $pdo->prepare("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.id = ?");
  $stmt->execute([$project_id]);
  $project = $stmt->fetch();
@@ -19,7 +23,7 @@ if (!$project) {
     exit;
 }
 
-// get project members from project_team -> team_members
+// Mengambil anggota proyek melalui relasi project_team -> team_members
  $stmt = $pdo->prepare("
     SELECT DISTINCT u.id, u.name
     FROM users u
@@ -31,6 +35,7 @@ if (!$project) {
  $stmt->execute([$project_id]);
  $project_members = $stmt->fetchAll();
 
+// Mengambil daftar tugas dalam proyek ini
  $stmt = $pdo->prepare("
     SELECT 
         t.*, 
@@ -45,7 +50,7 @@ if (!$project) {
  $stmt->execute([$project_id]);
  $tasks = $stmt->fetchAll();
 
-// count tasks by status
+// Menghitung jumlah tugas berdasarkan status
  $task_counts = [
     'TO_DO' => 0,
     'IN_PROGRESS' => 0,
@@ -57,12 +62,12 @@ foreach ($tasks as $task) {
     $task_counts[$task['status']]++;
 }
 
-// calculate progress
+// Menghitung persentase kemajuan proyek
  $total_tasks = count($tasks);
  $completed_tasks = $task_counts['DONE'];
  $progress = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
 
-// get project documents
+// Mengambil dokumen yang terkait dengan proyek ini
  $stmt = $pdo->prepare("SELECT d.*, u.name as uploader_name FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id WHERE d.project_id = ? ORDER BY d.uploaded_at DESC");
  $stmt->execute([$project_id]);
  $documents = $stmt->fetchAll();
@@ -74,6 +79,7 @@ foreach ($tasks as $task) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $project['name']; ?> - Sistem Manajemen Proyek</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -113,7 +119,7 @@ foreach ($tasks as $task) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -169,7 +175,7 @@ foreach ($tasks as $task) {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $project['name']; ?></h1>
@@ -187,7 +193,7 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
-                <!-- Project Info -->
+                <!-- Informasi Proyek -->
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -264,7 +270,7 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
-                <!-- Tasks -->
+                <!-- Tugas (Kanban Board) -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card">
@@ -294,8 +300,7 @@ foreach ($tasks as $task) {
                                                             <div class="card-body p-2">
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
-                                                                    <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -331,8 +336,7 @@ foreach ($tasks as $task) {
                                                             <div class="card-body p-2">
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
-                                                                    <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -368,8 +372,7 @@ foreach ($tasks as $task) {
                                                             <div class="card-body p-2">
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
-                                                                    <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -405,8 +408,7 @@ foreach ($tasks as $task) {
                                                             <div class="card-body p-2">
                                                                 <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
                                                                 <div class="d-flex justify-content-between align-items-center">
-                                                                    <!-- PERBAIKAN: Tampilkan nama assignee yang sudah digabung -->
-                                                                    <small class="text-muted"><?php echo $task['assignee_names'] ?? 'None'; ?></small>
+                                                                    <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
                                                                     <span class="badge bg-<?php 
                                                                         echo match($task['priority']) {
                                                                             'LOW' => 'success',
@@ -434,7 +436,7 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
-                <!-- Documents -->
+                <!-- Dokumen Proyek -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card">
@@ -502,7 +504,7 @@ foreach ($tasks as $task) {
         </div>
     </div>
 
-    <!-- Create Task Modals -->
+    <!-- Modal Buat Tugas Cepat -->
     <?php 
     $statuses = [
         'TO_DO' => 'To Do', 
@@ -570,7 +572,7 @@ foreach ($tasks as $task) {
     </div>
     <?php endforeach; ?>
 
-    <!-- Delete Document Modal -->
+    <!-- Modal Konfirmasi Hapus Dokumen -->
     <div class="modal fade" id="deleteDocumentModal" tabindex="-1" aria-labelledby="deleteDocumentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -592,7 +594,7 @@ foreach ($tasks as $task) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete document functionality
+            // Logika Hapus Dokumen
             const deleteDocumentModal = new bootstrap.Modal(document.getElementById('deleteDocumentModal'));
             const confirmDeleteDocumentBtn = document.getElementById('confirmDeleteDocumentBtn');
             

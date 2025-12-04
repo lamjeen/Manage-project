@@ -1,14 +1,17 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// only Admin can view users
+// Membatasi akses hanya untuk Admin
 if ($_SESSION['user_role'] != 'ADMIN') {
     header("Location: dashboard.php");
     exit;
 }
 
-// get all users
+// Mengambil semua data pengguna dari database
  $stmt = $pdo->query("SELECT * FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 ?>
@@ -19,6 +22,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -31,7 +35,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -85,7 +89,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Users</h1>
@@ -98,7 +102,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                     </div>
                 </div>
 
-                <!-- Users Table -->
+                <!-- Tabel Pengguna -->
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($users)): ?>
@@ -132,7 +136,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                                             </td>
                                             <td><?php echo date('d M Y', strtotime($user['created_at'])); ?></td>
                                             <td>
-                                                <!-- Add edit user functionality here if needed -->
+                                                <!-- Tombol edit user (bisa ditambahkan nanti) -->
                                                 <button class="btn btn-sm btn-outline-secondary" disabled>
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
@@ -154,7 +158,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Modal Konfirmasi Hapus -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -176,7 +180,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // delete user functionality
+            // Logika Hapus User
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             

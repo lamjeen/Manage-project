@@ -1,8 +1,12 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-
+// Mengambil semua tugas beserta informasi proyek dan assignee
+// Menggunakan LEFT JOIN untuk mendapatkan nama proyek dan nama assignee
 $stmt = $pdo->query("
     SELECT 
         t.*, 
@@ -15,38 +19,13 @@ $stmt = $pdo->query("
     ORDER BY t.due_date ASC, t.id
 ");
 
-$tasks = [];
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $taskId = $row['id'];
+$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (!isset($tasks[$taskId])) {
-        $tasks[$taskId] = [
-            'id'            => $row['id'],
-            'title'         => $row['title'],
-            'project_id'    => $row['project_id'],
-            'project_name'  => $row['project_name'],
-            'priority'      => $row['priority'],
-            'status'        => $row['status'],
-            'due_date'      => $row['due_date'],
-            'created_by_id' => $row['created_by_id'], 
-            'assignees'     => [] 
-        ];
-    }
-
-
-    if ($row['assignee_id']) {
-        $tasks[$taskId]['assignees'][] = [
-            'id'   => $row['assignee_id'],
-            'name' => $row['assignee_name']
-        ];
-    }
-}
-
-// get projects for filter dropdown
+// Mengambil daftar proyek untuk dropdown filter
 $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
 $projects = $stmt->fetchAll();
 
-// get users for assignee filter dropdown
+// Mengambil daftar pengguna untuk dropdown filter assignee
 $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
 $users = $stmt->fetchAll();
 ?>
@@ -57,6 +36,7 @@ $users = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasks - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -75,6 +55,7 @@ $users = $stmt->fetchAll();
 <body>
     <div class="container-fluid">
         <div class="row">
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -130,6 +111,7 @@ $users = $stmt->fetchAll();
                 </div>
             </nav>
 
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Tasks</h1>
@@ -142,6 +124,7 @@ $users = $stmt->fetchAll();
                     </div>
                 </div>
 
+                <!-- Filter Tugas -->
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <select class="form-select" id="projectFilter">
@@ -170,6 +153,7 @@ $users = $stmt->fetchAll();
                     </div>
                 </div>
 
+                <!-- Tabel Tugas -->
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($tasks)): ?>
@@ -189,23 +173,16 @@ $users = $stmt->fetchAll();
                                         </tr>
                                     </thead>
                                     <tbody id="tasksTableBody">
-                                        <?php foreach ($tasks as $task): 
-                                            
-                                            $idsArray = array_column($task['assignees'], 'id');
-                                            $idsString = implode(',', $idsArray); 
-
-                                            $namesArray = array_column($task['assignees'], 'name');
-                                            $namesString = implode(', ', $namesArray);
-                                        ?>
+                                        <?php foreach ($tasks as $task): ?>
                                         <tr 
                                             data-project-id="<?php echo $task['project_id']; ?>" 
-                                            data-assignee-ids="<?php echo htmlspecialchars($idsString); ?>" 
+                                            data-assignee-ids="<?php echo $task['assignee_id']; ?>" 
                                             data-status="<?php echo $task['status']; ?>">
                                             
                                             <td><a href="task_detail.php?id=<?php echo $task['id']; ?>"><?php echo htmlspecialchars($task['title']); ?></a></td>
                                             <td><a href="project_detail.php?id=<?php echo $task['project_id']; ?>"><?php echo htmlspecialchars($task['project_name']); ?></a></td>
                                             
-                                            <td><?php echo $namesString ?: 'None'; ?></td>
+                                            <td><?php echo $task['assignee_name'] ? htmlspecialchars($task['assignee_name']) : 'None'; ?></td>
                                             
                                             <td>
                                                 <span class="badge bg-<?php 
@@ -255,6 +232,7 @@ $users = $stmt->fetchAll();
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Hapus -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -277,7 +255,7 @@ $users = $stmt->fetchAll();
     <script>
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Delete task functionality
+            // Logika Hapus Tugas
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             
@@ -289,7 +267,7 @@ $users = $stmt->fetchAll();
                 });
             });
             
-            // Filter functionality
+            // Logika Filter Tugas
             const projectFilter = document.getElementById('projectFilter');
             const assigneeFilter = document.getElementById('assigneeFilter');
             const statusFilter = document.getElementById('statusFilter');

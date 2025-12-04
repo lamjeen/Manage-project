@@ -1,7 +1,11 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
+// Memeriksa apakah ID tugas tersedia di URL
 if (!isset($_GET['id'])) {
     header("Location: tasks.php");
     exit;
@@ -9,7 +13,8 @@ if (!isset($_GET['id'])) {
 
  $task_id = $_GET['id'];
 
-// get task data tanpa join ke assignee, karena sekarang bisa banyak
+// Mengambil data tugas tanpa join ke assignee, karena sekarang bisa banyak
+// Menggunakan LEFT JOIN untuk mendapatkan nama proyek dan pembuat tugas
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $task = $stmt->fetch();
@@ -19,20 +24,23 @@ if (!$task) {
     exit;
 }
 
-// get assignee name
+// Mengambil nama assignee (penerima tugas)
+// Karena assignee sekarang bisa lebih dari satu (many-to-many mungkin di masa depan, tapi saat ini masih single assignee di tabel tasks, namun query ini disiapkan untuk fleksibilitas atau jika struktur tabel berubah)
+// Catatan: Query ini mengasumsikan hubungan tasks.assignee -> users.id masih berlaku
  $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN tasks t ON u.id = t.assignee WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $assignee_name = $stmt->fetchColumn();
     $task['assignee_names'] = $assignee_name ?: 'None';
 
-// kita ambil semua komentar dulu, nanti di-filter di PHP
+// Mengambil semua komentar untuk tugas ini
+// Komentar akan difilter di PHP berdasarkan privasi
  $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.is_pinned DESC, c.created_at ASC");
  $stmt->execute([$task_id]);
  $all_comments = $stmt->fetchAll();
 
  $comments_to_display = [];
 foreach ($all_comments as $comment) {
-    // logika privasi: tampilkan jika publik, atau jika user adalah admin/manager/pembuat
+    // Logika privasi: tampilkan jika publik (ALL_MEMBERS), atau jika user adalah admin/manager/pembuat komentar
     if ($comment['privacy'] === 'ALL_MEMBERS' || 
         $_SESSION['user_role'] === 'ADMIN' || 
         $_SESSION['user_role'] === 'MANAGER' || 
@@ -41,7 +49,7 @@ foreach ($all_comments as $comment) {
     }
 }
 
-// get documents for this task
+// Mengambil dokumen yang terkait dengan tugas ini
  $stmt = $pdo->prepare("SELECT d.*, u.name as uploader_name FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id WHERE d.task_id = ? ORDER BY d.uploaded_at DESC");
  $stmt->execute([$task_id]);
  $documents = $stmt->fetchAll();
@@ -53,6 +61,7 @@ foreach ($all_comments as $comment) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $task['title']; ?> - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -81,7 +90,7 @@ foreach ($all_comments as $comment) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -137,7 +146,7 @@ foreach ($all_comments as $comment) {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $task['title']; ?></h1>
@@ -155,7 +164,7 @@ foreach ($all_comments as $comment) {
                     </div>
                 </div>
 
-                <!-- Task Info -->
+                <!-- Informasi Tugas -->
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -166,7 +175,7 @@ foreach ($all_comments as $comment) {
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <strong>Status:</strong>
-                                        <!-- Status Update Dropdown -->
+                                        <!-- Dropdown Update Status -->
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: <?php 
                                                 echo match($task['status']) {
@@ -264,7 +273,7 @@ foreach ($all_comments as $comment) {
                     </div>
                 </div>
 
-                <!-- Comments -->
+                <!-- Bagian Komentar -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -279,10 +288,10 @@ foreach ($all_comments as $comment) {
                                         <div class="col-md-6 mb-3">
                                             <label for="type" class="form-label">Comment Type</label>
                                             <select class="form-select" id="type" name="type" required>
-                                                <option value="Question">Question</option>
-                                                <option value="Suggestion">Suggestion</option>
-                                                <option value="Bug Report">Bug Report</option>
-                                                <option value="Blocker">Blocker</option>
+                                                <option value="QUESTION">Question</option>
+                                                <option value="SUGGESTION">Suggestion</option>
+                                                <option value="BUG_REPORT">Bug Report</option>
+                                                <option value="BLOCKER">Blocker</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -329,13 +338,13 @@ foreach ($all_comments as $comment) {
                                                 <?php echo $comment['author_name']; ?>
                                                 <span class="badge bg-<?php 
                                                     echo match($comment['type']) {
-                                                        'Question' => 'info',
-                                                        'Suggestion' => 'success',
-                                                        'Bug Report' => 'danger',
-                                                        'Blocker' => 'dark',
+                                                        'QUESTION' => 'info',
+                                                        'SUGGESTION' => 'success',
+                                                        'BUG_REPORT' => 'danger',
+                                                        'BLOCKER' => 'dark',
                                                         default => 'secondary'
                                                     };
-                                                ?> ms-2"><?php echo $comment['type']; ?></span>
+                                                ?> ms-2"><?php echo ucwords(strtolower(str_replace('_', ' ', $comment['type']))); ?></span>
                                                 <!-- --- Tampilkan Badge Pin --- -->
                                                 <?php if ($comment['is_pinned']): ?>
                                                     <span class="badge bg-warning text-dark pinned-badge ms-2"><i class="bi bi-pin-angle-fill"></i> Pinned</span>

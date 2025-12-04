@@ -1,15 +1,19 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
  $document = null;
  $is_edit = false;
 
-// check if editing existing document
+// Memeriksa apakah mode edit aktif (ada parameter ID di URL)
 if (isset($_GET['id'])) {
     $is_edit = true;
     $document_id = $_GET['id'];
     
+    // Mengambil data dokumen yang akan diedit
     $stmt = $pdo->prepare("SELECT * FROM documents WHERE id = ?");
     $stmt->execute([$document_id]);
     $document = $stmt->fetch();
@@ -19,37 +23,39 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // check if user has permission to edit this document
+    // Memeriksa izin pengguna: Admin, Manajer, atau Pengunggah dokumen dapat mengedit
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $document['uploaded_by_id'] != $_SESSION['user_id']) {
         header("Location: documents.php");
         exit;
     }
 }
 
-// handle form submission
+// Memproses data form jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $related_to = $_POST['related_to'];
+    // Menentukan apakah dokumen terkait dengan proyek atau tugas
     $project_id = $related_to == 'project' ? $_POST['project_id'] : null;
     $task_id = $related_to == 'task' ? $_POST['task_id'] : null;
 
     $category = $_POST['category'];
     $uploaded_by_id = $_SESSION['user_id'];
     
-    // handle file upload
+    // Inisialisasi variabel upload file
     $file_path = '';
     $file_name = '';
     $file_size = 0;
     $file_type = '';
     
+    // Memproses upload file baru jika ada
     if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
         $allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', 'jpg', 'jpeg', 'png', 'gif'];
         $filename = $_FILES['file']['name'];
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
         
         if (in_array(strtolower($filetype), $allowed)) {
-            // create a unique filename to prevent overwriting
+            // Membuat nama file unik
             $new_filename = uniqid() . '.' . $filetype;
             $upload_path = 'uploads/' . $new_filename;
             
@@ -65,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Tipe file tidak diizinkan.";
         }
     } elseif ($is_edit) {
-        // keep old file if no new file is uploaded during edit
+        // Jika mode edit dan tidak ada file baru, gunakan file lama
         $file_path = $document['file_path'];
         $file_name = $document['file_name'];
         $file_size = $document['file_size'];
@@ -74,15 +80,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Harap pilih file untuk diunggah.";
     }
     
+    // Jika tidak ada error, simpan ke database
     if (!isset($error)) {
         if ($is_edit) {
+            // Update data dokumen yang ada
             $stmt = $pdo->prepare("UPDATE documents SET title = ?, description = ?, file_path = ?, file_name = ?, file_size = ?, file_type = ?, category = ?, project_id = ?, task_id = ? WHERE id = ?");
             $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $project_id, $task_id, $document_id]);
             header("Location: project_detail.php?id=" . ($document['project_id'] ?: '#documents'));
         } else {
+            // Insert dokumen baru
             $stmt = $pdo->prepare("INSERT INTO documents (title, description, file_path, file_name, file_size, file_type, category, uploaded_by_id, project_id, task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $uploaded_by_id, $project_id, $task_id]);
             
+            // Redirect sesuai konteks (proyek, tugas, atau daftar dokumen)
             if ($project_id) {
                 header("Location: project_detail.php?id=$project_id#documents");
             } elseif ($task_id) {
@@ -95,28 +105,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// get projects for dropdown
+// Mengambil daftar proyek untuk dropdown
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 
-// get tasks for dropdown
+// Mengambil daftar tugas untuk dropdown
  $stmt = $pdo->query("SELECT id, title FROM tasks ORDER BY title");
  $tasks = $stmt->fetchAll();
 
-// ---  ---
+// Menentukan nilai awal untuk dropdown proyek/tugas
  $current_project_id = null;
  $current_task_id = null;
 
 if ($is_edit) {
-    // jika mengedit, ambil ID dari data dokumen
+    // Jika edit, gunakan nilai dari database
     $current_project_id = $document['project_id'];
     $current_task_id = $document['task_id'];
 } else {
-    // jika membuat baru, ambil ID dari URL
+    // Jika baru, gunakan nilai dari URL jika ada
     $current_project_id = $_GET['project_id'] ?? null;
     $current_task_id = $_GET['task_id'] ?? null;
 }
-// sekarang $current_project_id dan $current_task_id aman, nilainya adalah integer atau null.
 ?>
 
 <!DOCTYPE html>
@@ -125,6 +134,7 @@ if ($is_edit) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?> - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -137,7 +147,7 @@ if ($is_edit) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -193,7 +203,7 @@ if ($is_edit) {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?></h1>
@@ -249,7 +259,6 @@ if ($is_edit) {
                                         <select class="form-select" id="project_id" name="project_id">
                                             <option value="">Select Project</option>
                                             <?php foreach ($projects as $project_item): ?>
-                                                <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
                                                 <option value="<?php echo $project_item['id']; ?>" <?php echo ($current_project_id == $project_item['id']) ? 'selected' : ''; ?>>
                                                     <?php echo $project_item['name']; ?>
                                                 </option>
@@ -261,7 +270,6 @@ if ($is_edit) {
                                         <select class="form-select" id="task_id" name="task_id">
                                             <option value="">Select Task</option>
                                             <?php foreach ($tasks as $task_item): ?>
-                                                <!-- --- PERUBAHAN: Perbandingan yang aman tanpa akses array NULL --- -->
                                                 <option value="<?php echo $task_item['id']; ?>" <?php echo ($current_task_id == $task_item['id']) ? 'selected' : ''; ?>>
                                                     <?php echo $task_item['title']; ?>
                                                 </option>
@@ -300,6 +308,7 @@ if ($is_edit) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Mengambil elemen-elemen DOM untuk logika dinamis
             const relatedProject = document.getElementById('relatedProject');
             const relatedTask = document.getElementById('relatedTask');
             const projectSelectContainer = document.getElementById('projectSelectContainer');
@@ -307,6 +316,7 @@ if ($is_edit) {
             const projectIdSelect = document.getElementById('project_id');
             const taskIdSelect = document.getElementById('task_id');
 
+            // Fungsi untuk menampilkan/menyembunyikan dropdown berdasarkan pilihan "Related To"
             function toggleSelects() {
                 if (relatedProject.checked) {
                     projectSelectContainer.classList.remove('d-none');
@@ -321,9 +331,11 @@ if ($is_edit) {
                 }
             }
 
+            // Menambahkan event listener untuk perubahan pada radio button
             relatedProject.addEventListener('change', toggleSelects);
             relatedTask.addEventListener('change', toggleSelects);
             
+            // Menjalankan fungsi saat halaman dimuat
             toggleSelects();
         });
     </script>

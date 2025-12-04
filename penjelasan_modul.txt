@@ -1,0 +1,154 @@
+PENJELASAN CARA KERJA MODUL APLIKASI MANAJEMEN PROYEK
+
+Berikut adalah penjelasan detail mengenai cara kerja setiap modul berdasarkan kode program (source code) yang ada, termasuk struktur HTML spesifik (Tabel vs Div), penggunaan elemen UI seperti Bootstrap, TomSelect, dan JavaScript.
+
+================================================================================
+1. MODUL TUGAS (TASK MODULE)
+================================================================================
+Modul ini menangani siklus hidup tugas mulai dari pembuatan, status pengerjaan, hingga penyelesaian.
+
+File Terkait:
+- tasks.php (Daftar semua tugas)
+- task_detail.php (Detail tugas & komentar)
+- form_task.php (Form tambah/edit tugas)
+- project_detail.php (Tampilan tugas dalam proyek)
+
+Cara Kerja & Teknis:
+1. Tampilan Daftar Tugas (tasks.php):
+   - **Struktur HTML**: Menggunakan **TABEL HTML** (`<table>`).
+     - Tag: `<table class="table table-striped table-hover">`
+     - Header: `<thead>` dengan `<tr>` dan `<th>` untuk judul kolom (Title, Project, Assignee, dll).
+     - Body: `<tbody>` dengan `<tr>` untuk setiap baris tugas dan `<td>` untuk data sel.
+   - **Fitur**:
+     - Menggunakan `data-attributes` pada tag `<tr>` (contoh: `data-status="..."`) yang disiapkan untuk fitur filtering via JavaScript.
+     - **Assignee**: Menampilkan nama satu user yang ditugaskan (Single Assignee). Jika tidak ada, menampilkan "None".
+
+2. Tampilan Kanban Board (project_detail.php):
+   - **Struktur HTML**: Menggunakan **DIV GRID SYSTEM** (Bukan Tabel).
+     - Container utama adalah `<div class="row">`.
+     - Kolom Status: Dibagi menjadi 4 kolom menggunakan `<div class="col-md-3">`. Setiap kolom mewakili status (To Do, In Progress, Review, Done).
+     - Kartu Tugas: Di dalam setiap kolom, tugas ditampilkan sebagai `<div class="card task-card">`.
+   - **Logika Coding**:
+     - PHP melakukan looping (`foreach`) pada semua tugas yang diambil dari database.
+     - Di dalam loop, terdapat pengecekan kondisi (Conditional Rendering):
+       `if ($task['status'] == 'TO_DO')` -> Render di kolom To Do
+       `if ($task['status'] == 'IN_PROGRESS')` -> Render di kolom In Progress
+       dst.
+     - Ini memastikan tugas muncul di kolom yang sesuai dengan statusnya di database.
+   - **Interaksi**:
+     - Kartu tugas memiliki event `onclick="window.location='...'"` yang mengarahkan user ke halaman detail tugas saat diklik.
+
+3. Pembuatan Tugas Cepat (Quick Create):
+   - Di `project_detail.php`, terdapat tombol "+" di setiap kolom status.
+   - Tombol ini memicu **Bootstrap Modal** (`data-bs-toggle="modal"`).
+   - Setiap status memiliki ID Modal yang unik (misal: `#createTaskModal-TO_DO`), sehingga saat tugas dibuat dari kolom "In Progress", input hidden `status` otomatis terisi "In Progress".
+
+================================================================================
+2. MODUL PROJEK (PROJECT MODULE)
+================================================================================
+Modul pusat yang mengikat tim, tugas, dan dokumen.
+
+File Terkait:
+- projects.php, project_detail.php, form_project.php
+
+Cara Kerja & Teknis:
+1. Tampilan Daftar Proyek (projects.php):
+   - **Struktur HTML**: Menggunakan **DIV GRID SYSTEM** (Bukan Tabel).
+     - Layout: `<div class="row">` dengan item `<div class="col-md-4">`.
+     - Setiap proyek ditampilkan sebagai **Card** (`<div class="card">`).
+     - Ini memberikan tampilan yang lebih visual dan modern dibandingkan tabel kaku.
+
+2. Detail Proyek (project_detail.php):
+   - Halaman ini adalah "Dashboard" untuk sebuah proyek.
+   - **Progress Bar**: Dibuat dengan `<div class="progress">` dari Bootstrap. Lebar bar (`style="width: X%"`) dihitung oleh PHP: `(Jumlah Task Done / Total Task) * 100`.
+   - **Informasi**: Menggunakan Grid System untuk membagi layout menjadi info utama (kiri) dan sidebar statistik/anggota (kanan).
+
+3. Form Proyek (form_project.php):
+   - **TomSelect**: Digunakan pada elemen `<select id="team_ids" multiple>`.
+   - Script JS: `new TomSelect("#team_ids", ...)` mengubah select box biasa menjadi input interaktif yang bisa mencari dan memilih banyak tim sekaligus (Multi-select).
+
+================================================================================
+3. MODUL KOMENTAR/NOTES (COMMENT MODULE)
+================================================================================
+Fitur komunikasi yang melekat pada halaman detail tugas.
+
+File Terkait:
+- task_detail.php
+- form_comment.php
+
+Cara Kerja & Teknis:
+1. Tampilan Komentar:
+   - **Struktur HTML**: Menggunakan **DIV LIST** (Bukan Tabel).
+     - Setiap komentar dibungkus dalam `<div class="comment">`.
+     - Header komentar (Nama, Tanggal, Badge Tipe) menggunakan Flexbox (`d-flex justify-content-between`) untuk tata letak yang rapi.
+   - **Styling Khusus**:
+     - Jika komentar di-pin (`is_pinned == 1`), PHP menambahkan class `.pinned` ke div utama, yang memberikan styling khusus (misal: border atau background kuning) agar terlihat menonjol.
+     - Badge tipe komentar (Question, Bug Report, dll) diwarnai dinamis menggunakan ekspresi `match` di PHP.
+
+2. Form Komentar:
+   - Terletak di dalam `task_detail.php`.
+   - Menggunakan `enctype="multipart/form-data"` untuk mendukung upload file lampiran.
+   - Dropdown tipe komentar menggunakan value yang sesuai dengan database (misal: `BUG_REPORT`).
+
+================================================================================
+4. MODUL DOKUMEN (DOCUMENT MODULE)
+================================================================================
+Manajemen file yang bisa dikaitkan dengan proyek atau tugas.
+
+File Terkait:
+- documents.php, project_detail.php, form_document.php
+
+Cara Kerja & Teknis:
+1. Tampilan Daftar Dokumen (documents.php):
+   - **Struktur HTML**: Menggunakan **TABEL HTML** (`<table>`).
+     - Alasannya: Data dokumen bersifat tabular (Nama, Tipe, Pengupload, Tanggal) sehingga lebih mudah dibaca dalam format baris dan kolom.
+     - Kolom "Action" berisi tombol-tombol kecil (icon mata, download, tong sampah) untuk interaksi.
+
+2. Penghapusan Dokumen:
+   - **JavaScript & Modal**:
+     - Tidak langsung menghapus saat tombol diklik.
+     - Script JS mendengarkan klik pada tombol class `.delete-document`.
+     - Script mengambil ID dokumen dari `data-id`.
+     - Script mengubah link pada tombol "Delete" di dalam **Bootstrap Modal** konfirmasi.
+     - Ini mencegah penghapusan tidak sengaja.
+
+================================================================================
+5. MODUL TIM (TEAM MODULE)
+================================================================================
+Pengelolaan kelompok kerja dan anggotanya.
+
+File Terkait:
+- teams.php, team_detail.php, form_team.php
+
+Cara Kerja & Teknis:
+1. Tampilan Daftar Tim (teams.php):
+   - **Struktur HTML**: Menggunakan **DIV GRID SYSTEM** (Bukan Tabel).
+     - Mirip dengan daftar proyek, menggunakan `<div class="col-lg-4 col-md-6">` untuk responsivitas (3 kolom di layar besar, 2 di layar sedang).
+     - Setiap tim adalah `<div class="card">`.
+
+2. Detail Tim (team_detail.php):
+   - **Daftar Anggota**: Menggunakan **TABEL HTML** (`<table>`) di dalam kartu detail tim.
+   - Menampilkan Nama, Email, dan Role anggota dalam format baris yang rapi.
+
+3. Form Tim (form_team.php):
+   - **TomSelect**: Digunakan untuk memilih anggota tim (`#members-select`).
+   - **JavaScript "Make Me Head"**:
+     - Script sederhana: `document.getElementById('make_me_head').addEventListener(...)`.
+     - Saat checkbox dicentang, script otomatis mengubah nilai dropdown "Team Head" menjadi ID user yang sedang login.
+
+================================================================================
+SUMMARY (RINGKASAN SISTEM)
+================================================================================
+Secara keseluruhan, aplikasi ini dibangun dengan arsitektur PHP Native (tanpa framework backend berat) namun menggunakan **Bootstrap 5** untuk antarmuka yang responsif dan modern.
+
+1. **Pola UI (Table vs Div)**:
+   - **Tabel (`<table>`)** digunakan untuk data yang padat dan butuh perbandingan baris per baris (Daftar Tugas, Dokumen, Anggota Tim).
+   - **Div Grid & Cards (`<div>`)** digunakan untuk data yang lebih visual atau butuh layout fleksibel (Daftar Proyek, Daftar Tim, Kanban Board, Komentar).
+
+2. **Interaktivitas UI**:
+   - **Bootstrap Modals**: Digunakan secara ekstensif untuk form cepat (Quick Task) dan konfirmasi aksi destruktif (Delete), meningkatkan UX dengan tidak perlu reload halaman hanya untuk konfirmasi.
+   - **TomSelect**: Solusi elegan untuk input "Multi-select" (memilih banyak tim/anggota) yang biasanya sulit dilakukan dengan select box standar.
+
+3. **Backend Logic**:
+   - Menggunakan pola satu file per aksi (misal: `handle_create_...`, `handle_delete_...`) yang membuat alur data jelas.
+   - Logic tampilan (seperti Kanban Board) dihandle dengan kombinasi Query SQL dan Loop PHP di sisi server, lalu dirender menjadi HTML statis ke klien.

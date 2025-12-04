@@ -1,8 +1,11 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// check if user has permission to create/edit project
+// Memeriksa izin pengguna: Hanya Admin dan Manajer yang boleh membuat/mengedit proyek
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
@@ -12,12 +15,12 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
  $project_team_ids = [];
  $is_edit = false;
 
-// check if editing existing project
+// Memeriksa apakah mode edit aktif (ada parameter ID di URL)
 if (isset($_GET['id'])) {
     $is_edit = true;
     $project_id = $_GET['id'];
     
-    // get project data
+    // Mengambil data proyek yang akan diedit
     $stmt = $pdo->prepare("SELECT * FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);
     $project = $stmt->fetch();
@@ -27,19 +30,19 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // check if user has permission to edit this project
+    // Memeriksa izin spesifik: Jika bukan Admin, pengguna haruslah manajer proyek tersebut
     if ($_SESSION['user_role'] != 'ADMIN' && $project['manager_id'] != $_SESSION['user_id']) {
         header("Location: projects.php");
         exit;
     }
     
-    // get project teams
+    // Mengambil tim yang sudah terhubung dengan proyek ini (untuk pre-fill form)
     $stmt = $pdo->prepare("SELECT team_id FROM project_team WHERE project_id = ?");
     $stmt->execute([$project_id]);
     $project_team_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// handle form submission
+// Memproses data form jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
@@ -51,11 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $team_ids = $_POST['team_ids'] ?? [];
     
     if ($is_edit) {
-        // update project
+        // Memperbarui data proyek yang ada
         $stmt = $pdo->prepare("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ?, priority = ?, manager_id = ? WHERE id = ?");
         $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $project_id]);
         
-        // update project team
+        // Memperbarui relasi tim (hapus semua lalu insert ulang)
         $stmt = $pdo->prepare("DELETE FROM project_team WHERE project_id = ?");
         $stmt->execute([$project_id]);
 
@@ -68,12 +71,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         header("Location: project_detail.php?id=$project_id");
     } else {
-        // create new project
+        // Membuat proyek baru
         $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, end_date, status, priority, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id]);
         
         $project_id = $pdo->lastInsertId();
         
+        // Menyimpan relasi tim untuk proyek baru
         if (!empty($team_ids)) {
              $stmt = $pdo->prepare("INSERT INTO project_team (project_id, team_id) VALUES (?, ?)");
              foreach ($team_ids as $tid) {
@@ -86,11 +90,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// get all teams for team selection
+// Mengambil semua tim untuk opsi dropdown
  $stmt = $pdo->query("SELECT id, name FROM teams ORDER BY name");
  $teams = $stmt->fetchAll();
 
-// get managers for dropdown
+// Mengambil daftar manajer (Admin dan Manager) untuk dropdown
  $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
  $managers = $stmt->fetchAll();
 ?>
@@ -101,7 +105,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $is_edit ? 'Edit Project' : 'New Project'; ?> - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Menggunakan TomSelect untuk dropdown multi-select yang lebih baik -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -114,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -170,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Project' : 'New Project'; ?></h1>
@@ -279,8 +285,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script untuk TomSelect -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
+        // Inisialisasi TomSelect pada elemen dengan ID team_ids
         new TomSelect("#team_ids",{
             plugins: ['remove_button'],
             create: false,

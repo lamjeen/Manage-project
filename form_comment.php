@@ -1,7 +1,11 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
+// Memeriksa apakah ID komentar tersedia di URL
 if (!isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit;
@@ -9,30 +13,35 @@ if (!isset($_GET['id'])) {
 
  $comment_id = $_GET['id'];
 
-// get comment data, termasuk is_pinned
+// Mengambil data komentar dari database berdasarkan ID
+// Termasuk status is_pinned untuk fitur penyematan komentar
  $stmt = $pdo->prepare("SELECT * FROM comments WHERE id = ?");
  $stmt->execute([$comment_id]);
  $comment = $stmt->fetch();
 
+// Jika komentar tidak ditemukan, arahkan kembali ke dashboard
 if (!$comment) {
     header("Location: dashboard.php");
     exit;
 }
 
-// check if user has permission to edit this comment
+// Memeriksa izin pengguna: Admin, Manajer, atau Penulis komentar dapat mengedit
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $comment['author_id'] != $_SESSION['user_id']) {
     header("Location: task_detail.php?id=" . $comment['task_id']);
     exit;
 }
 
-// handle form submission
+// Memproses data form jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
+    // Mengambil status pin (1 jika dicentang, 0 jika tidak)
     $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
     
+    // Memperbarui konten dan status pin komentar di database
     $stmt = $pdo->prepare("UPDATE comments SET content = ?, is_pinned = ? WHERE id = ?");
     $stmt->execute([$content, $is_pinned, $comment_id]);
     
+    // Mengarahkan kembali ke halaman detail tugas terkait
     header("Location: task_detail.php?id=" . $comment['task_id']);
     exit;
 }
@@ -44,7 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Comment - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 untuk styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Menggunakan Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         .sidebar {
@@ -56,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -112,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Edit Comment</h1>
@@ -135,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <textarea class="form-control" id="content" name="content" rows="6" required><?php echo $comment['content']; ?></textarea>
                                     </div>
                                     
-                                    <!-- Pin feature -->
+                                    <!-- Fitur Pin Komentar -->
                                     <div class="mb-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned" <?php echo $comment['is_pinned'] ? 'checked' : ''; ?>>
@@ -158,6 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
+    <!-- Script Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,24 +1,27 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// get projects count
+// Mengambil total jumlah proyek untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
-// get tasks count
+// Mengambil total jumlah tugas untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM tasks");
  $tasks_count = $stmt->fetch()['total'];
 
-// get users count
+// Mengambil total jumlah pengguna untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
 
-// get recent project
+// Mengambil 5 proyek terbaru beserta nama manajernya
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
-
+// Mengambil 5 tugas saya yang belum selesai, diurutkan berdasarkan tenggat waktu
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
@@ -30,6 +33,7 @@ require_once 'db_connect.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistem Manajemen Proyek</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -48,7 +52,7 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -104,7 +108,7 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Dashboard</h1>
@@ -117,7 +121,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
+                <!-- Kartu Statistik -->
                 <div class="row mb-4">
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-primary shadow h-100 py-2 card-stat">
@@ -189,7 +193,7 @@ require_once 'db_connect.php';
                 </div>
 
                 <div class="row">
-                    <!-- Recent Projects -->
+                    <!-- Proyek Terbaru -->
                     <div class="col-lg-8 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -241,7 +245,7 @@ require_once 'db_connect.php';
                         </div>
                     </div>
 
-                    <!-- My Tasks -->
+                    <!-- Tugas Saya -->
                     <div class="col-lg-4 mb-4">
                         <div class="card">
                             <div class="card-header">

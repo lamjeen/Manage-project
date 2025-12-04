@@ -1,13 +1,17 @@
 <?php
+// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
+
+// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// only Admin and Manager can view team details
+// Membatasi akses hanya untuk Admin dan Manager
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
 }
 
+// Memeriksa apakah ID tim tersedia di URL
 if (!isset($_GET['id'])) {
     header("Location: teams.php");
     exit;
@@ -15,7 +19,8 @@ if (!isset($_GET['id'])) {
 
  $team_id = $_GET['id'];
 
-// get team data
+// Mengambil data tim beserta nama ketua tim
+// Menggunakan LEFT JOIN untuk mendapatkan nama user dari tabel users berdasarkan team_head_id
  $stmt = $pdo->prepare("SELECT t.*, u.name as team_head_name FROM teams t LEFT JOIN users u ON t.team_head_id = u.id WHERE t.id = ?");
  $stmt->execute([$team_id]);
  $team = $stmt->fetch();
@@ -26,7 +31,8 @@ if (!$team) {
 }
 
 
-// get team members
+// Mengambil daftar anggota tim
+// Menggunakan JOIN antara tabel users dan team_members untuk mendapatkan detail user yang tergabung dalam tim ini
  $stmt = $pdo->prepare("SELECT u.* FROM users u JOIN team_members tm ON u.id = tm.user_id WHERE tm.team_id = ?");
  $stmt->execute([$team_id]);
  $team_members = $stmt->fetchAll();
@@ -38,6 +44,7 @@ if (!$team) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $team['name']; ?> - WeProject</title>
+    <!-- Menggunakan Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -50,7 +57,7 @@ if (!$team) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- Sidebar Navigasi -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -106,7 +113,7 @@ if (!$team) {
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            <!-- Konten Utama -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $team['name']; ?></h1>
@@ -122,7 +129,7 @@ if (!$team) {
                     </div>
                 </div>
 
-                <!-- Team Info -->
+                <!-- Informasi Tim -->
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -155,7 +162,7 @@ if (!$team) {
                     </div>
                 </div>
 
-                <!-- Team Members -->
+                <!-- Anggota Tim -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
