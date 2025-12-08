@@ -1,12 +1,8 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Mengambil semua tugas beserta informasi proyek dan assignee
-// Menggunakan LEFT JOIN untuk mendapatkan nama proyek dan nama assignee
 $stmt = $pdo->query("
     SELECT 
         t.*, 
@@ -21,11 +17,9 @@ $stmt = $pdo->query("
 
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Mengambil daftar proyek untuk dropdown filter
 $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
 $projects = $stmt->fetchAll();
 
-// Mengambil daftar pengguna untuk dropdown filter assignee
 $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
 $users = $stmt->fetchAll();
 ?>
@@ -36,13 +30,13 @@ $users = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasks - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #f8f9fa;
         }
         .task-card {
             transition: transform 0.3s;
@@ -55,9 +49,9 @@ $users = $stmt->fetchAll();
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -74,7 +68,7 @@ $users = $stmt->fetchAll();
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="tasks.php">
+                            <a class="nav-link" href="tasks.php">
                                 <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
@@ -111,7 +105,7 @@ $users = $stmt->fetchAll();
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Tasks</h1>
@@ -124,7 +118,7 @@ $users = $stmt->fetchAll();
                     </div>
                 </div>
 
-                <!-- Filter Tugas -->
+                
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <select class="form-select" id="projectFilter">
@@ -153,7 +147,7 @@ $users = $stmt->fetchAll();
                     </div>
                 </div>
 
-                <!-- Tabel Tugas -->
+                
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($tasks)): ?>
@@ -232,7 +226,7 @@ $users = $stmt->fetchAll();
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
+    
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -255,7 +249,6 @@ $users = $stmt->fetchAll();
     <script>
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Logika Hapus Tugas
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             
@@ -267,7 +260,6 @@ $users = $stmt->fetchAll();
                 });
             });
             
-            // Logika Filter Tugas
             const projectFilter = document.getElementById('projectFilter');
             const assigneeFilter = document.getElementById('assigneeFilter');
             const statusFilter = document.getElementById('statusFilter');

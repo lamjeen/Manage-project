@@ -1,11 +1,8 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Memeriksa apakah ID tugas tersedia di URL
 if (!isset($_GET['id'])) {
     header("Location: tasks.php");
     exit;
@@ -13,8 +10,6 @@ if (!isset($_GET['id'])) {
 
  $task_id = $_GET['id'];
 
-// Mengambil data tugas tanpa join ke assignee, karena sekarang bisa banyak
-// Menggunakan LEFT JOIN untuk mendapatkan nama proyek dan pembuat tugas
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $task = $stmt->fetch();
@@ -24,23 +19,17 @@ if (!$task) {
     exit;
 }
 
-// Mengambil nama assignee (penerima tugas)
-// Karena assignee sekarang bisa lebih dari satu (many-to-many mungkin di masa depan, tapi saat ini masih single assignee di tabel tasks, namun query ini disiapkan untuk fleksibilitas atau jika struktur tabel berubah)
-// Catatan: Query ini mengasumsikan hubungan tasks.assignee -> users.id masih berlaku
  $stmt = $pdo->prepare("SELECT u.name FROM users u JOIN tasks t ON u.id = t.assignee WHERE t.id = ?");
  $stmt->execute([$task_id]);
  $assignee_name = $stmt->fetchColumn();
     $task['assignee_names'] = $assignee_name ?: 'None';
 
-// Mengambil semua komentar untuk tugas ini
-// Komentar akan difilter di PHP berdasarkan privasi
  $stmt = $pdo->prepare("SELECT c.*, u.name as author_name FROM comments c LEFT JOIN users u ON c.author_id = u.id WHERE c.task_id = ? ORDER BY c.is_pinned DESC, c.created_at ASC");
  $stmt->execute([$task_id]);
  $all_comments = $stmt->fetchAll();
 
  $comments_to_display = [];
 foreach ($all_comments as $comment) {
-    // Logika privasi: tampilkan jika publik (ALL_MEMBERS), atau jika user adalah admin/manager/pembuat komentar
     if ($comment['privacy'] === 'ALL_MEMBERS' || 
         $_SESSION['user_role'] === 'ADMIN' || 
         $_SESSION['user_role'] === 'MANAGER' || 
@@ -49,7 +38,6 @@ foreach ($all_comments as $comment) {
     }
 }
 
-// Mengambil dokumen yang terkait dengan tugas ini
  $stmt = $pdo->prepare("SELECT d.*, u.name as uploader_name FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id WHERE d.task_id = ? ORDER BY d.uploaded_at DESC");
  $stmt->execute([$task_id]);
  $documents = $stmt->fetchAll();
@@ -61,26 +49,28 @@ foreach ($all_comments as $comment) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $task['title']; ?> - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
         .comment {
-            border-left: 3px solid #007bff;
+            border-left: 3px solid var(--primary-color);
             padding-left: 15px;
             margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: var(--surface-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
         }
 
         .comment.pinned {
-            border-left-color: #ffc107;
-            background-color: #fffdf7;
+            border-left-color: var(--warning-color);
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #FCD34D 100%);
             padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            border: 1px solid var(--warning-color);
         }
         .pinned-badge {
             font-size: 0.75rem;
@@ -90,9 +80,9 @@ foreach ($all_comments as $comment) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -109,7 +99,7 @@ foreach ($all_comments as $comment) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="tasks.php">
+                            <a class="nav-link" href="tasks.php">
                                 <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
@@ -146,8 +136,48 @@ foreach ($all_comments as $comment) {
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <?php if (isset($_GET['success']) && $_GET['success'] == 'document_uploaded'): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Document uploaded successfully!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?php
+                    switch ($_GET['error']) {
+                        case 'empty_fields':
+                            echo 'Please fill in all required fields.';
+                            break;
+                        case 'no_file':
+                            echo 'Please select a file to upload.';
+                            break;
+                        case 'invalid_file_type':
+                            echo 'File type not allowed. Allowed: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF';
+                            break;
+                        case 'invalid_category':
+                            echo 'Invalid category selected.';
+                            break;
+                        case 'upload_failed':
+                            echo 'Failed to upload file. Please try again.';
+                            break;
+                        case 'access_denied':
+                            echo 'You do not have permission to upload documents to this task.';
+                            break;
+                        case 'task_not_found':
+                            echo 'Task not found.';
+                            break;
+                        default:
+                            echo 'An error occurred.';
+                    }
+                    ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php endif; ?>
+
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $task['title']; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
@@ -164,7 +194,7 @@ foreach ($all_comments as $comment) {
                     </div>
                 </div>
 
-                <!-- Informasi Tugas -->
+                
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -175,7 +205,7 @@ foreach ($all_comments as $comment) {
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <strong>Status:</strong>
-                                        <!-- Dropdown Update Status -->
+                                        
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: <?php 
                                                 echo match($task['status']) {
@@ -265,15 +295,57 @@ foreach ($all_comments as $comment) {
                                         <?php endforeach; ?>
                                     </ul>
                                 <?php endif; ?>
-                                <a href="form_document.php?task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-primary mt-2">
+                                <button type="button" class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
                                     <i class="bi bi-upload me-1"></i> Upload Document
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bagian Komentar -->
+                <div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="uploadDocumentModalLabel">Upload Document</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="handle_upload_task_document.php" method="post" enctype="multipart/form-data">
+                                <div class="modal-body">
+                                    <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
+                                    <div class="mb-3">
+                                        <label for="documentTitle" class="form-label">Document Title</label>
+                                        <input type="text" class="form-control" id="documentTitle" name="title" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="documentDescription" class="form-label">Description (Optional)</label>
+                                        <textarea class="form-control" id="documentDescription" name="description" rows="3"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="documentCategory" class="form-label">Category</label>
+                                        <select class="form-select" id="documentCategory" name="category" required>
+                                            <option value="Design">Design</option>
+                                            <option value="Document">Document</option>
+                                            <option value="Report">Report</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="documentFile" class="form-label">File</label>
+                                        <input type="file" class="form-control" id="documentFile" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif" required>
+                                        <div class="form-text">Allowed formats: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -314,7 +386,7 @@ foreach ($all_comments as $comment) {
                                             <input type="file" class="form-control" id="attachment" name="attachment">
                                         </div>
                                         <div class="col-md-6 mb-3 d-flex align-items-end">
-                                            <!-- --- Checkbox Pin Komentar --- -->
+                                            
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" value="1" id="is_pinned" name="is_pinned">
                                                 <label class="form-check-label" for="is_pinned">
@@ -345,7 +417,7 @@ foreach ($all_comments as $comment) {
                                                         default => 'secondary'
                                                     };
                                                 ?> ms-2"><?php echo ucwords(strtolower(str_replace('_', ' ', $comment['type']))); ?></span>
-                                                <!-- --- Tampilkan Badge Pin --- -->
+                                                
                                                 <?php if ($comment['is_pinned']): ?>
                                                     <span class="badge bg-warning text-dark pinned-badge ms-2"><i class="bi bi-pin-angle-fill"></i> Pinned</span>
                                                 <?php endif; ?>
@@ -354,7 +426,7 @@ foreach ($all_comments as $comment) {
                                         </div>
                                         <p class="mb-1"><?php echo nl2br($comment['content']); ?></p>
                                         
-                                        <!-- Tampilkan Lampiran jika ada -->
+                                        
                                         <?php if (!empty($comment['file_path'])): ?>
                                         <div class="alert alert-light d-flex align-items-center" role="alert">
                                             <i class="bi bi-paperclip me-2"></i>
@@ -381,5 +453,16 @@ foreach ($all_comments as $comment) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadModal = document.getElementById('uploadDocumentModal');
+
+            // Reset form when modal is shown
+            uploadModal.addEventListener('show.bs.modal', function() {
+                const form = uploadModal.querySelector('form');
+                form.reset();
+            });
+        });
+    </script>
 </body>
 </html>

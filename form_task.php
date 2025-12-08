@@ -1,19 +1,15 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
  $task = null;
  $is_edit = false;
 
-// Memeriksa apakah mode edit aktif (ada parameter ID di URL)
 if (isset($_GET['id'])) {
     $is_edit = true;
     $task_id = $_GET['id'];
     
-    // Mengambil data tugas yang akan diedit
     $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch();
@@ -23,7 +19,6 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Memeriksa izin pengguna: Admin, Manajer, atau Pembuat tugas dapat mengedit
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
         header("Location: tasks.php");
         exit;
@@ -31,7 +26,6 @@ if (isset($_GET['id'])) {
 
 }
 
-// Memproses data form jika metode request adalah POST dan tombol save_task ditekan
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_task'])) {
     $title = $_POST['title'];
     $description = $_POST['description'];
@@ -43,13 +37,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_task'])) {
     $assignee = $_POST['assignee'] ?? null;
     
     if ($is_edit) {
-        // Memperbarui data tugas yang ada
         $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, project_id = ?, assignee = ? WHERE id = ?");
         $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $assignee, $task_id]);
 
         header("Location: task_detail.php?id=$task_id");
     } else {
-        // Membuat tugas baru
         $created_by_id = $_SESSION['user_id'];
         $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
@@ -60,7 +52,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_task'])) {
     exit;
 }
 
-// Menyiapkan data untuk form (Prioritas: Data POST > Data Database > Default)
 $form_data = [
     'title' => $_POST['title'] ?? ($task['title'] ?? ''),
     'description' => $_POST['description'] ?? ($task['description'] ?? ''),
@@ -71,13 +62,9 @@ $form_data = [
     'assignee' => $_POST['assignee'] ?? ($task['assignee'] ?? '')
 ];
 
-// Mengambil daftar proyek untuk dropdown
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 
-// Mengambil pengguna untuk dropdown assignee
-// Logika: Jika proyek dipilih, hanya tampilkan anggota tim proyek tersebut
-// Jika tidak, tampilkan semua pengguna
 $selected_project_id = $form_data['project_id'];
 
 if ($selected_project_id) {
@@ -103,26 +90,19 @@ if ($selected_project_id) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $is_edit ? 'Edit Task' : 'New Task'; ?> - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
-    <!-- Menggunakan TomSelect untuk dropdown -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -139,7 +119,7 @@ if ($selected_project_id) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="tasks.php">
+                            <a class="nav-link" href="tasks.php">
                                 <i class="bi bi-check2-square me-2"></i> Tasks
                             </a>
                         </li>
@@ -176,7 +156,7 @@ if ($selected_project_id) {
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Task' : 'New Task'; ?></h1>
@@ -205,7 +185,7 @@ if ($selected_project_id) {
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="project_id" class="form-label">Project</label>
-                                            <!-- Reload halaman saat proyek berubah untuk memperbarui daftar assignee -->
+                                            
                                             <select class="form-select" id="project_id" name="project_id" required onchange="this.form.submit()">
                                                 <option value="">Select Project</option>
                                                 <?php foreach ($projects as $project): ?>

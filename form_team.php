@@ -1,11 +1,8 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Memeriksa izin pengguna: Hanya Admin dan Manajer yang boleh membuat/mengedit tim
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     header("Location: dashboard.php");
     exit;
@@ -15,12 +12,10 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
  $team_members = [];
  $is_edit = false;
 
-// Memeriksa apakah mode edit aktif (ada parameter ID di URL)
 if (isset($_GET['id'])) {
     $is_edit = true;
     $team_id = $_GET['id'];
     
-    // Mengambil data tim yang akan diedit
     $stmt = $pdo->prepare("SELECT * FROM teams WHERE id = ?");
     $stmt->execute([$team_id]);
     $team = $stmt->fetch();
@@ -30,18 +25,15 @@ if (isset($_GET['id'])) {
         exit;
     }
     
-    // Mengambil anggota tim saat ini
     $stmt = $pdo->prepare("SELECT user_id FROM team_members WHERE team_id = ?");
     $stmt->execute([$team_id]);
     $team_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Memproses data form jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['description'];
     
-    // Menentukan ketua tim (bisa diri sendiri atau orang lain)
     if (isset($_POST['make_me_head']) && $_POST['make_me_head'] == '1') {
         $team_head_id = $_SESSION['user_id'];
     } else {
@@ -50,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $members = $_POST['members'] ?? [];
     
-    // Proses upload logo tim
     $logo_path = $team['logo_path'] ?? null; 
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
@@ -58,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
         
         if (in_array(strtolower($filetype), $allowed)) {
-            // Hapus logo lama jika ada dan sedang dalam mode edit
             if ($is_edit && !empty($team['logo_path'])) {
                 $old_logo_path = 'uploads/' . $team['logo_path'];
                 if (file_exists($old_logo_path)) {
@@ -66,7 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
             
-            // Simpan logo baru
             $new_filename = 'team_logo_' . uniqid() . '.' . $filetype;
             $upload_path = 'uploads/' . $new_filename;
             
@@ -77,11 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     if ($is_edit) {
-        // Memperbarui data tim yang ada
         $stmt = $pdo->prepare("UPDATE teams SET name = ?, description = ?, team_head_id = ?, logo_path = ? WHERE id = ?");
         $stmt->execute([$name, $description, $team_head_id, $logo_path, $team_id]);
         
-        // Memperbarui anggota tim (hapus semua lalu insert ulang)
         $stmt = $pdo->prepare("DELETE FROM team_members WHERE team_id = ?");
         $stmt->execute([$team_id]);
         
@@ -92,13 +79,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         header("Location: team_detail.php?id=$team_id");
     } else {
-        // Membuat tim baru
         $stmt = $pdo->prepare("INSERT INTO teams (name, description, team_head_id, logo_path) VALUES (?, ?, ?, ?)");
         $stmt->execute([$name, $description, $team_head_id, $logo_path]);
         
         $team_id = $pdo->lastInsertId();
         
-        // Menambahkan anggota ke tim baru
         foreach ($members as $member_id) {
             $stmt = $pdo->prepare("INSERT INTO team_members (team_id, user_id) VALUES (?, ?)");
             $stmt->execute([$team_id, $member_id]);
@@ -109,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// Mengambil semua pengguna untuk pilihan anggota tim
  $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
  $users = $stmt->fetchAll();
 ?>
@@ -120,33 +104,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $is_edit ? 'Edit Team' : 'New Team'; ?> - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Menggunakan Tom Select untuk dropdown multi-select -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
         .logo-preview {
             max-width: 100px;
             max-height: 100px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
             padding: 5px;
             margin-top: 10px;
+            background-color: var(--surface-color);
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -173,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="teams.php">
+                            <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
                         </li>
@@ -200,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Team' : 'New Team'; ?></h1>
@@ -287,7 +268,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inisialisasi TomSelect untuk daftar anggota
             new TomSelect('#members-select', {
                 plugins: {
                     'checkbox_options': {},
@@ -299,20 +279,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 maxItems: null
             });
 
-            // Logika "Make Me Head"
             const makeMeHeadCheckbox = document.getElementById('make_me_head');
             const teamHeadDropdown = document.getElementById('team_head_id');
             const currentUserId = '<?php echo $_SESSION['user_id']; ?>';
 
             makeMeHeadCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    // Pilih user saat ini di dropdown
                     teamHeadDropdown.value = currentUserId;
-                    // Opsional: disable dropdown jika ingin memaksa
-                    // teamHeadDropdown.disabled = true;
                 } else {
-                    // Enable kembali jika unchecked
-                    // teamHeadDropdown.disabled = false;
                 }
             });
         });

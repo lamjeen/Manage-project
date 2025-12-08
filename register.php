@@ -1,41 +1,32 @@
 <?php
-// Memulai sesi
 session_start();
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
  $error = '';
 
-// Memproses registrasi jika metode request adalah POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
-    // Role default untuk pengguna baru adalah MEMBER
     $role = 'MEMBER';
 
-    // Validasi kesesuaian password
     if ($password != $confirm_password) {
         $error = "Passwords do not match!";
     } else {
-        // Memeriksa apakah email sudah terdaftar
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         
         if ($stmt->fetch()) {
             $error = "Email already registered!";
         } else {
-            // Mengamankan password dengan hashing
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             
-            // Menyimpan pengguna baru ke database
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
             $stmt->execute([$name, $email, $password_hash, $role]);
             
-            // Redirect ke halaman login dengan pesan sukses
             header("Location: login.php?registered=1");
             exit;
         }
@@ -49,11 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -62,10 +54,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .register-container {
             max-width: 400px;
             width: 100%;
-            padding: 30px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            background-color: var(--surface-color);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--border-color);
+        }
+        .register-container h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 0.75rem 2rem !important;
+            font-weight: 500 !important;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3) !important;
         }
     </style>
 </head>

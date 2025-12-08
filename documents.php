@@ -1,12 +1,8 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Mengambil daftar dokumen beserta informasi pengunggah, proyek, dan tugas terkait
-// Menggunakan LEFT JOIN untuk mendapatkan nama pengguna, nama proyek, dan judul tugas
  $stmt = $pdo->query("SELECT d.*, u.name as uploader_name, p.name as project_name, t.title as task_title FROM documents d LEFT JOIN users u ON d.uploaded_by_id = u.id LEFT JOIN projects p ON d.project_id = p.id LEFT JOIN tasks t ON d.task_id = t.id ORDER BY d.uploaded_at DESC");
  $documents = $stmt->fetchAll();
 ?>
@@ -17,22 +13,17 @@ require_once 'db_connect.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documents - WeProject</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -54,7 +45,7 @@ require_once 'db_connect.php';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="documents.php">
+                            <a class="nav-link" href="documents.php">
                                 <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
@@ -86,7 +77,7 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Documents</h1>
@@ -99,7 +90,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Tabel Dokumen -->
+                
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($documents)): ?>
@@ -167,7 +158,7 @@ require_once 'db_connect.php';
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
+    
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -189,7 +180,6 @@ require_once 'db_connect.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Logika untuk menampilkan modal konfirmasi hapus
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             

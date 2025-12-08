@@ -1,27 +1,20 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Mengambil total jumlah proyek untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
-// Mengambil total jumlah tugas untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM tasks");
  $tasks_count = $stmt->fetch()['total'];
 
-// Mengambil total jumlah pengguna untuk statistik
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
 
-// Mengambil 5 proyek terbaru beserta nama manajernya
- $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC LIMIT 5");
+ $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
-// Mengambil 5 tugas saya yang belum selesai, diurutkan berdasarkan tenggat waktu
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
@@ -33,14 +26,11 @@ require_once 'db_connect.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistem Manajemen Proyek</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
         .card-stat {
             transition: transform 0.3s;
         }
@@ -52,16 +42,16 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="dashboard.php">
+                            <a class="nav-link" href="dashboard.php">
                                 <i class="bi bi-house-door me-2"></i> Dashboard
                             </a>
                         </li>
@@ -108,7 +98,7 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Dashboard</h1>
@@ -121,7 +111,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Kartu Statistik -->
+                
                 <div class="row mb-4">
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-primary shadow h-100 py-2 card-stat">
@@ -193,15 +183,15 @@ require_once 'db_connect.php';
                 </div>
 
                 <div class="row">
-                    <!-- Proyek Terbaru -->
+                    
                     <div class="col-lg-8 mb-4">
                         <div class="card">
                             <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Recent Projects</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Upcoming Project Due</h6>
                             </div>
                             <div class="card-body">
                                 <?php if (empty($recent_projects)): ?>
-                                    <p>No projects yet.</p>
+                                    <p>No active projects with deadlines.</p>
                                 <?php else: ?>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -210,6 +200,7 @@ require_once 'db_connect.php';
                                                     <th>Project Name</th>
                                                     <th>Manager</th>
                                                     <th>Status</th>
+                                                    <th>Deadline</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -219,7 +210,7 @@ require_once 'db_connect.php';
                                                     <td><a href="project_detail.php?id=<?php echo $project['id']; ?>"><?php echo $project['name']; ?></a></td>
                                                     <td><?php echo $project['manager_name'] ?? 'None'; ?></td>
                                                     <td>
-                                                        <span class="badge bg-<?php 
+                                                        <span class="badge bg-<?php
                                                             echo match($project['status']) {
                                                                 'PLANNING' => 'info',
                                                                 'ACTIVE' => 'success',
@@ -230,6 +221,7 @@ require_once 'db_connect.php';
                                                             };
                                                         ?>"><?php echo $project['status']; ?></span>
                                                     </td>
+                                                    <td><?php echo date('d M Y', strtotime($project['end_date'])); ?></td>
                                                     <td>
                                                         <a href="project_detail.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-info">
                                                             <i class="bi bi-eye"></i>
@@ -245,7 +237,7 @@ require_once 'db_connect.php';
                         </div>
                     </div>
 
-                    <!-- Tugas Saya -->
+                    
                     <div class="col-lg-4 mb-4">
                         <div class="card">
                             <div class="card-header">

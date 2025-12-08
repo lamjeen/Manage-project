@@ -1,17 +1,11 @@
 <?php
-// Memastikan pengguna sudah login sebelum mengakses file ini
 require_once 'auth_check.php';
 
-// Menghubungkan ke database
 require_once 'db_connect.php';
 
-// Mengambil daftar proyek beserta nama manajernya
-// Menggunakan LEFT JOIN untuk mendapatkan nama manajer dari tabel users
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC");
  $projects = $stmt->fetchAll();
 
-// Mengambil daftar pengguna yang bisa menjadi manajer (Admin & Manager)
-// Digunakan untuk dropdown filter atau keperluan lain (jika ada)
  $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
  $managers = $stmt->fetchAll();
 ?>
@@ -22,14 +16,11 @@ require_once 'db_connect.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proyek - Sistem Manajemen Proyek</title>
-    <!-- Menggunakan Bootstrap 5 -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
         .project-card {
             transition: transform 0.3s;
         }
@@ -41,9 +32,9 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar Navigasi -->
+            
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+                <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-kanban fs-4 me-2"></i>
                         <h5 class="mb-0">WeProject</h5>
@@ -55,7 +46,7 @@ require_once 'db_connect.php';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="projects.php">
+                            <a class="nav-link" href="projects.php">
                                 <i class="bi bi-folder me-2"></i> Projects
                             </a>
                         </li>
@@ -97,7 +88,7 @@ require_once 'db_connect.php';
                 </div>
             </nav>
 
-            <!-- Konten Utama -->
+            
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Projects</h1>
@@ -110,7 +101,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Filter dan Pencarian -->
+                
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="input-group">
@@ -132,7 +123,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                <!-- Grid Proyek -->
+                
                 <div class="row" id="projectsContainer">
                     <?php if (empty($projects)): ?>
                         <div class="col-12">
@@ -192,7 +183,7 @@ require_once 'db_connect.php';
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Hapus -->
+    
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -214,7 +205,6 @@ require_once 'db_connect.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Logika untuk menampilkan modal konfirmasi hapus
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             
@@ -226,7 +216,6 @@ require_once 'db_connect.php';
                 });
             });
             
-            // Logika Filter dan Pencarian
             const statusFilter = document.getElementById('statusFilter');
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');

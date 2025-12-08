@@ -1,0 +1,321 @@
+/* =============================================================================
+   WeProject - Simple Theme
+   ============================================================================= */
+
+body {
+  background-color: #F8FAFC !important;
+  color: #1E293B;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* =============================================================================
+   SIDEBAR STYLES
+   ============================================================================= */
+
+.sidebar {
+  background-color: #1e2c42 !important;
+  border-right: 1px solid #1D4ED8;
+  min-height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar .nav-link:hover {
+  color: #FFFFFF !important;
+}
+
+
+/* Brand/Logo */
+.sidebar .text-white,
+.sidebar h5 {
+  color: #FFFFFF !important;
+}
+
+/* Dropdown */
+.sidebar .dropdown-menu {
+  background-color: #1E40AF !important;
+  border: 1px solid #1D4ED8;
+}
+
+.sidebar .dropdown-item {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.sidebar .dropdown-item:hover {
+  color: #FFFFFF !important;
+  background-color: #2563EB !important;
+}
+
+/* Username in sidebar */
+.sidebar .dropdown-toggle strong {
+  color: #FCD34D !important;
+}
+
+/* =============================================================================
+   CARDS & COMPONENTS
+   ============================================================================= */
+
+.card {
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  background-color: #FFFFFF !important;
+}
+
+
+.card-header {
+  background-color: #DBEAFE !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.card-header h5, .card-header h6 {
+  color: #2563EB !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+/* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.btn-primary {
+  background-color: #2563EB !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 1.25rem !important;
+  font-weight: 500 !important;
+  color: white !important;
+}
+
+.btn-primary:hover {
+  background-color: #1D4ED8 !important;
+  color: white !important;
+}
+
+.btn-outline-primary {
+  color: #2563EB !important;
+  border-color: #2563EB !important;
+  background-color: transparent !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #2563EB !important;
+  border-color: #2563EB !important;
+  color: white !important;
+}
+
+.btn-outline-secondary {
+  color: #64748B !important;
+  border-color: #E2E8F0 !important;
+  border-radius: 8px !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #1E293B !important;
+}
+
+/* =============================================================================
+   FORM ELEMENTS
+   ============================================================================= */
+
+.form-control {
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  background-color: #FFFFFF !important;
+}
+
+.form-control:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15) !important;
+  background-color: #FFFFFF !important;
+}
+
+.form-select {
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 8px !important;
+  background-color: #FFFFFF !important;
+}
+
+.form-select:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Form Labels */
+.form-label {
+  color: #1E293B !important;
+  font-weight: 500 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* =============================================================================
+   TABLES
+   ============================================================================= */
+
+.table {
+  background-color: #FFFFFF !important;
+}
+
+.table thead th {
+  background-color: #DBEAFE !important;
+  color: #2563EB !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #2563EB !important;
+  padding: 1rem 0.75rem !important;
+}
+
+.table tbody tr:hover {
+  background-color: #F1F5F9 !important;
+}
+
+.table td {
+  padding: 1rem 0.75rem !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  vertical-align: middle !important;
+}
+
+/* =============================================================================
+   ALERTS & BADGES
+   ============================================================================= */
+
+.alert-success {
+  background-color: #D1FAE5 !important;
+  border: 1px solid #059669 !important;
+  color: #065F46 !important;
+  border-radius: 8px !important;
+}
+
+.alert-danger {
+  background-color: #FEE2E2 !important;
+  border: 1px solid #DC2626 !important;
+  color: #991B1B !important;
+  border-radius: 8px !important;
+}
+
+.badge {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  padding: 0.35em 0.65em !important;
+}
+
+/* Status Badges */
+.badge.bg-success { background-color: #059669 !important; }
+.badge.bg-warning { background-color: #D97706 !important; }
+.badge.bg-danger { background-color: #DC2626 !important; }
+.badge.bg-info { background-color: #2563EB !important; }
+.badge.bg-primary { background-color: #2563EB !important; }
+.badge.bg-secondary { background-color: #64748B !important; }
+
+/* =============================================================================
+   PROGRESS BARS
+   ============================================================================= */
+
+.progress {
+  background-color: #F1F5F9 !important;
+  border-radius: 10px !important;
+  height: 8px !important;
+}
+
+.progress-bar {
+  background-color: #2563EB !important;
+  border-radius: 10px !important;
+}
+
+/* =============================================================================
+   MODALS
+   ============================================================================= */
+
+.modal-content {
+  border-radius: 12px !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.modal-header {
+  background-color: #DBEAFE !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.modal-title {
+  color: #2563EB !important;
+  font-weight: 600 !important;
+}
+
+/* =============================================================================
+   TASK CARDS & KANBAN
+   ============================================================================= */
+
+.task-card {
+  border-radius: 8px !important;
+  border: 1px solid #E2E8F0 !important;
+  background-color: #FFFFFF !important;
+}
+
+
+.task-column {
+  background-color: #F1F5F9 !important;
+  border-radius: 8px !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
+.text-primary { color: #2563EB !important; }
+.text-secondary { color: #64748B !important; }
+.text-muted { color: #94A3B8 !important; }
+
+.bg-primary { background-color: #2563EB !important; }
+.bg-light { background-color: #F8FAFC !important; }
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 280px !important;
+    height: 100vh !important;
+    z-index: 1050 !important;
+  }
+
+  .sidebar.show {
+    left: 0 !important;
+  }
+
+  .card {
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* =============================================================================
+   ACCESSIBILITY
+   ============================================================================= */
+
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+  outline: none !important;
+}
+
+/* Focus indicators */
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+  outline: 2px solid #2563EB !important;
+  outline-offset: 2px !important;
+}
