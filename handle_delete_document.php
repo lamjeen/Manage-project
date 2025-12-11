@@ -21,7 +21,7 @@ if (isset($_GET['id'])) {
             $stmt = $pdo->prepare("DELETE FROM documents WHERE id = ?");
             $stmt->execute([$document_id]);
             
-            $redirect_url = "documents.php";
+            $redirect_url = "projects.php";
             if ($document['project_id']) {
                 $redirect_url = "project_detail.php?id=" . $document['project_id'] . "#documents";
             }
@@ -31,6 +31,6 @@ if (isset($_GET['id'])) {
     }
 }
 
-header("Location: documents.php");
+header("Location: projects.php");
 exit;
 ?>

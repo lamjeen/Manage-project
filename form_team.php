@@ -144,16 +144,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>

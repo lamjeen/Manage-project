@@ -85,23 +85,6 @@ foreach ($tasks as $task) {
         .task-card:hover {
             transform: translateY(-3px);
         }
-        .create-task-btn {
-            opacity: 0;
-            transition: opacity 0.2s;
-            width: 100%;
-            text-align: left;
-            padding: 8px 12px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-        }
-        .create-task-btn:hover {
-            background-color: var(--surface-hover);
-            color: var(--primary-color);
-        }
-        .task-column:hover .create-task-btn {
-            opacity: 1;
-        }
     </style>
 </head>
 <body>
@@ -123,16 +106,6 @@ foreach ($tasks as $task) {
                         <li class="nav-item">
                             <a class="nav-link" href="projects.php">
                                 <i class="bi bi-folder me-2"></i> Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
                             </a>
                         </li>
                         <li class="nav-item">
@@ -276,9 +249,9 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">To Do (<?php echo $task_counts['TO_DO']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-TO_DO">
+                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=TO_DO" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-plus-lg me-2"></i> Create
-                                                </button>
+                                                </a>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'TO_DO'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -312,9 +285,9 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">In Progress (<?php echo $task_counts['IN_PROGRESS']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-IN_PROGRESS">
+                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=IN_PROGRESS" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-plus-lg me-2"></i> Create
-                                                </button>
+                                                </a>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'IN_PROGRESS'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -348,9 +321,9 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">Review (<?php echo $task_counts['REVIEW']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-REVIEW">
+                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=REVIEW" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-plus-lg me-2"></i> Create
-                                                </button>
+                                                </a>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'REVIEW'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -384,9 +357,9 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">Done (<?php echo $task_counts['DONE']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <button class="create-task-btn mb-2" data-bs-toggle="modal" data-bs-target="#createTaskModal-DONE">
+                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=DONE" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-plus-lg me-2"></i> Create
-                                                </button>
+                                                </a>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'DONE'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -488,73 +461,6 @@ foreach ($tasks as $task) {
         </div>
     </div>
 
-    
-    <?php 
-    $statuses = [
-        'TO_DO' => 'To Do', 
-        'IN_PROGRESS' => 'In Progress', 
-        'REVIEW' => 'Review', 
-        'DONE' => 'Done'
-    ];
-    foreach ($statuses as $status_key => $status_label): 
-    ?>
-    <div class="modal fade" id="createTaskModal-<?php echo $status_key; ?>" tabindex="-1" aria-labelledby="createTaskModalLabel-<?php echo $status_key; ?>" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createTaskModalLabel-<?php echo $status_key; ?>">New Task (<?php echo $status_label; ?>)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="handle_create_task.php" method="POST" id="createTaskForm-<?php echo $status_key; ?>">
-                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                        <input type="hidden" name="status" value="<?php echo $status_key; ?>">
-                        
-                        <div class="mb-3">
-                            <label for="modalTaskTitle-<?php echo $status_key; ?>" class="form-label">Task Title</label>
-                            <input type="text" class="form-control" id="modalTaskTitle-<?php echo $status_key; ?>" name="title" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="modalTaskDescription-<?php echo $status_key; ?>" class="form-label">Description</label>
-                            <textarea class="form-control" id="modalTaskDescription-<?php echo $status_key; ?>" name="description" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="modalTaskPriority-<?php echo $status_key; ?>" class="form-label">Priority</label>
-                                <select class="form-select" id="modalTaskPriority-<?php echo $status_key; ?>" name="priority" required>
-                                    <option value="LOW">Low</option>
-                                    <option value="MEDIUM" selected>Medium</option>
-                                    <option value="HIGH">High</option>
-                                    <option value="CRITICAL">Critical</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="modalTaskAssignee-<?php echo $status_key; ?>" class="form-label">Assignee</label>
-                                <select class="form-select" id="modalTaskAssignee-<?php echo $status_key; ?>" name="assignee">
-                                    <option value="">Select...</option>
-                                    <?php foreach ($project_members as $member): ?>
-                                        <option value="<?php echo $member['id']; ?>"><?php echo htmlspecialchars($member['name']); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="modalTaskDueDate-<?php echo $status_key; ?>" class="form-label">Due Date</label>
-                            <input type="datetime-local" class="form-control" id="modalTaskDueDate-<?php echo $status_key; ?>" name="due_date">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" form="createTaskForm-<?php echo $status_key; ?>" class="btn btn-primary">Create Task</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
 
     
     <div class="modal fade" id="deleteDocumentModal" tabindex="-1" aria-labelledby="deleteDocumentModalLabel" aria-hidden="true">

@@ -4,7 +4,7 @@ require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if (!isset($_GET['id'])) {
-    header("Location: tasks.php");
+    header("Location: projects.php");
     exit;
 }
 
@@ -15,7 +15,7 @@ if (!isset($_GET['id'])) {
  $task = $stmt->fetch();
 
 if (!$task) {
-    header("Location: tasks.php");
+    header("Location: projects.php");
     exit;
 }
 
@@ -99,16 +99,6 @@ foreach ($all_comments as $comment) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -182,7 +172,7 @@ foreach ($all_comments as $comment) {
                     <h1 class="h2"><?php echo $task['title']; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="tasks.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="project_detail.php?id=<?php echo $task['project_id']; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                             <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $task['created_by_id'] == $_SESSION['user_id']): ?>

@@ -4,7 +4,7 @@ require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if (!isset($_GET['id'])) {
-    header("Location: documents.php");
+    header("Location: projects.php");
     exit;
 }
 
@@ -26,7 +26,7 @@ $stmt->execute([$document_id]);
 $document = $stmt->fetch();
 
 if (!$document) {
-    header("Location: documents.php");
+    header("Location: projects.php");
     exit;
 }
 ?>
@@ -64,16 +64,6 @@ if (!$document) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -107,7 +97,7 @@ if (!$document) {
                     <h1 class="h2">Document Details</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="documents.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="projects.php" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                             <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $document['uploaded_by_id'] == $_SESSION['user_id']): ?>

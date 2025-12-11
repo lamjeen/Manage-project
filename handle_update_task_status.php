@@ -23,6 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-header("Location: tasks.php");
+header("Location: task_detail.php?id=$task_id");
 exit;
 ?>

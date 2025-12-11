@@ -114,16 +114,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -262,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
-        new TomSelect("#team_ids",{
+            new TomSelect("#team_ids",{
             plugins: ['remove_button'],
             create: false,
             placeholder: "Select Teams..."

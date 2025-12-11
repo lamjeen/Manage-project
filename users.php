@@ -45,16 +45,6 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -86,9 +76,9 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                     <h1 class="h2">Users</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newUserModal">
+                            <a href="form_user.php" class="btn btn-sm btn-primary">
                                 <i class="bi bi-plus-circle me-1"></i> New User
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -179,13 +169,9 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                                             </td>
                                             <td><?php echo date('d M Y', strtotime($user['created_at'])); ?></td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary edit-user"
-                                                        data-id="<?php echo $user['id']; ?>"
-                                                        data-name="<?php echo htmlspecialchars($user['name']); ?>"
-                                                        data-email="<?php echo htmlspecialchars($user['email']); ?>"
-                                                        data-role="<?php echo $user['role']; ?>">
+                                                <a href="form_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-outline-primary">
                                                     <i class="bi bi-pencil"></i>
-                                                </button>
+                                                </a>
                                                 <?php if ($user['id'] != $_SESSION['user_id']): ?>
                                                 <button class="btn btn-sm btn-outline-danger delete-user" data-id="<?php echo $user['id']; ?>">
                                                     <i class="bi bi-trash"></i>
@@ -223,92 +209,10 @@ if ($_SESSION['user_role'] != 'ADMIN') {
         </div>
     </div>
 
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="handle_update_user.php" method="post">
-                    <div class="modal-body">
-                        <input type="hidden" id="editUserId" name="id">
-                        <div class="mb-3">
-                            <label for="editName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="editName" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="editEmail" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editRole" class="form-label">Role</label>
-                            <select class="form-select" id="editRole" name="role" required>
-                                <option value="MEMBER">Member</option>
-                                <option value="MANAGER">Manager</option>
-                                <option value="ADMIN">Admin</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="newUserModal" tabindex="-1" aria-labelledby="newUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="newUserModalLabel">New User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form action="handle_create_user.php" method="post">
-                    <div class="modal-body">
-                        <div id="newUserError" class="alert alert-danger" style="display: none;"></div>
-                        <div class="mb-3">
-                            <label for="newUserName" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="newUserName" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newUserEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="newUserEmail" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newUserRole" class="form-label">Role</label>
-                            <select class="form-select" id="newUserRole" name="role" required>
-                                <option value="MEMBER">Member</option>
-                                <option value="MANAGER">Manager</option>
-                                <option value="ADMIN">Admin</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newUserPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="newUserPassword" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="newUserConfirmPassword" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="newUserConfirmPassword" name="confirm_password" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Create User</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-            const newUserModal = new bootstrap.Modal(document.getElementById('newUserModal'));
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
             document.querySelectorAll('.delete-user').forEach(button => {
@@ -317,29 +221,6 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                     confirmDeleteBtn.href = `handle_delete_user.php?id=${userId}`;
                     deleteModal.show();
                 });
-            });
-
-            document.querySelectorAll('.edit-user').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    const userName = this.getAttribute('data-name');
-                    const userEmail = this.getAttribute('data-email');
-                    const userRole = this.getAttribute('data-role');
-
-                    document.getElementById('editUserId').value = userId;
-                    document.getElementById('editName').value = userName;
-                    document.getElementById('editEmail').value = userEmail;
-                    document.getElementById('editRole').value = userRole;
-
-                    editUserModal.show();
-                });
-            });
-
-            // Reset new user modal form when shown
-            document.getElementById('newUserModal').addEventListener('show.bs.modal', function() {
-                const form = this.querySelector('form');
-                form.reset();
-                document.getElementById('newUserError').style.display = 'none';
             });
         });
     </script>

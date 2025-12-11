@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task = $stmt->fetch();
 
     if (!$task) {
-        header("Location: tasks.php?error=task_not_found");
+        header("Location: projects.php?error=task_not_found");
         exit;
     }
 
@@ -89,6 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-header("Location: tasks.php");
+header("Location: task_detail.php?id=$task_id");
 exit;
 ?>

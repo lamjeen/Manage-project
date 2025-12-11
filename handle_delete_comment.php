@@ -22,6 +22,6 @@ if (isset($_GET['id']) && isset($_GET['task_id'])) {
     exit;
 }
 
-header("Location: tasks.php");
+header("Location: projects.php");
 exit;
 ?>

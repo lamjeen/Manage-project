@@ -15,12 +15,12 @@ if (isset($_GET['id'])) {
     $document = $stmt->fetch();
     
     if (!$document) {
-        header("Location: documents.php");
+        header("Location: projects.php");
         exit;
     }
-    
+
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $document['uploaded_by_id'] != $_SESSION['user_id']) {
-        header("Location: documents.php");
+        header("Location: projects.php");
         exit;
     }
 }
@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif ($task_id) {
                 header("Location: task_detail.php?id=$task_id");
             } else {
-                header("Location: documents.php");
+                header("Location: projects.php");
             }
         }
         exit;
@@ -141,16 +141,6 @@ if ($is_edit) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -184,7 +174,7 @@ if ($is_edit) {
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="documents.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="projects.php" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -268,7 +258,7 @@ if ($is_edit) {
                                         <input type="text" class="form-control" id="uploaded_by" name="uploaded_by" value="<?php echo $_SESSION['user_name']; ?>" readonly>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="documents.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <a href="projects.php" class="btn btn-secondary me-2">Cancel</a>
                                         <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Upload Document'; ?></button>
                                     </div>
                                 </form>

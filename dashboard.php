@@ -61,16 +61,6 @@ require_once 'db_connect.php';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="tasks.php">
-                                <i class="bi bi-check2-square me-2"></i> Tasks
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="documents.php">
-                                <i class="bi bi-file-earmark me-2"></i> Documents
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="teams.php">
                                 <i class="bi bi-people me-2"></i> Teams
                             </a>
@@ -170,7 +160,7 @@ require_once 'db_connect.php';
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            My Tasks</div>
+                                            My Total Tasks</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo count($my_tasks); ?></div>
                                     </div>
                                     <div class="col-auto">
