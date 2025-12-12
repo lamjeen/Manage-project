@@ -285,55 +285,14 @@ foreach ($all_comments as $comment) {
                                         <?php endforeach; ?>
                                     </ul>
                                 <?php endif; ?>
-                                <button type="button" class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+                                <a href="form_document.php?task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-primary mt-2">
                                     <i class="bi bi-upload me-1"></i> Upload Document
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="uploadDocumentModalLabel">Upload Document</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form action="handle_upload_task_document.php" method="post" enctype="multipart/form-data">
-                                <div class="modal-body">
-                                    <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
-                                    <div class="mb-3">
-                                        <label for="documentTitle" class="form-label">Document Title</label>
-                                        <input type="text" class="form-control" id="documentTitle" name="title" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="documentDescription" class="form-label">Description (Optional)</label>
-                                        <textarea class="form-control" id="documentDescription" name="description" rows="3"></textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="documentCategory" class="form-label">Category</label>
-                                        <select class="form-select" id="documentCategory" name="category" required>
-                                            <option value="Design">Design</option>
-                                            <option value="Document">Document</option>
-                                            <option value="Report">Report</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="documentFile" class="form-label">File</label>
-                                        <input type="file" class="form-control" id="documentFile" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif" required>
-                                        <div class="form-text">Allowed formats: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF</div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Upload</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
 
                 
                 <div class="row">
@@ -443,16 +402,5 @@ foreach ($all_comments as $comment) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const uploadModal = document.getElementById('uploadDocumentModal');
-
-            // Reset form when modal is shown
-            uploadModal.addEventListener('show.bs.modal', function() {
-                const form = uploadModal.querySelector('form');
-                form.reset();
-            });
-        });
-    </script>
 </body>
 </html>
