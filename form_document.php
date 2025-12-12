@@ -174,7 +174,15 @@ if ($is_edit) {
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Document' : 'Upload New Document'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="projects.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="<?php
+                                if ($current_task_id) {
+                                    echo 'task_detail.php?id=' . $current_task_id;
+                                } elseif ($current_project_id) {
+                                    echo 'project_detail.php?id=' . $current_project_id;
+                                } else {
+                                    echo 'projects.php';
+                                }
+                            ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -205,42 +213,13 @@ if ($is_edit) {
                                         <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="3"><?php echo $document['description'] ?? ''; ?></textarea>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Related To</label>
-                                        <div>
-                                            <div class="form-check form-check-inline">
-                                            
-                                                <input class="form-check-input" type="radio" name="related_to" id="relatedProject" value="project" <?php echo ($current_project_id) ? 'checked' : ''; ?> required>
-                                                <label class="form-check-label" for="relatedProject">Project</label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="related_to" id="relatedTask" value="task" <?php echo ($current_task_id) ? 'checked' : ''; ?> required>
-                                                <label class="form-check-label" for="relatedTask">Task</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3" id="projectSelectContainer">
-                                        <label for="project_id" class="form-label">Select Project</label>
-                                        <select class="form-select" id="project_id" name="project_id">
-                                            <option value="">Select Project</option>
-                                            <?php foreach ($projects as $project_item): ?>
-                                                <option value="<?php echo $project_item['id']; ?>" <?php echo ($current_project_id == $project_item['id']) ? 'selected' : ''; ?>>
-                                                    <?php echo $project_item['name']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3 d-none" id="taskSelectContainer">
-                                        <label for="task_id" class="form-label">Select Task</label>
-                                        <select class="form-select" id="task_id" name="task_id">
-                                            <option value="">Select Task</option>
-                                            <?php foreach ($tasks as $task_item): ?>
-                                                <option value="<?php echo $task_item['id']; ?>" <?php echo ($current_task_id == $task_item['id']) ? 'selected' : ''; ?>>
-                                                    <?php echo $task_item['title']; ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
+                                    <?php if ($current_task_id): ?>
+                                        <input type="hidden" name="related_to" value="task">
+                                        <input type="hidden" name="task_id" value="<?php echo $current_task_id; ?>">
+                                    <?php elseif ($current_project_id): ?>
+                                        <input type="hidden" name="related_to" value="project">
+                                        <input type="hidden" name="project_id" value="<?php echo $current_project_id; ?>">
+                                    <?php endif; ?>
                                     <div class="row">
 
                                         <div class="col-md-6 mb-3">
@@ -258,7 +237,15 @@ if ($is_edit) {
                                         <input type="text" class="form-control" id="uploaded_by" name="uploaded_by" value="<?php echo $_SESSION['user_name']; ?>" readonly>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="projects.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <a href="<?php
+                                            if ($current_task_id) {
+                                                echo 'task_detail.php?id=' . $current_task_id;
+                                            } elseif ($current_project_id) {
+                                                echo 'project_detail.php?id=' . $current_project_id;
+                                            } else {
+                                                echo 'projects.php';
+                                            }
+                                        ?>" class="btn btn-secondary me-2">Cancel</a>
                                         <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Upload Document'; ?></button>
                                     </div>
                                 </form>
@@ -271,34 +258,6 @@ if ($is_edit) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const relatedProject = document.getElementById('relatedProject');
-            const relatedTask = document.getElementById('relatedTask');
-            const projectSelectContainer = document.getElementById('projectSelectContainer');
-            const taskSelectContainer = document.getElementById('taskSelectContainer');
-            const projectIdSelect = document.getElementById('project_id');
-            const taskIdSelect = document.getElementById('task_id');
-
-            function toggleSelects() {
-                if (relatedProject.checked) {
-                    projectSelectContainer.classList.remove('d-none');
-                    taskSelectContainer.classList.add('d-none');
-                    projectIdSelect.setAttribute('required', 'required');
-                    taskIdSelect.removeAttribute('required');
-                } else {
-                    projectSelectContainer.classList.add('d-none');
-                    taskSelectContainer.classList.remove('d-none');
-                    projectIdSelect.removeAttribute('required');
-                    taskIdSelect.setAttribute('required', 'required');
-                }
-            }
-
-            relatedProject.addEventListener('change', toggleSelects);
-            relatedTask.addEventListener('change', toggleSelects);
-            
-            toggleSelects();
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

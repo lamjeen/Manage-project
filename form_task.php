@@ -152,7 +152,7 @@ if ($selected_project_id) {
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Task' : 'New Task'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="projects.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="<?php echo $selected_project_id ? 'project_detail.php?id=' . $selected_project_id : 'projects.php'; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -223,7 +223,7 @@ if ($selected_project_id) {
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="projects.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <a href="<?php echo $selected_project_id ? 'project_detail.php?id=' . $selected_project_id : 'projects.php'; ?>" class="btn btn-secondary me-2">Cancel</a>
                                         <button type="submit" name="save_task" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Create Task'; ?></button>
                                     </div>
                                 </form>

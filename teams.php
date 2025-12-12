@@ -105,12 +105,25 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                             <div class="card h-100 team-card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0"><?php echo $team['name']; ?></h6>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-gear text-muted" title="Team Settings"></i>
+                                        <i class="bi bi-sliders text-muted" title="Slot Settings"></i>
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text"><?php echo substr($team['description'], 0, 100) . (strlen($team['description']) > 100 ? '...' : ''); ?></p>
-                                    <small class="text-muted">
-                                        <i class="bi bi-person-badge"></i> Team Head: <?php echo $team['team_head_name'] ?? 'None'; ?>
-                                    </small>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <p class="card-text"><?php echo substr($team['description'], 0, 100) . (strlen($team['description']) > 100 ? '...' : ''); ?></p>
+                                            <small class="text-muted">
+                                                <i class="bi bi-person-badge"></i> Team Head: <?php echo $team['team_head_name'] ?? 'None'; ?>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <?php if (!empty($team['logo_path'])): ?>
+                                                <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Team Logo" class="img-thumbnail" style="max-width: 80px; max-height: 80px;">
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="d-flex justify-content-between">

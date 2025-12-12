@@ -249,9 +249,11 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">To Do (<?php echo $task_counts['TO_DO']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=TO_DO" class="btn btn-sm btn-outline-primary mb-2">
-                                                    <i class="bi bi-plus-lg me-2"></i> Create
-                                                </a>
+                                                <div class="text-center mb-2">
+                                                    <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=TO_DO" class="btn btn-sm d-block" style="background-color: #e9ecef; border: none; color: #6c757d; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1.0'" onmouseout="this.style.opacity='0.7'">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </a>
+                                                </div>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'TO_DO'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -285,9 +287,11 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">In Progress (<?php echo $task_counts['IN_PROGRESS']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=IN_PROGRESS" class="btn btn-sm btn-outline-primary mb-2">
-                                                    <i class="bi bi-plus-lg me-2"></i> Create
-                                                </a>
+                                                <div class="text-center mb-2">
+                                                    <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=IN_PROGRESS" class="btn btn-sm d-block" style="background-color: #e9ecef; border: none; color: #6c757d; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1.0'" onmouseout="this.style.opacity='0.7'">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </a>
+                                                </div>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'IN_PROGRESS'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -321,9 +325,11 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">Review (<?php echo $task_counts['REVIEW']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=REVIEW" class="btn btn-sm btn-outline-primary mb-2">
-                                                    <i class="bi bi-plus-lg me-2"></i> Create
-                                                </a>
+                                                <div class="text-center mb-2">
+                                                    <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=REVIEW" class="btn btn-sm d-block" style="background-color: #e9ecef; border: none; color: #6c757d; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1.0'" onmouseout="this.style.opacity='0.7'">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </a>
+                                                </div>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'REVIEW'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
@@ -357,9 +363,11 @@ foreach ($tasks as $task) {
                                                 <h6 class="mb-0">Done (<?php echo $task_counts['DONE']; ?>)</h6>
                                             </div>
                                             <div class="card-body p-2">
-                                                <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=DONE" class="btn btn-sm btn-outline-primary mb-2">
-                                                    <i class="bi bi-plus-lg me-2"></i> Create
-                                                </a>
+                                                <div class="text-center mb-2">
+                                                    <a href="form_task.php?project_id=<?php echo $project_id; ?>&status=DONE" class="btn btn-sm d-block" style="background-color: #e9ecef; border: none; color: #6c757d; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity='1.0'" onmouseout="this.style.opacity='0.7'">
+                                                        <i class="bi bi-plus-lg me-2"></i> Create
+                                                    </a>
+                                                </div>
                                                 <?php foreach ($tasks as $task): ?>
                                                     <?php if ($task['status'] == 'DONE'): ?>
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">

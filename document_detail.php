@@ -125,7 +125,7 @@ if (!$document) {
                                         <h6 class="card-title">File Information</h6>
                                         <ul class="list-unstyled mb-0">
                                             <li class="mb-2"><strong>Category:</strong> <?php echo htmlspecialchars($document['category'] ?? '-'); ?></li>
-
+                                            <li class="mb-2"><strong>File Type:</strong> <?php echo htmlspecialchars(strtoupper($document['file_type'] ?? '-')); ?></li>
                                             <li class="mb-2"><strong>Uploaded By:</strong> <?php echo htmlspecialchars($document['uploader_name']); ?></li>
                                             <li class="mb-2"><strong>Date:</strong> <?php echo date('d M Y H:i', strtotime($document['uploaded_at'])); ?></li>
                                         </ul>
@@ -135,28 +135,7 @@ if (!$document) {
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
-                                <h6>Relations</h6>
-                                <ul class="list-group">
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Project
-                                        <?php if ($document['project_name']): ?>
-                                            <a href="project_detail.php?id=<?php echo $document['project_id']; ?>" class="text-decoration-none"><?php echo htmlspecialchars($document['project_name']); ?></a>
-                                        <?php else: ?>
-                                            <span class="text-muted">-</span>
-                                        <?php endif; ?>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Task
-                                        <?php if ($document['task_title']): ?>
-                                            <a href="task_detail.php?id=<?php echo $document['task_id']; ?>" class="text-decoration-none"><?php echo htmlspecialchars($document['task_title']); ?></a>
-                                        <?php else: ?>
-                                            <span class="text-muted">-</span>
-                                        <?php endif; ?>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6 text-end align-self-end">
+                            <div class="col-12 text-end">
                                 <a href="uploads/<?php echo $document['file_path']; ?>" class="btn btn-primary" target="_blank">
                                     <i class="bi bi-download me-2"></i> Download / View File
                                 </a>

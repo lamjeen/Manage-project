@@ -147,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Project' : 'New Project'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="projects.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="<?php echo $is_edit ? 'project_detail.php?id=' . $project_id : 'projects.php'; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -221,7 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="projects.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <a href="<?php echo $is_edit ? 'project_detail.php?id=' . $project_id : 'projects.php'; ?>" class="btn btn-secondary me-2">Cancel</a>
                                         <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Create Project'; ?></button>
                                     </div>
                                 </form>

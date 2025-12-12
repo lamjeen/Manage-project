@@ -114,15 +114,22 @@ if (!$team) {
                                 <h5 class="mb-0">Team Information</h5>
                             </div>
                             <div class="card-body">
-                                <p><strong>Description:</strong> <?php echo nl2br($team['description'] ?? 'No description'); ?></p>
-                                <p><strong>Team Head:</strong> <?php echo $team['team_head_name'] ?? 'None'; ?></p>
-                                <p><strong>Created At:</strong> <?php echo date('d M Y', strtotime($team['created_at'])); ?></p>
-                                <?php if (!empty($team['logo_path'])): ?>
-                                    <div class="mt-3">
-                                        <strong>Logo:</strong><br>
-                                        <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Team Logo" class="img-thumbnail" style="max-width: 200px;">
-                                    </div>
-                                <?php endif; ?>
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 150px; vertical-align: top;">
+                                                <?php if (!empty($team['logo_path'])): ?>
+                                                    <img src="uploads/<?php echo htmlspecialchars($team['logo_path']); ?>" alt="Team Logo" class="img-fluid rounded shadow-sm" style="max-width: 120px; max-height: 120px;">
+                                                <?php endif; ?>
+                                            </td>
+                                            <td style="vertical-align: top;">
+                                                <p><strong>Description:</strong> <?php echo nl2br($team['description'] ?? 'No description'); ?></p>
+                                                <p><strong>Team Head:</strong> <?php echo $team['team_head_name'] ?? 'None'; ?></p>
+                                                <p><strong>Created At:</strong> <?php echo date('d M Y', strtotime($team['created_at'])); ?></p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

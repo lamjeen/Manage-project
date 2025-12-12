@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Team' : 'New Team'; ?></h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <a href="teams.php" class="btn btn-sm btn-outline-secondary">
+                            <a href="<?php echo $is_edit ? 'team_detail.php?id=' . $team_id : 'teams.php'; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back
                             </a>
                         </div>
@@ -242,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         </select>
                                     </div>
                                     <div class="d-flex justify-content-end">
-                                        <a href="teams.php" class="btn btn-secondary me-2">Cancel</a>
+                                        <a href="<?php echo $is_edit ? 'team_detail.php?id=' . $team_id : 'teams.php'; ?>" class="btn btn-secondary me-2">Cancel</a>
                                         <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Save Changes' : 'Create Team'; ?></button>
                                     </div>
                                 </form>
