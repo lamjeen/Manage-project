@@ -274,16 +274,39 @@ foreach ($all_comments as $comment) {
                                 <?php if (empty($documents)): ?>
                                     <p>No documents yet.</p>
                                 <?php else: ?>
-                                    <ul class="list-group list-group-flush">
+                                    <div class="list-group list-group-flush">
                                         <?php foreach ($documents as $doc): ?>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <a href="uploads/<?php echo $doc['file_path']; ?>" target="_blank"><?php echo $doc['title']; ?></a>
-                                            <a href="uploads/<?php echo $doc['file_path']; ?>" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                <i class="bi bi-download"></i>
-                                            </a>
-                                        </li>
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <a href="uploads/<?php echo $doc['file_path']; ?>" target="_blank" class="text-decoration-none fw-bold">
+                                                        <?php echo $doc['title']; ?>
+                                                    </a>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <?php echo htmlspecialchars($doc['uploader_name']); ?> • <?php echo date('d M Y', strtotime($doc['uploaded_at'])); ?>
+                                                    </small>
+                                                </div>
+                                                <div class="btn-group" role="group">
+                                                    <a href="document_detail.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="uploads/<?php echo $doc['file_path']; ?>" class="btn btn-sm btn-outline-primary" target="_blank" title="Download">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                    <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $doc['uploaded_by_id'] == $_SESSION['user_id']): ?>
+                                                    <a href="form_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <?php endforeach; ?>
-                                    </ul>
+                                    </div>
                                 <?php endif; ?>
                                 <a href="form_document.php?task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-primary mt-2">
                                     <i class="bi bi-upload me-1"></i> Upload Document

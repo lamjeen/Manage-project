@@ -450,9 +450,9 @@ foreach ($tasks as $task) {
                                                         <a href="form_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                                             <i class="bi bi-pencil"></i>
                                                         </a>
-                                                        <button class="btn btn-sm btn-outline-danger delete-document" data-id="<?php echo $document['id']; ?>">
+                                                        <a href="handle_delete_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
                                                             <i class="bi bi-trash"></i>
-                                                        </button>
+                                                        </a>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>
@@ -471,38 +471,6 @@ foreach ($tasks as $task) {
 
 
     
-    <div class="modal fade" id="deleteDocumentModal" tabindex="-1" aria-labelledby="deleteDocumentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteDocumentModalLabel">Delete Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this document? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirmDeleteDocumentBtn" class="btn btn-danger">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteDocumentModal = new bootstrap.Modal(document.getElementById('deleteDocumentModal'));
-            const confirmDeleteDocumentBtn = document.getElementById('confirmDeleteDocumentBtn');
-            
-            document.querySelectorAll('.delete-document').forEach(button => {
-                button.addEventListener('click', function() {
-                    const documentId = this.getAttribute('data-id');
-                    confirmDeleteDocumentBtn.href = `handle_delete_document.php?id=${documentId}`;
-                    deleteDocumentModal.show();
-                });
-            });
-        });
-    </script>
 </body>
 </html>
