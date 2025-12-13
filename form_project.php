@@ -252,10 +252,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
-            new TomSelect("#team_ids",{
-            plugins: ['remove_button'],
-            create: false,
-            placeholder: "Select Teams..."
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('#team_ids', {
+                plugins: {
+                    'checkbox_options': {},
+                    'remove_button':{
+                        'title':'Remove this item',
+                    }
+                },
+                create: false,
+                maxItems: null,
+                placeholder: "Select Teams..."
+            });
         });
     </script>
 </body>

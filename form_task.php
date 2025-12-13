@@ -62,8 +62,6 @@ $form_data = [
     'assignee' => $_POST['assignee'] ?? ($task['assignee'] ?? '')
 ];
 
- $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
- $projects = $stmt->fetchAll();
 
 $selected_project_id = $form_data['project_id'];
 
@@ -172,30 +170,17 @@ if ($selected_project_id) {
                                         <label for="description" class="form-label">Description</label>
                                         <textarea class="form-control" id="description" name="description" rows="4"><?php echo htmlspecialchars($form_data['description']); ?></textarea>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label for="project_id" class="form-label">Project</label>
-                                            
-                                            <select class="form-select" id="project_id" name="project_id" required onchange="this.form.submit()">
-                                                <option value="">Select Project</option>
-                                                <?php foreach ($projects as $project): ?>
-                                                    <option value="<?php echo $project['id']; ?>" <?php echo $form_data['project_id'] == $project['id'] ? 'selected' : ''; ?>>
-                                                        <?php echo $project['name']; ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="assignees-select" class="form-label">Assignee</label>
-                                            <select class="form-select" id="assignee" name="assignee">
-                                                <option value="">Select Assignee</option>
-                                                <?php foreach ($users as $user): ?>
-                                                    <option value="<?php echo $user['id']; ?>" <?php echo $form_data['assignee'] == $user['id'] ? 'selected' : ''; ?>>
-                                                        <?php echo htmlspecialchars($user['name']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
+                                    <input type="hidden" name="project_id" value="<?php echo $form_data['project_id']; ?>">
+                                    <div class="mb-3">
+                                        <label for="assignees-select" class="form-label">Assignee</label>
+                                        <select class="form-select" id="assignee" name="assignee">
+                                            <option value="">Select Assignee</option>
+                                            <?php foreach ($users as $user): ?>
+                                                <option value="<?php echo $user['id']; ?>" <?php echo $form_data['assignee'] == $user['id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($user['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -236,12 +221,14 @@ if ($selected_project_id) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
-
+            new TomSelect('#assignee', {
+                create: false,
+                maxItems: 1,
+                placeholder: "Select Assignee..."
+            });
         });
     </script>
 </body>

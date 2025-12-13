@@ -6,8 +6,8 @@ require_once 'db_connect.php';
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
- $stmt = $pdo->query("SELECT COUNT(*) as total FROM tasks");
- $tasks_count = $stmt->fetch()['total'];
+ $stmt = $pdo->query("SELECT COUNT(*) as total FROM teams");
+ $teams_count = $stmt->fetch()['total'];
 
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
@@ -126,11 +126,11 @@ require_once 'db_connect.php';
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Total Tasks</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $tasks_count; ?></div>
+                                            Total Teams</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $teams_count; ?></div>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="bi bi-check2-square fa-2x text-gray-300"></i>
+                                        <i class="bi bi-diagram-3-fill fa-2x text-gray-300"></i>
                                     </div>
                                 </div>
                             </div>

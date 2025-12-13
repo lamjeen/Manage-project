@@ -67,7 +67,7 @@ foreach ($all_comments as $comment) {
 
         .comment.pinned {
             border-left-color: var(--warning-color);
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #FCD34D 100%);
+            background-color: #FEF3C7;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--warning-color);
@@ -317,7 +317,7 @@ foreach ($all_comments as $comment) {
                 </div>
 
 
-                
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">

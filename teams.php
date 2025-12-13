@@ -106,8 +106,6 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0"><?php echo $team['name']; ?></h6>
                                     <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-gear text-muted" title="Team Settings"></i>
-                                        <i class="bi bi-sliders text-muted" title="Slot Settings"></i>
                                     </div>
                                 </div>
                                 <div class="card-body">
