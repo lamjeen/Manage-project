@@ -198,7 +198,6 @@ if ($selected_project_id) {
                                                 <option value="TO_DO" <?php echo $form_data['status'] == 'TO_DO' ? 'selected' : ''; ?>>To-Do</option>
                                                 <option value="IN_PROGRESS" <?php echo $form_data['status'] == 'IN_PROGRESS' ? 'selected' : ''; ?>>In Progress</option>
                                                 <option value="REVIEW" <?php echo $form_data['status'] == 'REVIEW' ? 'selected' : ''; ?>>Review</option>
-                                                <option value="DONE" <?php echo $form_data['status'] == 'DONE' ? 'selected' : ''; ?>>Done</option>
                                             </select>
                                         </div>
                                     </div>
