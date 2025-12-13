@@ -168,12 +168,12 @@ if ($selected_project_id) {
                                     </div>
                                     <div class="mb-3">
                                         <label for="description" class="form-label">Description</label>
-                                        <textarea class="form-control" id="description" name="description" rows="4"><?php echo htmlspecialchars($form_data['description']); ?></textarea>
+                                        <textarea class="form-control" id="description" name="description" rows="4" required><?php echo htmlspecialchars($form_data['description']); ?></textarea>
                                     </div>
                                     <input type="hidden" name="project_id" value="<?php echo $form_data['project_id']; ?>">
                                     <div class="mb-3">
                                         <label for="assignees-select" class="form-label">Assignee</label>
-                                        <select class="form-select" id="assignee" name="assignee">
+                                        <select class="form-select" id="assignee" name="assignee" required>
                                             <option value="">Select Assignee</option>
                                             <?php foreach ($users as $user): ?>
                                                 <option value="<?php echo $user['id']; ?>" <?php echo $form_data['assignee'] == $user['id'] ? 'selected' : ''; ?>>
@@ -203,7 +203,7 @@ if ($selected_project_id) {
                                     </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="due_date" class="form-label">Due Date</label>
-                                            <input type="datetime-local" class="form-control" id="due_date" name="due_date" value="<?php echo $form_data['due_date'] ? date('Y-m-d\TH:i', strtotime($form_data['due_date'])) : ''; ?>">
+                                            <input type="datetime-local" class="form-control" id="due_date" name="due_date" value="<?php echo $form_data['due_date'] ? date('Y-m-d\TH:i', strtotime($form_data['due_date'])) : ''; ?>" required>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end">

@@ -22,10 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->fetch()) {
             $error = "Email already registered!";
         } else {
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$name, $email, $password_hash, $role]);
+            $stmt->execute([$name, $email, $password, $role]);
             
             header("Location: login.php?registered=1");
             exit;
