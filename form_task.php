@@ -26,31 +26,7 @@ if (isset($_GET['id'])) {
 
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_task'])) {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $priority = $_POST['priority'];
-    $status = $_POST['status'];
-    $due_date = $_POST['due_date'];
-
-    $project_id = $_POST['project_id'];
-    $assignee = $_POST['assignee'] ?? null;
-    
-    if ($is_edit) {
-        $stmt = $pdo->prepare("UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ?, project_id = ?, assignee = ? WHERE id = ?");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $assignee, $task_id]);
-
-        header("Location: task_detail.php?id=$task_id");
-    } else {
-        $created_by_id = $_SESSION['user_id'];
-        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
-        $new_task_id = $pdo->lastInsertId();
-
-        header("Location: task_detail.php?id=$new_task_id");
-    }
-    exit;
-}
+// Form will submit directly to the appropriate handler based on action attribute
 
 $form_data = [
     'title' => $_POST['title'] ?? ($task['title'] ?? ''),
@@ -161,7 +137,10 @@ if ($selected_project_id) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="form_task.php<?php echo $is_edit ? '?id=' . $task['id'] : ''; ?>" method="post">
+                                <form action="<?php echo $is_edit ? 'handle_update_task.php' : 'handle_create_task.php'; ?>" method="post">
+                                    <?php if ($is_edit): ?>
+                                        <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
+                                    <?php endif; ?>
                                     <div class="mb-3">
                                         <label for="title" class="form-label">Task Title</label>
                                         <input type="text" class="form-control" id="title" name="title" value="<?php echo htmlspecialchars($form_data['title']); ?>" required>

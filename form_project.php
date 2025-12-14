@@ -32,48 +32,7 @@ if (isset($_GET['id'])) {
     $stmt->execute([$project_id]);
     $project_team_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
-    $status = $_POST['status'];
-    $priority = $_POST['priority'];
-    $manager_id = $_POST['manager_id'];
-    $team_ids = $_POST['team_ids'] ?? [];
-    
-    if ($is_edit) {
-        $stmt = $pdo->prepare("UPDATE projects SET name = ?, description = ?, start_date = ?, end_date = ?, status = ?, priority = ?, manager_id = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $project_id]);
-
-        $stmt = $pdo->prepare("DELETE FROM project_team WHERE project_id = ?");
-        $stmt->execute([$project_id]);
-
-        if (!empty($team_ids)) {
-             $stmt = $pdo->prepare("INSERT INTO project_team (project_id, team_id) VALUES (?, ?)");
-             foreach ($team_ids as $tid) {
-                 $stmt->execute([$project_id, $tid]);
-             }
-        }
-        
-        header("Location: project_detail.php?id=$project_id");
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO projects (name, description, start_date, end_date, status, priority, manager_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id]);
-        
-        $project_id = $pdo->lastInsertId();
-
-        if (!empty($team_ids)) {
-             $stmt = $pdo->prepare("INSERT INTO project_team (project_id, team_id) VALUES (?, ?)");
-             foreach ($team_ids as $tid) {
-                 $stmt->execute([$project_id, $tid]);
-             }
-        }
-        
-        header("Location: project_detail.php?id=$project_id");
-    }
-    exit;
-}
+// Form will submit directly to the appropriate handler
  $stmt = $pdo->query("SELECT id, name FROM teams ORDER BY name");
  $teams = $stmt->fetchAll();
 
@@ -158,7 +117,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="form_project.php<?php echo $is_edit ? '?id=' . $project['id'] : ''; ?>" method="post">
+                                <form action="<?php echo $is_edit ? 'handle_update_project.php' : 'handle_create_project.php'; ?>" method="post">
+                                    <?php if ($is_edit): ?>
+                                        <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
+                                    <?php endif; ?>
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Project Name</label>
                                         <input type="text" class="form-control" id="name" name="name" value="<?php echo $project['name'] ?? ''; ?>" required>

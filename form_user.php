@@ -37,7 +37,7 @@ $form_data = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $is_edit ? 'Edit User' : 'New User'; ?> - WeProject</title>
+    <title>Edit User</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -93,7 +93,7 @@ $form_data = [
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2"><?php echo $is_edit ? 'Edit User' : 'New User'; ?></h1>
+                    <h1 class="h2">User Information</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
                             <a href="users.php" class="btn btn-sm btn-outline-secondary">
@@ -107,9 +107,9 @@ $form_data = [
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="<?php echo $is_edit ? 'handle_update_user.php' : 'handle_create_user.php'; ?>" method="post">
+                                <form action="handle_create_user.php" method="post">
                                     <?php if ($is_edit): ?>
-                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                        <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                     <?php endif; ?>
 
                                     <div class="mb-3">
@@ -140,7 +140,7 @@ $form_data = [
                                     <?php endif; ?>
                                     <div class="d-flex justify-content-end">
                                         <a href="users.php" class="btn btn-secondary me-2">Cancel</a>
-                                        <button type="submit" class="btn btn-primary"><?php echo $is_edit ? 'Update User' : 'Create User'; ?></button>
+                                        <button type="submit" class="btn btn-primary">Save User</button>
                                     </div>
                                 </form>
                             </div>

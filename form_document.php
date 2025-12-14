@@ -25,70 +25,7 @@ if (isset($_GET['id'])) {
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $related_to = $_POST['related_to'];
-    $project_id = $related_to == 'project' ? $_POST['project_id'] : null;
-    $task_id = $related_to == 'task' ? $_POST['task_id'] : null;
-
-    $category = $_POST['category'];
-    $uploaded_by_id = $_SESSION['user_id'];
-    
-    $file_path = '';
-    $file_name = '';
-    $file_size = 0;
-    $file_type = '';
-    
-    if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
-        $allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', 'jpg', 'jpeg', 'png', 'gif'];
-        $filename = $_FILES['file']['name'];
-        $filetype = pathinfo($filename, PATHINFO_EXTENSION);
-        
-        if (in_array(strtolower($filetype), $allowed)) {
-            $new_filename = uniqid() . '.' . $filetype;
-            $upload_path = 'uploads/' . $new_filename;
-            
-            if (move_uploaded_file($_FILES['file']['tmp_name'], $upload_path)) {
-                $file_path = $new_filename;
-                $file_name = $filename;
-                $file_size = $_FILES['file']['size'];
-                $file_type = $filetype;
-            } else {
-                $error = "Gagal mengunggah file.";
-            }
-        } else {
-            $error = "Tipe file tidak diizinkan.";
-        }
-    } elseif ($is_edit) {
-        $file_path = $document['file_path'];
-        $file_name = $document['file_name'];
-        $file_size = $document['file_size'];
-        $file_type = $document['file_type'];
-    } else {
-        $error = "Harap pilih file untuk diunggah.";
-    }
-    
-    if (!isset($error)) {
-        if ($is_edit) {
-            $stmt = $pdo->prepare("UPDATE documents SET title = ?, description = ?, file_path = ?, file_name = ?, file_size = ?, file_type = ?, category = ?, project_id = ?, task_id = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $project_id, $task_id, $document_id]);
-            header("Location: project_detail.php?id=" . ($document['project_id'] ?: '#documents'));
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO documents (title, description, file_path, file_name, file_size, file_type, category, uploaded_by_id, project_id, task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $uploaded_by_id, $project_id, $task_id]);
-            
-            if ($project_id) {
-                header("Location: project_detail.php?id=$project_id#documents");
-            } elseif ($task_id) {
-                header("Location: task_detail.php?id=$task_id");
-            } else {
-                header("Location: projects.php");
-            }
-        }
-        exit;
-    }
-}
+// Form will submit directly to the appropriate handler
 
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
@@ -197,7 +134,10 @@ if ($is_edit) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="form_document.php<?php echo $is_edit ? '?id=' . $document['id'] : ''; ?>" method="post" enctype="multipart/form-data">
+                                <form action="<?php echo $is_edit ? 'handle_update_document.php' : 'handle_create_document.php'; ?>" method="post" enctype="multipart/form-data">
+                                    <?php if ($is_edit): ?>
+                                        <input type="hidden" name="document_id" value="<?php echo $document['id']; ?>">
+                                    <?php endif; ?>
                                     <div class="mb-3">
                                         <label for="title" class="form-label">Document Title</label>
                                         <input type="text" class="form-control" id="title" name="title" value="<?php echo $document['title'] ?? ''; ?>" required>

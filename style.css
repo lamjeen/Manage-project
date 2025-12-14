@@ -272,11 +272,8 @@ body {
    UTILITY CLASSES
    ============================================================================= */
 
-.text-primary { color: #2563EB !important; }
-.text-secondary { color: #64748B !important; }
 .text-muted { color: #94A3B8 !important; }
 
-.bg-primary { background-color: #2563EB !important; }
 .bg-light { background-color: #F8FAFC !important; }
 
 /* =============================================================================

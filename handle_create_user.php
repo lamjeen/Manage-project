@@ -11,11 +11,19 @@ if ($_SESSION['user_role'] != 'ADMIN') {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
-    $password = $_POST['password'];
     $role = $_POST['role'];
 
-    $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$name, $email, $password, $role]);
+    if (isset($_POST['id']) && !empty($_POST['id'])) {
+        // Update existing user
+        $user_id = $_POST['id'];
+        $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $role, $user_id]);
+    } else {
+        // Create new user
+        $password = $_POST['password'];
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$name, $email, $password, $role]);
+    }
 
     header("Location: users.php");
     exit;

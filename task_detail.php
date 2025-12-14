@@ -286,7 +286,7 @@ foreach ($all_comments as $comment) {
                                 <h5 class="mb-0">Comments</h5>
                             </div>
                             <div class="card-body">
-                                <form action="handle_add_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
+                                <form action="handle_create_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
                                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
                                     
                                     <div class="row">

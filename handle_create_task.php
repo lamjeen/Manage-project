@@ -1,6 +1,11 @@
 <?php
-require_once 'auth_check.php';
+/**
+ * Task Module - Create Task Handler
+ * 2432070 - Lam Jeen Sin Anthony
+ * Modul yang menangani pembuatan tugas dalam proyek.
+ */
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -13,18 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $assignee = $_POST['assignee'] ?? null;
     $created_by_id = $_SESSION['user_id'];
 
-    if (empty($title) || empty($project_id) || empty($status) || empty($priority)) {
-        header("Location: project_detail.php?id=$project_id");
-        exit;
-    }
-
-    $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("
+        INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
     $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
-    
-    header("Location: project_detail.php?id=$project_id");
-    exit;
-} else {
-    header("Location: projects.php");
+
+    $new_task_id = $pdo->lastInsertId();
+    header("Location: task_detail.php?id=$new_task_id");
     exit;
 }
+
+header("Location: projects.php");
+exit;
 ?>

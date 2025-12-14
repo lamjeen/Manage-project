@@ -24,16 +24,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && 
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $content = $_POST['content'];
-    $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
-    
-    $stmt = $pdo->prepare("UPDATE comments SET content = ?, is_pinned = ? WHERE id = ?");
-    $stmt->execute([$content, $is_pinned, $comment_id]);
-    
-    header("Location: task_detail.php?id=" . $comment['task_id']);
-    exit;
-}
+// Form will submit directly to the update handler
 ?>
 
 <!DOCTYPE html>
@@ -113,7 +104,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="form_comment.php?id=<?php echo $comment_id; ?>" method="post">
+                                <form action="handle_update_comment.php" method="post">
+                                    <input type="hidden" name="comment_id" value="<?php echo $comment_id; ?>">
                                     <div class="mb-3">
                                         <label for="content" class="form-label">Comment Content</label>
                                         <textarea class="form-control" id="content" name="content" rows="6" required><?php echo $comment['content']; ?></textarea>

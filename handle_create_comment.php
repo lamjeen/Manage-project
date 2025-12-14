@@ -1,6 +1,11 @@
 <?php
-require_once 'auth_check.php';
+/**
+ * Comment/Notes Module - Create Comment Handler
+ * 2432050 - Nicholas Syahputra
+ * Modul yang menyediakan fitur komentar dan catatan sebagai ruang komunikasi antar anggota.
+ */
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -35,7 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO comments (content, task_id, author_id, type, privacy, file_path, file_name, file_size, file_type, is_pinned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("
+        INSERT INTO comments (content, task_id, author_id, type, privacy, file_path, file_name, file_size, file_type, is_pinned)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
     $stmt->execute([$content, $task_id, $author_id, $type, $privacy, $file_path, $file_name, $file_size, $file_type, $is_pinned]);
 
     header("Location: task_detail.php?id=$task_id");

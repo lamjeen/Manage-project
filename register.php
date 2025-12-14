@@ -3,32 +3,18 @@ session_start();
 
 require_once 'db_connect.php';
 
- $error = '';
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-    
+
     $role = 'MEMBER';
 
-    if ($password != $confirm_password) {
-        $error = "Passwords do not match!";
-    } else {
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        
-        if ($stmt->fetch()) {
-            $error = "Email already registered!";
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$name, $email, $password, $role]);
-            
-            header("Location: login.php");
-            exit;
-        }
-    }
+    $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$name, $email, $password, $role]);
+
+    header("Location: login.php");
+    exit;
 }
 ?>
 
@@ -43,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -53,36 +39,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             max-width: 400px;
             width: 100%;
             padding: 40px;
-            background-color: var(--surface-color);
+            background-color: #FFFFFF;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border-color);
+            border: 1px solid #E2E8F0;
         }
         .register-container h2 {
-            color: var(--primary-color);
+            color: #2563EB;
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             border: none !important;
             border-radius: 25px !important;
             padding: 0.75rem 2rem !important;
             font-weight: 500 !important;
+            color: white !important;
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%) !important;
+            background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%) !important;
             transform: translateY(-1px);
             box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3) !important;
+            color: white !important;
         }
     </style>
 </head>
 <body>
     <div class="register-container">
         <h2 class="text-center mb-4">Register</h2>
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
         <form action="register.php" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">Full Name</label>
@@ -95,10 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
             
             <button type="submit" class="btn btn-primary w-100">Register</button>

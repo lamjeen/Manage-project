@@ -3,25 +3,21 @@ session_start();
 
 require_once 'db_connect.php';
 
- $error = '';
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
-    
+
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
-    
+
     if ($user && $password === $user['password_hash']) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];
-        
+
         header("Location: dashboard.php");
         exit;
-    } else {
-        $error = "Invalid email or password!";
     }
 }
 ?>
@@ -37,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -47,36 +43,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             max-width: 400px;
             width: 100%;
             padding: 40px;
-            background-color: var(--surface-color);
+            background-color: #FFFFFF;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border-color);
+            border: 1px solid #E2E8F0;
         }
         .login-container h2 {
-            color: var(--primary-color);
+            color: #2563EB;
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
             border: none !important;
             border-radius: 25px !important;
             padding: 0.75rem 2rem !important;
             font-weight: 500 !important;
+            color: white !important;
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%) !important;
+            background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%) !important;
             transform: translateY(-1px);
             box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3) !important;
+            color: white !important;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2 class="text-center mb-4">Login</h2>
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
         <form action="login.php" method="post">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>

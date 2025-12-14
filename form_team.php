@@ -30,69 +30,7 @@ if (isset($_GET['id'])) {
     $team_members = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    
-    if (isset($_POST['make_me_head']) && $_POST['make_me_head'] == '1') {
-        $team_head_id = $_SESSION['user_id'];
-    } else {
-        $team_head_id = $_POST['team_head_id'];
-    }
-    
-    $members = $_POST['members'] ?? [];
-    
-    $logo_path = $team['logo_path'] ?? null; 
-    if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-        $filename = $_FILES['logo']['name'];
-        $filetype = pathinfo($filename, PATHINFO_EXTENSION);
-        
-        if (in_array(strtolower($filetype), $allowed)) {
-            if ($is_edit && !empty($team['logo_path'])) {
-                $old_logo_path = 'uploads/' . $team['logo_path'];
-                if (file_exists($old_logo_path)) {
-                    unlink($old_logo_path);
-                }
-            }
-            
-            $new_filename = 'team_logo_' . uniqid() . '.' . $filetype;
-            $upload_path = 'uploads/' . $new_filename;
-            
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $upload_path)) {
-                $logo_path = $new_filename;
-            }
-        }
-    }
-    
-    if ($is_edit) {
-        $stmt = $pdo->prepare("UPDATE teams SET name = ?, description = ?, team_head_id = ?, logo_path = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $team_head_id, $logo_path, $team_id]);
-        
-        $stmt = $pdo->prepare("DELETE FROM team_members WHERE team_id = ?");
-        $stmt->execute([$team_id]);
-        
-        foreach ($members as $member_id) {
-            $stmt = $pdo->prepare("INSERT INTO team_members (team_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$team_id, $member_id]);
-        }
-        
-        header("Location: team_detail.php?id=$team_id");
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO teams (name, description, team_head_id, logo_path) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $team_head_id, $logo_path]);
-        
-        $team_id = $pdo->lastInsertId();
-        
-        foreach ($members as $member_id) {
-            $stmt = $pdo->prepare("INSERT INTO team_members (team_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$team_id, $member_id]);
-        }
-        
-        header("Location: team_detail.php?id=$team_id");
-    }
-    exit;
-}
+// Form will submit directly to the appropriate handler
 
  $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
  $users = $stmt->fetchAll();
@@ -188,7 +126,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="form_team.php<?php echo $is_edit ? '?id=' . $team['id'] : ''; ?>" method="post" enctype="multipart/form-data">
+                                <form action="<?php echo $is_edit ? 'handle_update_team.php' : 'handle_create_team.php'; ?>" method="post" enctype="multipart/form-data">
+                                    <?php if ($is_edit): ?>
+                                        <input type="hidden" name="team_id" value="<?php echo $team['id']; ?>">
+                                    <?php endif; ?>
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Team Name</label>
                                         <input type="text" class="form-control" id="name" name="name" value="<?php echo $team['name'] ?? ''; ?>" required>
