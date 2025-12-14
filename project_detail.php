@@ -243,138 +243,63 @@ foreach ($tasks as $task) {
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-3 mb-4">
-                                        <div class="card bg-light task-column">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">To Do (<?php echo $task_counts['TO_DO']; ?>)</h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <?php foreach ($tasks as $task): ?>
-                                                    <?php if ($task['status'] == 'TO_DO'): ?>
-                                                    <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
-                                                        <div class="card-body p-2">
-                                                            <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
-                                                                <span class="badge bg-<?php
-                                                                    echo match($task['priority']) {
-                                                                        'LOW' => 'success',
-                                                                        'MEDIUM' => 'info',
-                                                                        'HIGH' => 'warning',
-                                                                        'CRITICAL' => 'danger',
-                                                                        default => 'secondary'
-                                                                    };
-                                                                ?> rounded-pill"><?php echo $task['priority']; ?></span>
+                                    <?php
+                                    // Konfigurasi kolom-kolom task
+                                    $task_columns = [
+                                        'TO_DO' => 'To Do',
+                                        'IN_PROGRESS' => 'In Progress',
+                                        'REVIEW' => 'Review',
+                                        'DONE' => 'Done'
+                                    ];
+
+                                    // Loop untuk setiap kolom task
+                                    foreach ($task_columns as $status_key => $status_name) {
+                                        ?>
+                                        <div class="col-md-3 mb-4">
+                                            <div class="card bg-light task-column">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0"><?php echo $status_name; ?> (<?php echo $task_counts[$status_key]; ?>)</h6>
+                                                </div>
+                                                <div class="card-body p-2">
+                                                    <?php
+                                                    // Loop untuk setiap task
+                                                    foreach ($tasks as $task) {
+                                                        // Tampilkan task hanya jika status sesuai
+                                                        if ($task['status'] == $status_key) {
+                                                            // Tentukan warna badge berdasarkan priority
+                                                            $badge_color = 'secondary'; // default
+                                                            if ($task['priority'] == 'LOW') {
+                                                                $badge_color = 'success';
+                                                            } elseif ($task['priority'] == 'MEDIUM') {
+                                                                $badge_color = 'info';
+                                                            } elseif ($task['priority'] == 'HIGH') {
+                                                                $badge_color = 'warning';
+                                                            } elseif ($task['priority'] == 'CRITICAL') {
+                                                                $badge_color = 'danger';
+                                                            }
+                                                            ?>
+                                                            <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
+                                                                <div class="card-body p-2">
+                                                                    <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
+                                                                        <span class="badge bg-<?php echo $badge_color; ?> rounded-pill"><?php echo $task['priority']; ?></span>
+                                                                    </div>
+                                                                    <?php if ($task['due_date']): ?>
+                                                                    <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
+                                                                    <?php endif; ?>
+                                                                </div>
                                                             </div>
-                                                            <?php if ($task['due_date']): ?>
-                                                            <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
+                                                            <?php
+                                                        }
+                                                    }
+                                                    ?>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-3 mb-4">
-                                        <div class="card bg-light task-column">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">In Progress (<?php echo $task_counts['IN_PROGRESS']; ?>)</h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <?php foreach ($tasks as $task): ?>
-                                                    <?php if ($task['status'] == 'IN_PROGRESS'): ?>
-                                                    <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
-                                                        <div class="card-body p-2">
-                                                            <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
-                                                                <span class="badge bg-<?php
-                                                                    echo match($task['priority']) {
-                                                                        'LOW' => 'success',
-                                                                        'MEDIUM' => 'info',
-                                                                        'HIGH' => 'warning',
-                                                                        'CRITICAL' => 'danger',
-                                                                        default => 'secondary'
-                                                                    };
-                                                                ?> rounded-pill"><?php echo $task['priority']; ?></span>
-                                                            </div>
-                                                            <?php if ($task['due_date']): ?>
-                                                            <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-4">
-                                        <div class="card bg-light task-column">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">Review (<?php echo $task_counts['REVIEW']; ?>)</h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <?php foreach ($tasks as $task): ?>
-                                                    <?php if ($task['status'] == 'REVIEW'): ?>
-                                                    <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
-                                                        <div class="card-body p-2">
-                                                            <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
-                                                                <span class="badge bg-<?php
-                                                                    echo match($task['priority']) {
-                                                                        'LOW' => 'success',
-                                                                        'MEDIUM' => 'info',
-                                                                        'HIGH' => 'warning',
-                                                                        'CRITICAL' => 'danger',
-                                                                        default => 'secondary'
-                                                                    };
-                                                                ?> rounded-pill"><?php echo $task['priority']; ?></span>
-                                                            </div>
-                                                            <?php if ($task['due_date']): ?>
-                                                            <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 mb-4">
-                                        <div class="card bg-light task-column">
-                                            <div class="card-header">
-                                                <h6 class="mb-0">Done (<?php echo $task_counts['DONE']; ?>)</h6>
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <?php foreach ($tasks as $task): ?>
-                                                    <?php if ($task['status'] == 'DONE'): ?>
-                                                    <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
-                                                        <div class="card-body p-2">
-                                                            <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
-                                                                <span class="badge bg-<?php
-                                                                    echo match($task['priority']) {
-                                                                        'LOW' => 'success',
-                                                                        'MEDIUM' => 'info',
-                                                                        'HIGH' => 'warning',
-                                                                        'CRITICAL' => 'danger',
-                                                                        default => 'secondary'
-                                                                    };
-                                                                ?> rounded-pill"><?php echo $task['priority']; ?></span>
-                                                            </div>
-                                                            <?php if ($task['due_date']): ?>
-                                                            <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                <?php endforeach; ?>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <?php
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
