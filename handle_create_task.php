@@ -14,20 +14,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $created_by_id = $_SESSION['user_id'];
 
     if (empty($title) || empty($project_id) || empty($status) || empty($priority)) {
-        header("Location: project_detail.php?id=$project_id&error=missing_fields");
+        header("Location: project_detail.php?id=$project_id");
         exit;
     }
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
-        
-        header("Location: project_detail.php?id=$project_id");
-        exit;
-    } catch (PDOException $e) {
-        header("Location: project_detail.php?id=$project_id&error=db_error");
-        exit;
-    }
+    $stmt = $pdo->prepare("INSERT INTO tasks (title, description, priority, status, due_date, project_id, created_by_id, assignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
+    
+    header("Location: project_detail.php?id=$project_id");
+    exit;
 } else {
     header("Location: projects.php");
     exit;

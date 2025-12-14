@@ -126,47 +126,8 @@ foreach ($all_comments as $comment) {
                 </div>
             </nav>
 
-            
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <?php if (isset($_GET['success']) && $_GET['success'] == 'document_uploaded'): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Document uploaded successfully!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
 
-                <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php
-                    switch ($_GET['error']) {
-                        case 'empty_fields':
-                            echo 'Please fill in all required fields.';
-                            break;
-                        case 'no_file':
-                            echo 'Please select a file to upload.';
-                            break;
-                        case 'invalid_file_type':
-                            echo 'File type not allowed. Allowed: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF';
-                            break;
-                        case 'invalid_category':
-                            echo 'Invalid category selected.';
-                            break;
-                        case 'upload_failed':
-                            echo 'Failed to upload file. Please try again.';
-                            break;
-                        case 'access_denied':
-                            echo 'You do not have permission to upload documents to this task.';
-                            break;
-                        case 'task_not_found':
-                            echo 'Task not found.';
-                            break;
-                        default:
-                            echo 'An error occurred.';
-                    }
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $task['title']; ?></h1>

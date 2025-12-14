@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task = $stmt->fetch();
 
     if (!$task) {
-        header("Location: projects.php?error=task_not_found");
+        header("Location: projects.php");
         exit;
     }
 
@@ -31,20 +31,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (!$has_access) {
-        header("Location: task_detail.php?id=$task_id&error=access_denied");
-        exit;
-    }
-
-    // Validasi input
-    if (empty($title) || empty($category)) {
-        header("Location: task_detail.php?id=$task_id&error=empty_fields");
+        header("Location: task_detail.php?id=$task_id");
         exit;
     }
 
     // Validasi category sesuai ENUM di database
     $allowed_categories = ['Design', 'Document', 'Report', 'Other'];
     if (!in_array($category, $allowed_categories)) {
-        header("Location: task_detail.php?id=$task_id&error=invalid_category");
+        header("Location: task_detail.php?id=$task_id");
         exit;
     }
 
@@ -68,24 +62,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $file_name = $filename;
                 $file_size = $_FILES['file']['size'];
                 $file_type = $filetype;
-            } else {
-                header("Location: task_detail.php?id=$task_id&error=upload_failed");
-                exit;
             }
-        } else {
-            header("Location: task_detail.php?id=$task_id&error=invalid_file_type");
-            exit;
         }
-    } else {
-        header("Location: task_detail.php?id=$task_id&error=no_file");
-        exit;
     }
 
     // Insert document
     $stmt = $pdo->prepare("INSERT INTO documents (title, description, file_path, file_name, file_size, file_type, category, uploaded_by_id, project_id, task_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$title, $description, $file_path, $file_name, $file_size, $file_type, $category, $uploaded_by_id, $task['project_id'], $task_id]);
 
-    header("Location: task_detail.php?id=$task_id&success=document_uploaded");
+    header("Location: task_detail.php?id=$task_id");
     exit;
 }
 

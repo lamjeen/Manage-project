@@ -83,59 +83,6 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                     </div>
                 </div>
 
-                <?php if (isset($_GET['success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php
-                    switch ($_GET['success']) {
-                        case 'updated':
-                            echo 'User updated successfully!';
-                            break;
-                        case 'created':
-                            echo 'User created successfully!';
-                            break;
-                        default:
-                            echo 'Operation completed successfully!';
-                    }
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
-
-                <?php if (isset($_GET['error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php
-                    $error_msg = urldecode($_GET['error']);
-                    switch ($error_msg) {
-                        case 'All fields are required.':
-                        case 'Passwords do not match!':
-                        case 'Please enter a valid email address.':
-                        case 'Invalid role selected.':
-                        case 'Email already registered!':
-                            echo $error_msg;
-                            break;
-                        case 'empty_fields':
-                            echo 'All fields are required.';
-                            break;
-                        case 'invalid_email':
-                            echo 'Please enter a valid email address.';
-                            break;
-                        case 'invalid_role':
-                            echo 'Invalid role selected.';
-                            break;
-                        case 'email_exists':
-                            echo 'Email address is already in use by another user.';
-                            break;
-                        case 'cannot_delete':
-                            echo 'Cannot delete user who manages projects or has created tasks.';
-                            break;
-                        default:
-                            echo htmlspecialchars($error_msg);
-                    }
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <?php endif; ?>
-
                 <div class="card">
                     <div class="card-body">
                         <?php if (empty($users)): ?>

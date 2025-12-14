@@ -10,16 +10,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allowed_statuses = ['TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
     
     if (!in_array($status, $allowed_statuses)) {
-        header("Location: task_detail.php?id=$task_id&error=invalid_status");
+        header("Location: task_detail.php?id=$task_id");
         exit;
     }
 
     $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE id = ?");
-    if ($stmt->execute([$status, $task_id])) {
-        header("Location: task_detail.php?id=$task_id&success=status_updated");
-    } else {
-        header("Location: task_detail.php?id=$task_id&error=update_failed");
-    }
+    $stmt->execute([$status, $task_id]);
+    
+    header("Location: task_detail.php?id=$task_id");
     exit;
 }
 

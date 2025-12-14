@@ -33,25 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$setup_completed) {
     }
 
     if (empty($errors)) {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, 'ADMIN')");
-            $stmt->execute([$name, $email, $password]);
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, 'ADMIN')");
+        $stmt->execute([$name, $email, $password]);
 
-            $message = 'Admin user created successfully! File will be deleted automatically.';
-            $message_type = 'success';
+        $message = 'Admin user created successfully! File will be deleted automatically.';
+        $message_type = 'success';
 
-            // Auto-delete this file after successful setup
-            register_shutdown_function(function() {
-                $current_file = __FILE__;
-                if (file_exists($current_file)) {
-                    unlink($current_file);
-                }
-            });
-
-        } catch (Exception $e) {
-            $message = 'Error: ' . $e->getMessage();
-            $message_type = 'error';
-        }
+        // Auto-delete this file after successful setup
+        register_shutdown_function(function() {
+            $current_file = __FILE__;
+            if (file_exists($current_file)) {
+                unlink($current_file);
+            }
+        });
     } else {
         $message = implode('<br>', $errors);
         $message_type = 'error';

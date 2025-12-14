@@ -25,7 +25,7 @@ if (isset($_GET['id'])) {
     $created_tasks = $stmt->fetch()['count'] > 0;
 
     if ($manages_projects || $created_tasks) {
-        header("Location: users.php?error=cannot_delete");
+        header("Location: users.php");
         exit;
     }
 

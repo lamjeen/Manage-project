@@ -8,41 +8,16 @@ if ($_SESSION['user_role'] != 'ADMIN') {
     exit;
 }
 
-$error = '';
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
     $role = $_POST['role'];
 
-    if (empty($name) || empty($email) || empty($password) || empty($confirm_password) || empty($role)) {
-        $error = "All fields are required.";
-    } elseif ($password != $confirm_password) {
-        $error = "Passwords do not match!";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Please enter a valid email address.";
-    } elseif (!in_array($role, ['MEMBER', 'MANAGER', 'ADMIN'])) {
-        $error = "Invalid role selected.";
-    } else {
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+    $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$name, $email, $password, $role]);
 
-        if ($stmt->fetch()) {
-            $error = "Email already registered!";
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$name, $email, $password, $role]);
-
-            header("Location: users.php?success=created");
-            exit;
-        }
-    }
-}
-
-if (!empty($error)) {
-    header("Location: users.php?error=" . urlencode($error));
+    header("Location: users.php");
     exit;
 }
 
