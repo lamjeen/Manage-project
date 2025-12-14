@@ -262,7 +262,7 @@ foreach ($all_comments as $comment) {
                                                     <a href="form_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <a href="handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                                    <a href="handle/document/handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
                                                         <i class="bi bi-trash"></i>
                                                     </a>
                                                     <?php endif; ?>
@@ -289,17 +289,17 @@ foreach ($all_comments as $comment) {
                                 <h5 class="mb-0">Comments</h5>
                             </div>
                             <div class="card-body">
-                                <form action="handle_create_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
+                                <form action="handle/comment/handle_create_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
                                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
                                     
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="type" class="form-label">Comment Type</label>
                                             <select class="form-select" id="type" name="type" required>
-                                                <option value="QUESTION">Question</option>
-                                                <option value="SUGGESTION">Suggestion</option>
-                                                <option value="BUG_REPORT">Bug Report</option>
-                                                <option value="BLOCKER">Blocker</option>
+                                                <option value="Question">Question</option>
+                                                <option value="Suggestion">Suggestion</option>
+                                                <option value="Bug Report">Bug Report</option>
+                                                <option value="Blocker">Blocker</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -344,15 +344,19 @@ foreach ($all_comments as $comment) {
                                         <div class="d-flex justify-content-between align-items-center">
                                             <h6 class="mb-1">
                                                 <?php echo $comment['author_name']; ?>
-                                                <span class="badge bg-<?php 
-                                                    echo match($comment['type']) {
-                                                        'QUESTION' => 'info',
-                                                        'SUGGESTION' => 'success',
-                                                        'BUG_REPORT' => 'danger',
-                                                        'BLOCKER' => 'dark',
-                                                        default => 'secondary'
-                                                    };
-                                                ?> ms-2"><?php echo ucwords(strtolower(str_replace('_', ' ', $comment['type']))); ?></span>
+                                                <span class="badge ms-2 <?php
+                                                    if ($comment['type'] == 'Question') {
+                                                        echo 'bg-info';
+                                                    } elseif ($comment['type'] == 'Suggestion') {
+                                                        echo 'bg-success';
+                                                    } elseif ($comment['type'] == 'Bug Report') {
+                                                        echo 'bg-danger';
+                                                    } elseif ($comment['type'] == 'Blocker') {
+                                                        echo 'bg-dark';
+                                                    } else {
+                                                        echo 'bg-secondary';
+                                                    }
+                                                ?>"><?php echo $comment['type']; ?></span>
                                                 
                                                 <?php if ($comment['is_pinned']): ?>
                                                     <span class="badge bg-warning text-dark pinned-badge ms-2"><i class="bi bi-pin-angle-fill"></i> Pinned</span>
@@ -374,7 +378,7 @@ foreach ($all_comments as $comment) {
                                         <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $comment['author_id'] == $_SESSION['user_id']): ?>
                                         <div>
                                             <a href="form_comment.php?id=<?php echo $comment['id']; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                            <a href="handle_delete_comment.php?id=<?php echo $comment['id']; ?>&task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-outline-danger">Delete</a>
+                                            <a href="handle/comment/handle_delete_comment.php?id=<?php echo $comment['id']; ?>&task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-outline-danger">Delete</a>
                                         </div>
                                         <?php endif; ?>
                                     </div>
