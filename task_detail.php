@@ -140,6 +140,9 @@ foreach ($all_comments as $comment) {
                             <a href="form_task.php?id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-pencil me-1"></i> Edit
                             </a>
+                            <a href="handle/task/handle_delete_task.php?id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this task?')">
+                                <i class="bi bi-trash me-1"></i> Delete
+                            </a>
                             <?php endif; ?>
                         </div>
                     </div>

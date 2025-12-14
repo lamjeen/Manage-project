@@ -157,9 +157,9 @@ require_once 'db_connect.php';
                                             <a href="form_project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button class="btn btn-sm btn-outline-danger delete-project" data-id="<?php echo $project['id']; ?>">
+                                            <a href="handle/project/handle_delete_project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
                                                 <i class="bi bi-trash"></i>
-                                            </button>
+                                            </a>
                                         </div>
                                         <?php endif; ?>
                                     </div>
@@ -173,39 +173,10 @@ require_once 'db_connect.php';
         </div>
     </div>
 
-    
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this project? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            
-            document.querySelectorAll('.delete-project').forEach(button => {
-                button.addEventListener('click', function() {
-                    const projectId = this.getAttribute('data-id');
-                    confirmDeleteBtn.href = `handle/project/handle_delete_project.php?id=${projectId}`;
-                    deleteModal.show();
-                });
-            });
-            
             const statusFilter = document.getElementById('statusFilter');
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
