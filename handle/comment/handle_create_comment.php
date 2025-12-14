@@ -5,8 +5,8 @@
  * Modul yang menyediakan fitur komentar dan catatan sebagai ruang komunikasi antar anggota.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task_id = $_POST['task_id'];
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (in_array(strtolower($filetype), $allowed)) {
             $new_filename = 'comment_' . uniqid() . '.' . $filetype;
-            $upload_path = 'uploads/' . $new_filename;
+            $upload_path = '../../uploads/' . $new_filename;
 
             if (move_uploaded_file($_FILES['attachment']['tmp_name'], $upload_path)) {
                 $file_path = $new_filename;
@@ -46,10 +46,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
     $stmt->execute([$content, $task_id, $author_id, $type, $privacy, $file_path, $file_name, $file_size, $file_type, $is_pinned]);
 
-    header("Location: task_detail.php?id=$task_id");
+    header("Location: ../../task_detail.php?id=$task_id");
     exit;
 }
 
-header("Location: projects.php");
+header("Location: ../../projects.php");
 exit;
 ?>

@@ -5,11 +5,11 @@
  * Modul pengelolaan anggota dan struktur tim dalam aplikasi, termasuk role dan akses.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
-    header("Location: dashboard.php");
+    header("Location: ../../dashboard.php");
     exit;
 }
 
@@ -28,17 +28,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Handle logo upload
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $allowed = ['jpg', 'jpeg', 'png'];
+        $max_size = 10 * 1024 * 1024; // 10MB in bytes
         $filename = $_FILES['logo']['name'];
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+        $filesize = $_FILES['logo']['size'];
 
-        if (in_array(strtolower($filetype), $allowed)) {
-            $new_filename = 'team_logo_' . uniqid() . '.' . $filetype;
-            $upload_path = 'uploads/' . $new_filename;
+        if (!in_array(strtolower($filetype), $allowed)) {
+            // Invalid file type - redirect back with error
+            header("Location: ../../form_team.php?error=invalid_file_type");
+            exit;
+        }
 
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $upload_path)) {
-                $logo_path = $new_filename;
-            }
+        if ($filesize > $max_size) {
+            // File too large - redirect back with error
+            header("Location: ../../form_team.php?error=file_too_large");
+            exit;
+        }
+
+        $new_filename = 'team_logo_' . uniqid() . '.' . $filetype;
+        $upload_path = '../../uploads/' . $new_filename;
+
+        if (move_uploaded_file($_FILES['logo']['tmp_name'], $upload_path)) {
+            $logo_path = $new_filename;
         }
     }
 
@@ -56,10 +68,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$team_id, $member_id]);
     }
 
-    header("Location: team_detail.php?id=$team_id");
+    header("Location: ../../team_detail.php?id=$team_id");
     exit;
 }
 
-header("Location: teams.php");
+header("Location: ../../teams.php");
 exit;
 ?>

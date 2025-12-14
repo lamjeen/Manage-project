@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if ($user && $password === $user['password_hash']) {
+    if ($user && $password === $user['password']) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $user['role'];

@@ -295,7 +295,7 @@ foreach ($all_comments as $comment) {
                                             <select class="form-select" id="type" name="type" required>
                                                 <option value="QUESTION">Question</option>
                                                 <option value="SUGGESTION">Suggestion</option>
-                                                <option value="BUG_REPORT">Bug Report</option>
+                                                <option value="BUG REPORT">Bug Report</option>
                                                 <option value="BLOCKER">Blocker</option>
                                             </select>
                                         </div>
@@ -345,7 +345,7 @@ foreach ($all_comments as $comment) {
                                                     echo match($comment['type']) {
                                                         'QUESTION' => 'info',
                                                         'SUGGESTION' => 'success',
-                                                        'BUG_REPORT' => 'danger',
+                                                        'BUG REPORT' => 'danger',
                                                         'BLOCKER' => 'dark',
                                                         default => 'secondary'
                                                     };

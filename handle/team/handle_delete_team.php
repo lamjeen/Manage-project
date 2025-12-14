@@ -5,11 +5,11 @@
  * Modul pengelolaan anggota dan struktur tim dalam aplikasi, termasuk role dan akses.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
-    header("Location: teams.php");
+    header("Location: ../../teams.php");
     exit;
 }
 
@@ -23,7 +23,7 @@ if (isset($_GET['id'])) {
         $team = $stmt->fetch();
 
         if (!$team || $team['team_head_id'] != $_SESSION['user_id']) {
-            header("Location: teams.php");
+            header("Location: ../../teams.php");
             exit;
         }
     }
@@ -43,13 +43,13 @@ if (isset($_GET['id'])) {
 
     // Delete logo file if exists
     if (!empty($team['logo_path'])) {
-        $logo_path = 'uploads/' . $team['logo_path'];
+        $logo_path = '../../uploads/' . $team['logo_path'];
         if (file_exists($logo_path)) {
             unlink($logo_path);
         }
     }
 
-    header("Location: teams.php");
+    header("Location: ../../teams.php");
     exit;
 }
 

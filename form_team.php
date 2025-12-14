@@ -141,7 +141,30 @@ if (isset($_GET['id'])) {
                                     
                                     <div class="mb-3">
                                         <label for="logo" class="form-label">Team Logo/Avatar</label>
-                                        <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                        <input type="file" class="form-control" id="logo" name="logo" accept=".jpg,.jpeg,.png">
+                                        <div class="form-text">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle"></i>
+                                                Hanya file JPG atau PNG yang diperbolehkan. Ukuran maksimal 10MB.
+                                            </small>
+                                        </div>
+                                        <?php if (isset($_GET['error'])): ?>
+                                            <div class="mt-2">
+                                                <?php if ($_GET['error'] == 'invalid_file_type'): ?>
+                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                        Tipe file tidak valid. Hanya file JPG dan PNG yang diperbolehkan.
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    </div>
+                                                <?php elseif ($_GET['error'] == 'file_too_large'): ?>
+                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                        Ukuran file terlalu besar. Maksimal 10MB diperbolehkan.
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                         <?php if ($is_edit && !empty($team['logo_path'])): ?>
                                             <div class="mt-2">
                                                 <small class="text-muted">Current Logo:</small><br>

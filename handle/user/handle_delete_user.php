@@ -1,10 +1,10 @@
 <?php
-require_once 'auth_check.php';
+require_once '../../auth_check.php';
 
-require_once 'db_connect.php';
+require_once '../../db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN') {
-    header("Location: dashboard.php");
+    header("Location: ../../dashboard.php");
     exit;
 }
 
@@ -12,7 +12,7 @@ if (isset($_GET['id'])) {
     $user_id = $_GET['id'];
     
     if ($user_id == $_SESSION['user_id']) {
-        header("Location: users.php");
+        header("Location: ../../users.php");
         exit;
     }
     
@@ -25,7 +25,7 @@ if (isset($_GET['id'])) {
     $created_tasks = $stmt->fetch()['count'] > 0;
 
     if ($manages_projects || $created_tasks) {
-        header("Location: users.php");
+        header("Location: ../../users.php");
         exit;
     }
 

@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$setup_completed) {
     }
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare("INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, 'ADMIN')");
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'ADMIN')");
         $stmt->execute([$name, $email, $password]);
 
         $message = 'Admin user created successfully! File will be deleted automatically.';

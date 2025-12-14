@@ -5,8 +5,8 @@
  * Modul yang menangani pembuatan tugas dalam proyek.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['title'];
@@ -25,10 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute([$title, $description, $priority, $status, $due_date, $project_id, $created_by_id, $assignee]);
 
     $new_task_id = $pdo->lastInsertId();
-    header("Location: task_detail.php?id=$new_task_id");
+    header("Location: ../../task_detail.php?id=$new_task_id");
     exit;
 }
 
-header("Location: projects.php");
+header("Location: ../../projects.php");
 exit;
 ?>

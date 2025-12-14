@@ -5,8 +5,8 @@
  * Modul yang menyediakan fitur komentar dan catatan sebagai ruang komunikasi antar anggota.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if (isset($_GET['id']) && isset($_GET['task_id'])) {
     $comment_id = $_GET['id'];
@@ -23,10 +23,10 @@ if (isset($_GET['id']) && isset($_GET['task_id'])) {
         }
     }
 
-    header("Location: task_detail.php?id=$task_id");
+    header("Location: ../../task_detail.php?id=$task_id");
     exit;
 }
 
-header("Location: projects.php");
+header("Location: ../../projects.php");
 exit;
 ?>

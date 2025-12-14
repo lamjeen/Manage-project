@@ -5,11 +5,11 @@
  * Modul yang mengelola proyek, termasuk informasi, tujuan, timeline, dan struktur keseluruhan.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
-    header("Location: dashboard.php");
+    header("Location: ../../dashboard.php");
     exit;
 }
 
@@ -38,10 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    header("Location: project_detail.php?id=$project_id");
+    header("Location: ../../project_detail.php?id=$project_id");
     exit;
 }
 
-header("Location: projects.php");
+header("Location: ../../projects.php");
 exit;
 ?>

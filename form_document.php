@@ -144,7 +144,31 @@ if ($is_edit) {
                                     </div>
                                     <div class="mb-3">
                                         <label for="file" class="form-label">Select File</label>
-                                        <input type="file" class="form-control" id="file" name="file" <?php echo !$is_edit ? 'required' : ''; ?>>
+                                        <input type="file" class="form-control" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif" <?php echo !$is_edit ? 'required' : ''; ?>>
+                                        <div class="form-text">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle"></i>
+                                                File yang diperbolehkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF.
+                                                Ukuran maksimal 50MB.
+                                            </small>
+                                        </div>
+                                        <?php if (isset($_GET['error'])): ?>
+                                            <div class="mt-2">
+                                                <?php if ($_GET['error'] == 'invalid_file_type'): ?>
+                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                        Tipe file tidak valid. File yang diperbolehkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR, JPG, JPEG, PNG, GIF.
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    </div>
+                                                <?php elseif ($_GET['error'] == 'file_too_large'): ?>
+                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                        Ukuran file terlalu besar. Maksimal 50MB diperbolehkan.
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
                                         <?php if ($is_edit && $document['file_name']): ?>
                                             <div class="form-text">Current file: <?php echo $document['file_name']; ?></div>
                                         <?php endif; ?>

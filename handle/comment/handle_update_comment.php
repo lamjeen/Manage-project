@@ -5,8 +5,8 @@
  * Modul yang menyediakan fitur komentar dan catatan sebagai ruang komunikasi antar anggota.
  */
 
-require_once 'auth_check.php';
-require_once 'db_connect.php';
+require_once '../../auth_check.php';
+require_once '../../db_connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $comment_id = $_POST['comment_id'];
@@ -19,12 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $comment = $stmt->fetch();
 
     if (!$comment) {
-        header("Location: dashboard.php");
+        header("Location: ../../dashboard.php");
         exit;
     }
 
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $comment['author_id'] != $_SESSION['user_id']) {
-        header("Location: task_detail.php?id=" . $comment['task_id']);
+        header("Location: ../../task_detail.php?id=" . $comment['task_id']);
         exit;
     }
 
@@ -35,6 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-header("Location: projects.php");
+header("Location: ../../projects.php");
 exit;
 ?>
