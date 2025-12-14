@@ -255,12 +255,12 @@ foreach ($tasks as $task) {
                                     // Loop untuk setiap kolom task
                                     foreach ($task_columns as $status_key => $status_name) {
                                         ?>
-                                        <div class="col-md-3 mb-4">
-                                            <div class="card bg-light task-column">
-                                                <div class="card-header">
+                                    <div class="col-md-3 mb-4">
+                                        <div class="card bg-light task-column">
+                                            <div class="card-header">
                                                     <h6 class="mb-0"><?php echo $status_name; ?> (<?php echo $task_counts[$status_key]; ?>)</h6>
-                                                </div>
-                                                <div class="card-body p-2">
+                                            </div>
+                                            <div class="card-body p-2">
                                                     <?php
                                                     // Loop untuk setiap task
                                                     foreach ($tasks as $task) {
@@ -278,23 +278,23 @@ foreach ($tasks as $task) {
                                                                 $badge_color = 'danger';
                                                             }
                                                             ?>
-                                                            <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
-                                                                <div class="card-body p-2">
-                                                                    <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
-                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                        <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
+                                                    <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
+                                                        <div class="card-body p-2">
+                                                            <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <small class="text-muted"><?php echo $task['assignee_name'] ?? 'None'; ?></small>
                                                                         <span class="badge bg-<?php echo $badge_color; ?> rounded-pill"><?php echo $task['priority']; ?></span>
-                                                                    </div>
-                                                                    <?php if ($task['due_date']): ?>
-                                                                    <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
-                                                                    <?php endif; ?>
-                                                                </div>
                                                             </div>
+                                                            <?php if ($task['due_date']): ?>
+                                                            <small class="text-muted"><i class="bi bi-calendar"></i> <?php echo date('d M', strtotime($task['due_date'])); ?></small>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
                                                             <?php
                                                         }
                                                     }
                                                     ?>
-                                                </div>
+                                                    </div>
                                             </div>
                                         </div>
                                         <?php

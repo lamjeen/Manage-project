@@ -7,14 +7,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password'];
-
+    
     $role = 'MEMBER';
 
             $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$name, $email, $password, $role]);
-
+            $stmt->execute([$name, $email, $password, $role]);
+            
     header("Location: login.php");
-    exit;
+            exit;
 }
 ?>
 
