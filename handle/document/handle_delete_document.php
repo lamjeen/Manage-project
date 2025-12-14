@@ -8,8 +8,8 @@
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';
 
-if (isset($_GET['id'])) {
-    $document_id = $_GET['id'];
+if (isset($_POST['id'])) {
+    $document_id = $_POST['id'];
 
     $stmt = $pdo->prepare("SELECT file_path, uploaded_by_id, project_id, task_id FROM documents WHERE id = ?");
     $stmt->execute([$document_id]);

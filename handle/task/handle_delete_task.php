@@ -8,8 +8,8 @@
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';
 
-if (isset($_GET['id'])) {
-    $task_id = $_GET['id'];
+if (isset($_POST['id'])) {
+    $task_id = $_POST['id'];
 
     // Check if user has permission to delete
     $stmt = $pdo->prepare("SELECT created_by_id, project_id FROM tasks WHERE id = ?");

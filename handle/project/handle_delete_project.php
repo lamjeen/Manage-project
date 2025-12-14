@@ -13,8 +13,8 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     exit;
 }
 
-if (isset($_GET['id'])) {
-    $project_id = $_GET['id'];
+if (isset($_POST['id'])) {
+    $project_id = $_POST['id'];
 
     $stmt = $pdo->prepare("SELECT manager_id FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);

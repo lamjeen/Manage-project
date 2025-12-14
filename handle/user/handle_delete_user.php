@@ -8,8 +8,8 @@ if ($_SESSION['user_role'] != 'ADMIN') {
     exit;
 }
 
-if (isset($_GET['id'])) {
-    $user_id = $_GET['id'];
+if (isset($_POST['id'])) {
+    $user_id = $_POST['id'];
     
     if ($user_id == $_SESSION['user_id']) {
         header("Location: ../../users.php");
@@ -33,6 +33,6 @@ if (isset($_GET['id'])) {
     $stmt->execute([$user_id]);
 }
 
-header("Location: users.php");
+header("Location: ../../users.php");
 exit;
 ?>

@@ -13,8 +13,8 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
     exit;
 }
 
-if (isset($_GET['id'])) {
-    $team_id = $_GET['id'];
+if (isset($_POST['id'])) {
+    $team_id = $_POST['id'];
 
     // Check if user has permission to delete
     if ($_SESSION['user_role'] != 'ADMIN') {

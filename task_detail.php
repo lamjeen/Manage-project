@@ -140,9 +140,12 @@ foreach ($all_comments as $comment) {
                             <a href="form_task.php?id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="bi bi-pencil me-1"></i> Edit
                             </a>
-                            <a href="handle/task/handle_delete_task.php?id=<?php echo $task['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this task?')">
-                                <i class="bi bi-trash me-1"></i> Delete
-                            </a>
+                            <form method="POST" action="handle/task/handle_delete_task.php" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                                <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash me-1"></i> Delete
+                                </button>
+                            </form>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -262,9 +265,12 @@ foreach ($all_comments as $comment) {
                                                     <a href="form_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <a href="handle/document/handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
+                                                    <form method="POST" action="handle/document/handle_delete_document.php" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this document?')">
+                                                        <input type="hidden" name="id" value="<?php echo $doc['id']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -378,7 +384,11 @@ foreach ($all_comments as $comment) {
                                         <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $comment['author_id'] == $_SESSION['user_id']): ?>
                                         <div>
                                             <a href="form_comment.php?id=<?php echo $comment['id']; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                            <a href="handle/comment/handle_delete_comment.php?id=<?php echo $comment['id']; ?>&task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-outline-danger">Delete</a>
+                                            <form method="POST" action="handle/comment/handle_delete_comment.php" class="d-inline">
+                                                <input type="hidden" name="id" value="<?php echo $comment['id']; ?>">
+                                                <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this comment?')">Delete</button>
+                                            </form>
                                         </div>
                                         <?php endif; ?>
                                     </div>

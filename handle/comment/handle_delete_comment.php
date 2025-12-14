@@ -8,9 +8,9 @@
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';
 
-if (isset($_GET['id']) && isset($_GET['task_id'])) {
-    $comment_id = $_GET['id'];
-    $task_id = $_GET['task_id'];
+if (isset($_POST['id']) && isset($_POST['task_id'])) {
+    $comment_id = $_POST['id'];
+    $task_id = $_POST['task_id'];
 
     $stmt = $pdo->prepare("SELECT author_id FROM comments WHERE id = ?");
     $stmt->execute([$comment_id]);

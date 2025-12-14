@@ -120,9 +120,12 @@ if ($_SESSION['user_role'] != 'ADMIN') {
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                                <button class="btn btn-sm btn-outline-danger delete-user" data-id="<?php echo $user['id']; ?>">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                <form method="POST" action="handle/user/handle_delete_user.php" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                                    <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>
@@ -137,39 +140,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
         </div>
     </div>
 
-    
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this user? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
-            document.querySelectorAll('.delete-user').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    confirmDeleteBtn.href = `handle/user/handle_delete_user.php?id=${userId}`;
-                    deleteModal.show();
-                });
-            });
-        });
-    </script>
 </body>
 </html>

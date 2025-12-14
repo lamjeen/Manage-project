@@ -355,9 +355,12 @@ foreach ($tasks as $task) {
                                                         <a href="form_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                                             <i class="bi bi-pencil"></i>
                                                         </a>
-                                                        <a href="handle/document/handle_delete_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
-                                                            <i class="bi bi-trash"></i>
-                                                        </a>
+                                                        <form method="POST" action="handle/document/handle_delete_document.php" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this document?')">
+                                                            <input type="hidden" name="id" value="<?php echo $document['id']; ?>">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
                                                         <?php endif; ?>
                                                     </td>
                                                 </tr>

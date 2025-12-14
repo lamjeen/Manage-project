@@ -157,9 +157,12 @@ require_once 'db_connect.php';
                                             <a href="form_project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a href="handle/project/handle_delete_project.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            <form method="POST" action="handle/project/handle_delete_project.php" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project? This action cannot be undone.')">
+                                                <input type="hidden" name="id" value="<?php echo $project['id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                         <?php endif; ?>
                                     </div>
