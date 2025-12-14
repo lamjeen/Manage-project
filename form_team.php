@@ -126,7 +126,7 @@ if (isset($_GET['id'])) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="<?php echo $is_edit ? 'handle_update_team.php' : 'handle_create_team.php'; ?>" method="post" enctype="multipart/form-data">
+                                <form action="<?php echo $is_edit ? 'handle/team/handle_update_team.php' : 'handle/team/handle_create_team.php'; ?>" method="post" enctype="multipart/form-data">
                                     <?php if ($is_edit): ?>
                                         <input type="hidden" name="team_id" value="<?php echo $team['id']; ?>">
                                     <?php endif; ?>

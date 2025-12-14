@@ -137,7 +137,7 @@ if ($selected_project_id) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="<?php echo $is_edit ? 'handle_update_task.php' : 'handle_create_task.php'; ?>" method="post">
+                                <form action="<?php echo $is_edit ? 'handle/task/handle_update_task.php' : 'handle/task/handle_create_task.php'; ?>" method="post">
                                     <?php if ($is_edit): ?>
                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                     <?php endif; ?>

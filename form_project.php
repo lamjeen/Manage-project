@@ -117,7 +117,7 @@ if (isset($_GET['id'])) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="<?php echo $is_edit ? 'handle_update_project.php' : 'handle_create_project.php'; ?>" method="post">
+                                <form action="<?php echo $is_edit ? 'handle/project/handle_update_project.php' : 'handle/project/handle_create_project.php'; ?>" method="post">
                                     <?php if ($is_edit): ?>
                                         <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
                                     <?php endif; ?>

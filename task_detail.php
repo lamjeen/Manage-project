@@ -171,25 +171,25 @@ foreach ($all_comments as $comment) {
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="TO_DO" class="dropdown-item <?php echo $task['status'] === 'TO_DO' ? 'active' : ''; ?>">TO DO</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="IN_PROGRESS" class="dropdown-item <?php echo $task['status'] === 'IN_PROGRESS' ? 'active' : ''; ?>">IN PROGRESS</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="REVIEW" class="dropdown-item <?php echo $task['status'] === 'REVIEW' ? 'active' : ''; ?>">REVIEW</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="DONE" class="dropdown-item <?php echo $task['status'] === 'DONE' ? 'active' : ''; ?>">DONE</button>
                                                     </form>
@@ -259,7 +259,7 @@ foreach ($all_comments as $comment) {
                                                     <a href="form_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Edit">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <a href="handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                                    <a href="handle/document/handle_delete_document.php?id=<?php echo $doc['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
                                                         <i class="bi bi-trash"></i>
                                                     </a>
                                                     <?php endif; ?>
@@ -286,7 +286,7 @@ foreach ($all_comments as $comment) {
                                 <h5 class="mb-0">Comments</h5>
                             </div>
                             <div class="card-body">
-                                <form action="handle_create_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
+                                <form action="handle/comment/handle_create_comment.php" method="post" class="mb-4" enctype="multipart/form-data">
                                     <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
                                     
                                     <div class="row">
@@ -371,7 +371,7 @@ foreach ($all_comments as $comment) {
                                         <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $comment['author_id'] == $_SESSION['user_id']): ?>
                                         <div>
                                             <a href="form_comment.php?id=<?php echo $comment['id']; ?>" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                            <a href="handle_delete_comment.php?id=<?php echo $comment['id']; ?>&task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-outline-danger">Delete</a>
+                                            <a href="handle/comment/handle_delete_comment.php?id=<?php echo $comment['id']; ?>&task_id=<?php echo $task_id; ?>" class="btn btn-sm btn-outline-danger">Delete</a>
                                         </div>
                                         <?php endif; ?>
                                     </div>

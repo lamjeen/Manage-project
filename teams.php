@@ -177,7 +177,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
             document.querySelectorAll('.delete-team').forEach(button => {
                 button.addEventListener('click', function() {
                     const teamId = this.getAttribute('data-id');
-                    confirmDeleteBtn.href = `handle_delete_team.php?id=${teamId}`;
+                    confirmDeleteBtn.href = `handle/team/handle_delete_team.php?id=${teamId}`;
                     deleteModal.show();
                 });
             });

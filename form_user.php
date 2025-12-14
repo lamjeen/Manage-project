@@ -107,7 +107,7 @@ $form_data = [
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="handle_create_user.php" method="post">
+                                <form action="handle/user/handle_create_user.php" method="post">
                                     <?php if ($is_edit): ?>
                                         <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                     <?php endif; ?>

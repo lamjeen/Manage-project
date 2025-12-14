@@ -165,7 +165,7 @@ if ($_SESSION['user_role'] != 'ADMIN') {
             document.querySelectorAll('.delete-user').forEach(button => {
                 button.addEventListener('click', function() {
                     const userId = this.getAttribute('data-id');
-                    confirmDeleteBtn.href = `handle_delete_user.php?id=${userId}`;
+                    confirmDeleteBtn.href = `handle/user/handle_delete_user.php?id=${userId}`;
                     deleteModal.show();
                 });
             });

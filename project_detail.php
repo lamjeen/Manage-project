@@ -430,7 +430,7 @@ foreach ($tasks as $task) {
                                                         <a href="form_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-secondary">
                                                             <i class="bi bi-pencil"></i>
                                                         </a>
-                                                        <a href="handle_delete_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
+                                                        <a href="handle/document/handle_delete_document.php?id=<?php echo $document['id']; ?>" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this document?')">
                                                             <i class="bi bi-trash"></i>
                                                         </a>
                                                         <?php endif; ?>

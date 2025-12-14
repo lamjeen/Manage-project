@@ -134,7 +134,7 @@ if ($is_edit) {
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="<?php echo $is_edit ? 'handle_update_document.php' : 'handle_create_document.php'; ?>" method="post" enctype="multipart/form-data">
+                                <form action="<?php echo $is_edit ? 'handle/document/handle_update_document.php' : 'handle/document/handle_create_document.php'; ?>" method="post" enctype="multipart/form-data">
                                     <?php if ($is_edit): ?>
                                         <input type="hidden" name="document_id" value="<?php echo $document['id']; ?>">
                                     <?php endif; ?>

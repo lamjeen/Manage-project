@@ -104,7 +104,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && 
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
-                                <form action="handle_update_comment.php" method="post">
+                                <form action="handle/comment/handle_update_comment.php" method="post">
                                     <input type="hidden" name="comment_id" value="<?php echo $comment_id; ?>">
                                     <div class="mb-3">
                                         <label for="content" class="form-label">Comment Content</label>

@@ -201,7 +201,7 @@ require_once 'db_connect.php';
             document.querySelectorAll('.delete-project').forEach(button => {
                 button.addEventListener('click', function() {
                     const projectId = this.getAttribute('data-id');
-                    confirmDeleteBtn.href = `handle_delete_project.php?id=${projectId}`;
+                    confirmDeleteBtn.href = `handle/project/handle_delete_project.php?id=${projectId}`;
                     deleteModal.show();
                 });
             });
