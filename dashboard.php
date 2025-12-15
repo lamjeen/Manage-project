@@ -18,6 +18,14 @@ require_once 'db_connect.php';
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
+
+ // Check for deadline notifications (H-1)
+ $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' AND t.due_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND t.due_date >= CURDATE()");
+ $stmt->execute([$_SESSION['user_id']]);
+ $deadline_tasks = $stmt->fetchAll();
+
+ $stmt = $pdo->query("SELECT p.* FROM projects p WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND p.end_date >= CURDATE()");
+ $deadline_projects = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -270,5 +278,35 @@ require_once 'db_connect.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    
+    <script>
+        // Deadline notification
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (!empty($deadline_tasks) || !empty($deadline_projects)): ?>
+                let message = "⚠️ Deadline Reminder:\n\n";
+
+                <?php if (!empty($deadline_tasks)): ?>
+                    message += "📋 Tasks due soon:\n";
+                    <?php foreach ($deadline_tasks as $task): ?>
+                        message += "• <?php echo addslashes($task['title']); ?> (<?php echo addslashes($task['project_name']); ?>)\n";
+                    <?php endforeach; ?>
+                    message += "\n";
+                <?php endif; ?>
+
+                <?php if (!empty($deadline_projects)): ?>
+                    message += "📁 Projects due soon:\n";
+                    <?php foreach ($deadline_projects as $project): ?>
+                        message += "• <?php echo addslashes($project['name']); ?>\n";
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+                // Show notification on page load
+                setTimeout(function() {
+                    alert(message);
+                }, 1000);
+            <?php endif; ?>
+        });
+    </script>
 </body>
 </html>
