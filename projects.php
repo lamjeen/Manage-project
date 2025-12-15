@@ -1,6 +1,7 @@
 <?php
-require_once 'auth_check.php';
+// Modul Projek - Halaman utama daftar projek
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC");
@@ -32,7 +33,8 @@ require_once 'db_connect.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-            
+
+            <!-- SIDEBAR START -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -77,8 +79,9 @@ require_once 'db_connect.php';
                     </div>
                 </div>
             </nav>
+            <!-- SIDEBAR END -->
 
-            
+            <!-- MAIN CONTENT START -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Projects</h1>
@@ -173,6 +176,7 @@ require_once 'db_connect.php';
                     <?php endif; ?>
                 </div>
             </main>
+            <!-- MAIN CONTENT END -->
         </div>
     </div>
 

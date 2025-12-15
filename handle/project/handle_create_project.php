@@ -1,9 +1,5 @@
 <?php
-/**
- * Project Module - Create Project Handler
- * 2432012 - Devin Ng
- * Modul yang mengelola proyek, termasuk informasi, tujuan, timeline, dan struktur keseluruhan.
- */
+// Modul Projek - Handler untuk buat projek baru
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';

@@ -1,9 +1,5 @@
 <?php
-/**
- * Document Module - Delete Document Handler
- * 2432059 - Xlhynz
- * Modul untuk mengupload, menyimpan, dan mengatur file serta dokumen yang terkait dengan proyek atau tugas.
- */
+// Modul Dokumen - Handler untuk hapus dokumen
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';

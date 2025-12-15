@@ -1,6 +1,7 @@
 <?php
-require_once 'auth_check.php';
+// Modul Komentar - Form untuk buat/edit komentar
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if (!isset($_GET['id'])) {

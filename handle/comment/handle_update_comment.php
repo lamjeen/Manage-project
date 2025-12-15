@@ -1,9 +1,5 @@
 <?php
-/**
- * Comment/Notes Module - Update Comment Handler
- * 2432050 - Nicholas Syahputra
- * Modul yang menyediakan fitur komentar dan catatan sebagai ruang komunikasi antar anggota.
- */
+// Modul Komentar - Handler untuk update komentar
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';

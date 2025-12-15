@@ -1,25 +1,31 @@
 <?php
 require_once 'auth_check.php';
-
 require_once 'db_connect.php';
 
+// Gabungan Modul Projek, Modul Tim, Modul User, dan Modul Tugas
+
+// SELECT - Hitung total proyek
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
+// SELECT - Hitung total tim
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM teams");
  $teams_count = $stmt->fetch()['total'];
 
+// SELECT - Hitung total user
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
 
+// SELECT - Ambil proyek yang deadline-nya akan datang
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
+// SELECT - Ambil tugas user saat ini
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
 
- // Check for deadline notifications (H-1)
+// SELECT - Cek deadline H-1 untuk notifikasi
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' AND t.due_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND t.due_date >= CURDATE()");
  $stmt->execute([$_SESSION['user_id']]);
  $deadline_tasks = $stmt->fetchAll();
@@ -51,6 +57,7 @@ require_once 'db_connect.php';
     <div class="container-fluid">
         <div class="row">
             
+            <!-- SIDEBAR START -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -95,8 +102,9 @@ require_once 'db_connect.php';
                     </div>
                 </div>
             </nav>
-
+            <!-- SIDEBAR END -->
             
+            <!-- MAIN CONTENT START -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Dashboard</h1>
@@ -109,7 +117,7 @@ require_once 'db_connect.php';
                     </div>
                 </div>
 
-                
+                <!-- MODUL STATISTIK - Gabungan dari Modul Projek, Tim, User, dan Tugas -->
                 <div class="row mb-4">
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-primary shadow h-100 py-2 card-stat">
@@ -182,6 +190,7 @@ require_once 'db_connect.php';
 
                 <div class="row">
                     
+                    <!-- MODUL PROYEK - Menampilkan proyek yang akan datang deadline-nya -->
                     <div class="col-lg-8 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -235,7 +244,7 @@ require_once 'db_connect.php';
                         </div>
                     </div>
 
-                    
+                    <!-- MODUL TUGAS - Menampilkan tugas yang assigned ke user saat ini -->
                     <div class="col-lg-4 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -274,12 +283,13 @@ require_once 'db_connect.php';
                     </div>
                 </div>
             </main>
+            <!-- MAIN CONTENT END -->
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    
+    <!-- NOTIFIKASI DEADLINE - Gabungan dari Modul Tugas dan Modul Proyek -->
     <script>
         // Deadline notification
         document.addEventListener('DOMContentLoaded', function() {
@@ -292,18 +302,18 @@ require_once 'db_connect.php';
                         message += "• <?php echo addslashes($task['title']); ?> (<?php echo addslashes($task['project_name']); ?>)\n";
                     <?php endforeach; ?>
                     message += "\n";
-                <?php endif; ?>
+                    <?php endif; ?>
 
                 <?php if (!empty($deadline_projects)): ?>
                     message += "📁 Projects due soon:\n";
                     <?php foreach ($deadline_projects as $project): ?>
                         message += "• <?php echo addslashes($project['name']); ?>\n";
-                    <?php endforeach; ?>
+                <?php endforeach; ?>
                 <?php endif; ?>
 
                 // Show notification on page load
                 setTimeout(function() {
-                    alert(message);
+                alert(message);
                 }, 1000);
             <?php endif; ?>
         });

@@ -1,9 +1,5 @@
 <?php
-/**
- * Task Module - Delete Task Handler
- * 2432070 - Lam Jeen Sin Anthony
- * Modul yang menangani penghapusan tugas dalam proyek.
- */
+// Modul Tugas - Handler untuk hapus tugas
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';
@@ -20,7 +16,7 @@ if (isset($_POST['id'])) {
         header("Location: ../../projects.php");
         exit;
     }
-
+    // only ADMIN, MANAGER, or task creator can delete task
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
         header("Location: ../../projects.php");
         exit;

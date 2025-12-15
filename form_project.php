@@ -1,4 +1,6 @@
 <?php
+// Modul Projek - Form untuk buat/edit projek
+
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {

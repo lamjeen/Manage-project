@@ -1,6 +1,7 @@
 <?php
-require_once 'auth_check.php';
+// Gabungan Modul Tugas, Modul Komentar, dan Modul Dokumen - Halaman detail tugas
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if (!isset($_GET['id'])) {

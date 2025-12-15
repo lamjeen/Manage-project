@@ -1,9 +1,5 @@
 <?php
-/**
- * Team Module - Update Team Handler
- * 2432003 - Muhammad Anugrah Wahyu Syahputra
- * Modul pengelolaan anggota dan struktur tim dalam aplikasi, termasuk role dan akses.
- */
+// Modul Tim - Handler untuk update tim
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';

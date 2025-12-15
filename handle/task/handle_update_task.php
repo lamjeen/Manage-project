@@ -1,9 +1,5 @@
 <?php
-/**
- * Task Module - Update Task Handler
- * 2432070 - Lam Jeen Sin Anthony
- * Modul yang menangani pembaruan tugas dalam proyek.
- */
+// Modul Tugas - Handler untuk update tugas
 
 require_once '../../auth_check.php';
 require_once '../../db_connect.php';
@@ -17,6 +13,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $due_date = $_POST['due_date'];
     $project_id = $_POST['project_id'];
     $assignee = $_POST['assignee'] ?? null;
+
+    // Check if user has permission to update task
+    $stmt = $pdo->prepare("SELECT created_by_id, project_id FROM tasks WHERE id = ?");
+    $stmt->execute([$task_id]);
+    $task = $stmt->fetch();
+
+    if (!$task) {
+        header("Location: ../../projects.php");
+        exit;
+    }
+
+    // Only ADMIN, MANAGER, or task creator can update task details
+    if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
+        header("Location: ../../task_detail.php?id=$task_id");
+        exit;
+    }
 
     $stmt = $pdo->prepare("
         UPDATE tasks SET

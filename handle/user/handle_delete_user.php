@@ -1,6 +1,7 @@
 <?php
-require_once '../../auth_check.php';
+// Modul User - Handler untuk hapus user
 
+require_once '../../auth_check.php';
 require_once '../../db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN') {

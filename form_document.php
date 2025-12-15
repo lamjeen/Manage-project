@@ -1,6 +1,7 @@
 <?php
-require_once 'auth_check.php';
+// Modul Dokumen - Form untuk buat/edit dokumen
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
  $document = null;

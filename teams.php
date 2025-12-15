@@ -1,6 +1,7 @@
 <?php
-require_once 'auth_check.php';
+// Modul Tim - Halaman utama daftar tim
 
+require_once 'auth_check.php';
 require_once 'db_connect.php';
 
 if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
@@ -34,7 +35,8 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
 <body>
     <div class="container-fluid">
         <div class="row">
-            
+
+            <!-- SIDEBAR START -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -79,8 +81,9 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                     </div>
                 </div>
             </nav>
+            <!-- SIDEBAR END -->
 
-            
+            <!-- MAIN CONTENT START -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2">Teams</h1>
@@ -149,6 +152,7 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
                     <?php endif; ?>
                 </div>
             </main>
+            <!-- MAIN CONTENT END -->
         </div>
     </div>
 

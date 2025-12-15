@@ -1,4 +1,6 @@
 <?php
+// Modul User - Form untuk buat/edit user
+
 require_once 'auth_check.php';
 
 if ($_SESSION['user_role'] != 'ADMIN') {
