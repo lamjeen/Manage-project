@@ -11,6 +11,7 @@ if (isset($_GET['id'])) {
     $is_edit = true;
     $task_id = $_GET['id'];
     
+    // query untuk mengambil detail tugas
     $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch();
@@ -27,8 +28,6 @@ if (isset($_GET['id'])) {
 
 }
 
-// Form will submit directly to the appropriate handler based on action attribute
-
 $form_data = [
     'title' => $_POST['title'] ?? ($task['title'] ?? ''),
     'description' => $_POST['description'] ?? ($task['description'] ?? ''),
@@ -42,21 +41,17 @@ $form_data = [
 
 $selected_project_id = $form_data['project_id'];
 
-if ($selected_project_id) {
-    $stmt = $pdo->prepare("
-        SELECT DISTINCT u.id, u.name 
-        FROM users u
-        JOIN team_members tm ON u.id = tm.user_id
-        JOIN project_team pt ON tm.team_id = pt.team_id
-        WHERE pt.project_id = ?
-        ORDER BY u.name
-    ");
-    $stmt->execute([$selected_project_id]);
-    $users = $stmt->fetchAll();
-} else {
-    $stmt = $pdo->query("SELECT id, name FROM users ORDER BY name");
-    $users = $stmt->fetchAll();
-}
+// query untuk mengambil pengguna yang ditugaskan dari proyek
+$stmt = $pdo->prepare("
+    SELECT DISTINCT u.id, u.name
+    FROM users u
+    JOIN team_members tm ON u.id = tm.user_id
+    JOIN project_team pt ON tm.team_id = pt.team_id
+    WHERE pt.project_id = ?
+    ORDER BY u.name
+");
+$stmt->execute([$selected_project_id]);
+$users = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -73,6 +68,7 @@ if ($selected_project_id) {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Modul Sidebar -->
     <div class="container-fluid">
         <div class="row">
             
@@ -121,7 +117,7 @@ if ($selected_project_id) {
                 </div>
             </nav>
 
-            
+            <!-- Modul Form Edit/Buat Tugas -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo $is_edit ? 'Edit Task' : 'New Task'; ?></h1>
@@ -134,6 +130,7 @@ if ($selected_project_id) {
                     </div>
                 </div>
 
+            
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="card">

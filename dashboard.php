@@ -4,32 +4,33 @@ require_once 'db_connect.php';
 
 // Gabungan Modul Projek, Modul Tim, Modul User, dan Modul Tugas
 
-// SELECT - Hitung total proyek
+// query untuk menghitung total proyek
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
  $projects_count = $stmt->fetch()['total'];
 
-// SELECT - Hitung total tim
+// query untuk menghitung total tim
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM teams");
  $teams_count = $stmt->fetch()['total'];
 
-// SELECT - Hitung total user
+// query untuk menghitung total user
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
  $users_count = $stmt->fetch()['total'];
 
-// SELECT - Ambil proyek yang deadline-nya akan datang
+// query untuk mengambil proyek yang deadlinenya akan datang
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
-// SELECT - Ambil tugas user saat ini
+// query untuk mengambil tugas user saat ini
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
 
-// SELECT - Cek deadline H-1 untuk notifikasi
+// query untuk mengecek deadline H-1 untuk notifikasi
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' AND t.due_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND t.due_date >= CURDATE()");
  $stmt->execute([$_SESSION['user_id']]);
  $deadline_tasks = $stmt->fetchAll();
 
+// query untuk mengecek deadline H-1 untuk notifikasi proyek
  $stmt = $pdo->query("SELECT p.* FROM projects p WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND p.end_date >= CURDATE()");
  $deadline_projects = $stmt->fetchAll();
 ?>
@@ -169,7 +170,8 @@ require_once 'db_connect.php';
                             </div>
                         </div>
                     </div>
-
+                        
+                    <!-- Modul My Total Tasks -->
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-warning shadow h-100 py-2 card-stat">
                             <div class="card-body">
@@ -190,7 +192,7 @@ require_once 'db_connect.php';
 
                 <div class="row">
                     
-                    <!-- MODUL PROYEK - Menampilkan proyek yang akan datang deadline-nya -->
+                    <!-- Modul Projects -->
                     <div class="col-lg-8 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -244,7 +246,7 @@ require_once 'db_connect.php';
                         </div>
                     </div>
 
-                    <!-- MODUL TUGAS - Menampilkan tugas yang assigned ke user saat ini -->
+                    <!-- Modul Tasks -->
                     <div class="col-lg-4 mb-4">
                         <div class="card">
                             <div class="card-header">
@@ -283,15 +285,14 @@ require_once 'db_connect.php';
                     </div>
                 </div>
             </main>
-            <!-- MAIN CONTENT END -->
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- NOTIFIKASI DEADLINE - Gabungan dari Modul Tugas dan Modul Proyek -->
+    <!-- Modul Deadline Notification -->
     <script>
-        // Deadline notification
         document.addEventListener('DOMContentLoaded', function() {
             <?php if (!empty($deadline_tasks) || !empty($deadline_projects)): ?>
                 let message = "⚠️ Deadline Reminder:\n\n";
@@ -311,7 +312,7 @@ require_once 'db_connect.php';
                 <?php endforeach; ?>
                 <?php endif; ?>
 
-                // Show notification on page load
+                // show notification on page load
                 setTimeout(function() {
                 alert(message);
                 }, 1000);

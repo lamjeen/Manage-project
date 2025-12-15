@@ -9,6 +9,7 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
+// query untuk mengambil detail tugas
  $task_id = $_GET['id'];
 
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name, creator.name as creator_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id LEFT JOIN users creator ON t.created_by_id = creator.id WHERE t.id = ?");
@@ -81,7 +82,7 @@ foreach ($all_comments as $comment) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            
+            <!-- Modul Sidebar -->
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -127,7 +128,7 @@ foreach ($all_comments as $comment) {
                 </div>
             </nav>
 
-            
+            <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -152,7 +153,7 @@ foreach ($all_comments as $comment) {
                     </div>
                 </div>
 
-                
+                <!-- Modul Detail Tugas -->
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -233,6 +234,8 @@ foreach ($all_comments as $comment) {
                             </div>
                         </div>
                     </div>
+
+                    <!-- Modul Dokumen -->
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
@@ -288,7 +291,7 @@ foreach ($all_comments as $comment) {
                 </div>
 
 
-
+                <!-- Modul Komentar -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card">

@@ -14,8 +14,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $assignee = $_POST['assignee'] ?? null;
     $created_by_id = $_SESSION['user_id'];
 
-    // Check if user has permission to create task in this project
-    // Only ADMIN, MANAGER, or team members of the project can create tasks
+
+    // hanya admin, manager, atau anggota tim dari proyek yang dapat membuat tugas
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) as count FROM team_members tm

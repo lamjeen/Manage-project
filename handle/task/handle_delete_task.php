@@ -7,7 +7,7 @@ require_once '../../db_connect.php';
 if (isset($_POST['id'])) {
     $task_id = $_POST['id'];
 
-    // Check if user has permission to delete
+    // query untuk mengambil pembuat tugas dan proyek dari tugas
     $stmt = $pdo->prepare("SELECT created_by_id, project_id FROM tasks WHERE id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch();
@@ -16,7 +16,7 @@ if (isset($_POST['id'])) {
         header("Location: ../../projects.php");
         exit;
     }
-    // only ADMIN, MANAGER, or task creator can delete task
+    // hanya admin, manager, atau pembuat tugas yang dapat menghapus tugas
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
         header("Location: ../../projects.php");
         exit;

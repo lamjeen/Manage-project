@@ -1,5 +1,5 @@
 <?php
-// Modul Projek - Halaman detail projek
+// gabungan modul proyek, modul tugas, dan modul dokumen
 
 require_once 'auth_check.php';
 require_once 'db_connect.php';
@@ -9,17 +9,20 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
+// query untuk mengambil detail proyek
  $project_id = $_GET['id'];
 
  $stmt = $pdo->prepare("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.id = ?");
  $stmt->execute([$project_id]);
  $project = $stmt->fetch();
 
+ 
 if (!$project) {
     header("Location: projects.php");
     exit;
 }
 
+// query untuk mengambil anggota proyek
  $stmt = $pdo->prepare("
     SELECT DISTINCT u.id, u.name
     FROM users u
@@ -31,6 +34,8 @@ if (!$project) {
  $stmt->execute([$project_id]);
  $project_members = $stmt->fetchAll();
 
+
+ // query untuk mengambil tugas proyek
  $stmt = $pdo->prepare("
     SELECT 
         t.*, 
@@ -45,6 +50,7 @@ if (!$project) {
  $stmt->execute([$project_id]);
  $tasks = $stmt->fetchAll();
 
+ // query untuk menghitung jumlah tugas berdasarkan status
  $task_counts = [
     'TO_DO' => 0,
     'IN_PROGRESS' => 0,
@@ -55,7 +61,7 @@ if (!$project) {
 foreach ($tasks as $task) {
     $task_counts[$task['status']]++;
 }
-
+// query untuk menghitung total tugas dan tugas yang selesai
  $total_tasks = count($tasks);
  $completed_tasks = $task_counts['DONE'];
  $progress = $total_tasks > 0 ? round(($completed_tasks / $total_tasks) * 100) : 0;
@@ -91,7 +97,7 @@ foreach ($tasks as $task) {
 <body>
     <div class="container-fluid">
         <div class="row">
-            
+            <!-- Modul Sidebar -->      
             <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="pt-3">
                     <div class="d-flex align-items-center mb-3">
@@ -155,7 +161,7 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
-                
+                <!-- Modul Detail Proyek -->
                 <div class="row mb-4">
                     <div class="col-md-8">
                         <div class="card">
@@ -232,6 +238,8 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
+
+                <!-- Modul Tugas -->
                 
                 <div class="row mb-4">
                     <div class="col-12">
@@ -245,7 +253,6 @@ foreach ($tasks as $task) {
                             <div class="card-body">
                                 <div class="row">
                                     <?php
-                                    // Konfigurasi kolom-kolom task
                                     $task_columns = [
                                         'TO_DO' => 'To Do',
                                         'IN_PROGRESS' => 'In Progress',
@@ -265,9 +272,8 @@ foreach ($tasks as $task) {
                                                     <?php
                                                     // Loop untuk setiap task
                                                     foreach ($tasks as $task) {
-                                                        // Tampilkan task hanya jika status sesuai
                                                         if ($task['status'] == $status_key) {
-                                                            // Tentukan warna badge berdasarkan priority
+                                                            // menentukan warna badge berdasarkan priority
                                                             $badge_color = 'secondary'; // default
                                                             if ($task['priority'] == 'LOW') {
                                                                 $badge_color = 'success';
@@ -279,6 +285,7 @@ foreach ($tasks as $task) {
                                                                 $badge_color = 'danger';
                                                             }
                                                             ?>
+                                                            <!-- Modul Card Tugas -->
                                                     <div class="card mb-2 task-card" onclick="window.location='task_detail.php?id=<?php echo $task['id']; ?>'">
                                                         <div class="card-body p-2">
                                                             <h6 class="card-title mb-1"><?php echo $task['title']; ?></h6>
@@ -307,7 +314,7 @@ foreach ($tasks as $task) {
                     </div>
                 </div>
 
-                
+                <!-- Modul Dokumen -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card">

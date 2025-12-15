@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $project_id = $_POST['project_id'];
     $assignee = $_POST['assignee'] ?? null;
 
-    // Check if user has permission to update task
+    // query untuk mengambil pembuat tugas dan proyek dari tugas
     $stmt = $pdo->prepare("SELECT created_by_id, project_id FROM tasks WHERE id = ?");
     $stmt->execute([$task_id]);
     $task = $stmt->fetch();
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    // Only ADMIN, MANAGER, or task creator can update task details
+    // hanya admin, manager, atau pembuat tugas yang dapat mengupdate detail tugas
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && $task['created_by_id'] != $_SESSION['user_id']) {
         header("Location: ../../task_detail.php?id=$task_id");
         exit;
