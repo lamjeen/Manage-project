@@ -177,25 +177,25 @@ foreach ($all_comments as $comment) {
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="TO_DO" class="dropdown-item <?php echo $task['status'] === 'TO_DO' ? 'active' : ''; ?>">TO DO</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="IN_PROGRESS" class="dropdown-item <?php echo $task['status'] === 'IN_PROGRESS' ? 'active' : ''; ?>">IN PROGRESS</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="REVIEW" class="dropdown-item <?php echo $task['status'] === 'REVIEW' ? 'active' : ''; ?>">REVIEW</button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="handle_update_task_status.php" method="POST">
+                                                    <form action="handle/task/handle_update_task_status.php" method="POST">
                                                         <input type="hidden" name="task_id" value="<?php echo $task['id']; ?>">
                                                         <button type="submit" name="status" value="DONE" class="dropdown-item <?php echo $task['status'] === 'DONE' ? 'active' : ''; ?>">DONE</button>
                                                     </form>

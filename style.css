@@ -309,7 +309,6 @@ body {
   outline: none !important;
 }
 
-/* Focus indicators */
 .btn:focus-visible,
 .form-control:focus-visible,
 .form-select:focus-visible {

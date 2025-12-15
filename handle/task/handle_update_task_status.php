@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
 
     $allowed_statuses = ['TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
-    
+
     if (!in_array($status, $allowed_statuses)) {
         header("Location: ../../task_detail.php?id=$task_id");
         exit;
@@ -16,11 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $pdo->prepare("UPDATE tasks SET status = ? WHERE id = ?");
     $stmt->execute([$status, $task_id]);
-    
-    header("Location: task_detail.php?id=$task_id");
+
+    header("Location: ../../task_detail.php?id=$task_id");
     exit;
 }
 
-header("Location: task_detail.php?id=$task_id");
+header("Location: ../../task_detail.php?id=$task_id");
 exit;
 ?>
