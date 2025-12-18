@@ -20,7 +20,12 @@ require_once 'db_connect.php';
  $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
  $recent_projects = $stmt->fetchAll();
 
-// query untuk mengambil tugas user saat ini
+// query untuk menghitung total tugas user saat ini
+ $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM tasks WHERE assignee = ? AND status != 'DONE'");
+ $stmt->execute([$_SESSION['user_id']]);
+ $my_tasks_count = $stmt->fetch()['total'];
+
+// query untuk mengambil tugas user saat ini (untuk ditampilkan)
  $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
@@ -179,7 +184,7 @@ require_once 'db_connect.php';
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                             My Total Tasks</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo count($my_tasks); ?></div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $my_tasks_count; ?></div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-person-check-fill fa-2x text-gray-300"></i>
