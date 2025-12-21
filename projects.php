@@ -4,11 +4,34 @@
 require_once 'auth_check.php';
 require_once 'db_connect.php';
 
- $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id ORDER BY p.created_at DESC");
- $projects = $stmt->fetchAll();
+    
+$search_keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
+$status_filter = isset($_GET['status']) ? trim($_GET['status']) : '';
 
- $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('ADMIN', 'MANAGER') ORDER BY name");
- $managers = $stmt->fetchAll();
+
+$sql = "SELECT p.*, u.name as manager_name 
+        FROM projects p 
+        LEFT JOIN users u ON p.manager_id = u.id 
+        WHERE 1=1";
+
+
+if (!empty($search_keyword)) {
+    $search_keyword_escaped = $pdo->quote('%' . $search_keyword . '%');
+    $sql .= " AND (p.name LIKE $search_keyword_escaped OR p.description LIKE $search_keyword_escaped)";
+}
+
+
+if (!empty($status_filter)) {
+    $status_filter_escaped = $pdo->quote($status_filter);
+    $sql .= " AND p.status = $status_filter_escaped";
+}
+
+
+$sql .= " ORDER BY p.created_at DESC";
+
+
+$stmt = $pdo->query($sql);
+$projects = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -95,36 +118,36 @@ require_once 'db_connect.php';
                 </div>
 
                 
-                <div class="row mb-4">
+                <form method="GET" action="projects.php" class="row mb-4">
                     <div class="col-md-6">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search projects..." id="searchInput">
-                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <input type="text" class="form-control" name="search" placeholder="Search projects..." value="<?php echo htmlspecialchars($search_keyword); ?>">
+                            <button class="btn btn-outline-secondary" type="submit">
                                 <i class="bi bi-search"></i>
                             </button>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <select class="form-select" id="statusFilter">
+                        <select class="form-select" name="status" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
-                            <option value="PLANNING">Planning</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="ON_HOLD">On Hold</option>
-                            <option value="COMPLETED">Completed</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <option value="PLANNING" <?php echo ($status_filter == 'PLANNING') ? 'selected' : ''; ?>>Planning</option>
+                            <option value="ACTIVE" <?php echo ($status_filter == 'ACTIVE') ? 'selected' : ''; ?>>Active</option>
+                            <option value="ON_HOLD" <?php echo ($status_filter == 'ON_HOLD') ? 'selected' : ''; ?>>On Hold</option>
+                            <option value="COMPLETED" <?php echo ($status_filter == 'COMPLETED') ? 'selected' : ''; ?>>Completed</option>
+                            <option value="CANCELLED" <?php echo ($status_filter == 'CANCELLED') ? 'selected' : ''; ?>>Cancelled</option>
                         </select>
                     </div>
-                </div>
+                </form>
 
                 
-                <div class="row" id="projectsContainer">
+                <div class="row">
                     <?php if (empty($projects)): ?>
                         <div class="col-12">
-                            <div class="alert alert-info">No projects yet.</div>
+                            <div class="alert alert-info">No projects found.</div>
                         </div>
                     <?php else: ?>
                         <?php foreach ($projects as $project): ?>
-                        <div class="col-lg-4 col-md-6 mb-4 project-item" data-status="<?php echo $project['status']; ?>">
+                        <div class="col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 project-card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0"><?php echo $project['name']; ?></h6>
@@ -182,41 +205,5 @@ require_once 'db_connect.php';
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const statusFilter = document.getElementById('statusFilter');
-            const searchInput = document.getElementById('searchInput');
-            const searchButton = document.getElementById('searchButton');
-            const projectItems = document.querySelectorAll('.project-item');
-            
-            function filterProjects() {
-                const statusValue = statusFilter.value.toLowerCase();
-                const searchValue = searchInput.value.toLowerCase();
-                
-                projectItems.forEach(item => {
-                    const status = item.getAttribute('data-status').toLowerCase();
-                    const title = item.querySelector('.card-header h6').textContent.toLowerCase();
-                    const description = item.querySelector('.card-text').textContent.toLowerCase();
-                    
-                    const statusMatch = statusValue === '' || status === statusValue;
-                    const searchMatch = searchValue === '' || title.includes(searchValue) || description.includes(searchValue);
-                    
-                    if (statusMatch && searchMatch) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            }
-            
-            statusFilter.addEventListener('change', filterProjects);
-            searchButton.addEventListener('click', filterProjects);
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    filterProjects();
-                }
-            });
-        });
-    </script>
 </body>
 </html>
