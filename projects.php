@@ -8,22 +8,44 @@ require_once 'db_connect.php';
 $search_keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status_filter = isset($_GET['status']) ? trim($_GET['status']) : '';
 
-
-$sql = "SELECT p.*, u.name as manager_name 
-        FROM projects p 
-        LEFT JOIN users u ON p.manager_id = u.id 
-        WHERE 1=1";
+// Filter: hanya project yang user terlibat (sebagai manager atau melalui team)
+// Admin bisa lihat semua project
+$user_id_escaped = $pdo->quote($_SESSION['user_id']);
+if ($_SESSION['user_role'] == 'ADMIN') {
+    $sql = "SELECT DISTINCT p.*, u.name as manager_name 
+            FROM projects p 
+            LEFT JOIN users u ON p.manager_id = u.id";
+} else {
+    $sql = "SELECT DISTINCT p.*, u.name as manager_name 
+            FROM projects p 
+            LEFT JOIN users u ON p.manager_id = u.id
+            LEFT JOIN project_team pt ON p.id = pt.project_id
+            LEFT JOIN team_members tm ON pt.team_id = tm.team_id
+            WHERE (p.manager_id = $user_id_escaped OR tm.user_id = $user_id_escaped)";
+}
 
 
 if (!empty($search_keyword)) {
     $search_keyword_escaped = $pdo->quote('%' . $search_keyword . '%');
-    $sql .= " AND (p.name LIKE $search_keyword_escaped OR p.description LIKE $search_keyword_escaped)";
+    if ($_SESSION['user_role'] == 'ADMIN') {
+        $sql .= " WHERE p.name LIKE $search_keyword_escaped";
+    } else {
+        $sql .= " AND p.name LIKE $search_keyword_escaped";
+    }
 }
 
 
 if (!empty($status_filter)) {
     $status_filter_escaped = $pdo->quote($status_filter);
-    $sql .= " AND p.status = $status_filter_escaped";
+    if ($_SESSION['user_role'] == 'ADMIN') {
+        if (!empty($search_keyword)) {
+            $sql .= " AND p.status = $status_filter_escaped";
+        } else {
+            $sql .= " WHERE p.status = $status_filter_escaped";
+        }
+    } else {
+        $sql .= " AND p.status = $status_filter_escaped";
+    }
 }
 
 

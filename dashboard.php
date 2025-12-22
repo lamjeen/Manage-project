@@ -4,9 +4,25 @@ require_once 'db_connect.php';
 
 // Gabungan Modul Projek, Modul Tim, Modul User, dan Modul Tugas
 
-// query untuk menghitung total proyek
- $stmt = $pdo->query("SELECT COUNT(*) as total FROM projects");
- $projects_count = $stmt->fetch()['total'];
+// query untuk menghitung jumlah project per status menggunakan COUNT dengan GROUP BY
+// Hanya untuk status ACTIVE
+if ($_SESSION['user_role'] == 'ADMIN') {
+    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM projects WHERE status = 'ACTIVE' GROUP BY status");
+} else {
+    $user_id_escaped = $pdo->quote($_SESSION['user_id']);
+    $stmt = $pdo->query("
+        SELECT p.status, COUNT(p.id) as count 
+        FROM projects p 
+        LEFT JOIN project_team pt ON p.id = pt.project_id
+        LEFT JOIN team_members tm ON pt.team_id = tm.team_id
+        WHERE p.status = 'ACTIVE' 
+        AND p.end_date IS NOT NULL 
+        AND (p.manager_id = $user_id_escaped OR tm.user_id = $user_id_escaped)
+        GROUP BY p.status
+    ");
+}
+$active_projects_result = $stmt->fetch();
+$projects_count = $active_projects_result ? $active_projects_result['count'] : 0;
 
 // query untuk menghitung total tim
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM teams");
@@ -17,7 +33,25 @@ require_once 'db_connect.php';
  $users_count = $stmt->fetch()['total'];
 
 // query untuk mengambil proyek yang deadlinenya akan datang
- $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
+// Filter: hanya project yang user terlibat (sebagai manager atau melalui team)
+// Admin bisa lihat semua project
+if ($_SESSION['user_role'] == 'ADMIN') {
+    $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status = 'ACTIVE' AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
+} else {
+    $stmt = $pdo->prepare("
+        SELECT p.*, u.name as manager_name 
+        FROM projects p 
+        LEFT JOIN users u ON p.manager_id = u.id 
+        LEFT JOIN project_team pt ON p.id = pt.project_id
+        LEFT JOIN team_members tm ON pt.team_id = tm.team_id
+        WHERE p.status = 'ACTIVE' 
+        AND p.end_date IS NOT NULL 
+        AND (p.manager_id = ? OR tm.user_id = ?)
+        ORDER BY p.end_date ASC 
+        LIMIT 5
+    ");
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+}
  $recent_projects = $stmt->fetchAll();
 
 // query untuk menghitung total tugas user saat ini
@@ -26,7 +60,17 @@ require_once 'db_connect.php';
  $my_tasks_count = $stmt->fetch()['total'];
 
 // query untuk mengambil tugas user saat ini (untuk ditampilkan)
- $stmt = $pdo->prepare("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON t.project_id = p.id WHERE t.assignee = ? AND t.status != 'DONE' ORDER BY t.due_date ASC LIMIT 5");
+// Hanya dari project yang statusnya ACTIVE
+ $stmt = $pdo->prepare("
+     SELECT t.*, p.name as project_name 
+     FROM tasks t 
+     INNER JOIN projects p ON t.project_id = p.id 
+     WHERE t.assignee = ? 
+     AND t.status != 'DONE'
+     AND p.status = 'ACTIVE'
+     ORDER BY t.due_date ASC 
+     LIMIT 5
+ ");
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks = $stmt->fetchAll();
 
@@ -36,7 +80,23 @@ require_once 'db_connect.php';
  $deadline_tasks = $stmt->fetchAll();
 
 // query untuk mengecek deadline H-1 untuk notifikasi proyek
- $stmt = $pdo->query("SELECT p.* FROM projects p WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND p.end_date >= CURDATE()");
+// Filter: hanya project yang user terlibat
+// Admin bisa lihat semua project
+if ($_SESSION['user_role'] == 'ADMIN') {
+    $stmt = $pdo->query("SELECT p.* FROM projects p WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND p.end_date >= CURDATE()");
+} else {
+    $stmt = $pdo->prepare("
+        SELECT p.* 
+        FROM projects p 
+        LEFT JOIN project_team pt ON p.id = pt.project_id
+        LEFT JOIN team_members tm ON pt.team_id = tm.team_id
+        WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') 
+        AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) 
+        AND p.end_date >= CURDATE()
+        AND (p.manager_id = ? OR tm.user_id = ?)
+    ");
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
+}
  $deadline_projects = $stmt->fetchAll();
 ?>
 
@@ -131,7 +191,7 @@ require_once 'db_connect.php';
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Total Projects</div>
+                                            Active Projects</div>
                                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $projects_count; ?></div>
                                     </div>
                                     <div class="col-auto">
