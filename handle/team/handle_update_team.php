@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $members = $_POST['members'] ?? [];
 
     // Check if user has permission to update
-    if ($_SESSION['user_role'] != 'ADMIN') {
+    if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
         $stmt = $pdo->prepare("SELECT team_head_id FROM teams WHERE id = ?");
         $stmt->execute([$team_id]);
         $team = $stmt->fetch();
