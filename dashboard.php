@@ -4,25 +4,23 @@ require_once 'db_connect.php';
 
 // Gabungan Modul Projek, Modul Tim, Modul User, dan Modul Tugas
 
-// query untuk menghitung jumlah project per status menggunakan COUNT dengan GROUP BY
-// Hanya untuk status ACTIVE
+// query untuk menghitung jumlah project dengan status ACTIVE
 if ($_SESSION['user_role'] == 'ADMIN') {
-    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM projects WHERE status = 'ACTIVE' GROUP BY status");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM projects WHERE status = 'ACTIVE'");
+    $projects_count = $stmt->fetchColumn();
 } else {
     $user_id_escaped = $pdo->quote($_SESSION['user_id']);
     $stmt = $pdo->query("
-        SELECT p.status, COUNT(p.id) as count 
+        SELECT COUNT(DISTINCT p.id) as count 
         FROM projects p 
         LEFT JOIN project_team pt ON p.id = pt.project_id
         LEFT JOIN team_members tm ON pt.team_id = tm.team_id
         WHERE p.status = 'ACTIVE' 
         AND p.end_date IS NOT NULL 
         AND (p.manager_id = $user_id_escaped OR tm.user_id = $user_id_escaped)
-        GROUP BY p.status
     ");
+    $projects_count = $stmt->fetchColumn();
 }
-$active_projects_result = $stmt->fetch();
-$projects_count = $active_projects_result ? $active_projects_result['count'] : 0;
 
 // query untuk menghitung total tim
  $stmt = $pdo->query("SELECT COUNT(*) as total FROM teams");
@@ -98,6 +96,41 @@ if ($_SESSION['user_role'] == 'ADMIN') {
     $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
 }
  $deadline_projects = $stmt->fetchAll();
+
+// query untuk statistik distribusi tasks berdasarkan status menggunakan COUNT dengan GROUP BY
+// Business Insight: Menampilkan distribusi tasks per status untuk melihat overview progress tugas
+// Hanya tasks dari project yang di-manage oleh admin/manager dan status project ACTIVE
+// Filter per project yang dipilih
+if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER') {
+    // Ambil project_id dari GET parameter (jika ada)
+    $selected_project_id = isset($_GET['project_id']) ? (int)$_GET['project_id'] : null;
+    
+    // Query untuk mengambil daftar project yang di-manage
+    $stmt = $pdo->prepare("SELECT id, name FROM projects WHERE manager_id = ? AND status = 'ACTIVE' ORDER BY name");
+    $stmt->execute([$_SESSION['user_id']]);
+    $managed_projects = $stmt->fetchAll();
+    
+    // Query untuk statistik tasks per status
+    if ($selected_project_id && $selected_project_id > 0) {
+        // Filter berdasarkan project yang dipilih
+        $stmt = $pdo->prepare("
+        SELECT t.status, COUNT(*) as count FROM tasks t 
+        INNER JOIN projects p ON t.project_id = p.id 
+        WHERE p.manager_id = ? AND p.status = 'ACTIVE' AND p.id = ? 
+        GROUP BY t.status
+        ");
+        $stmt->execute([$_SESSION['user_id'], $selected_project_id]);
+    } else {
+        // Semua tasks dari semua project yang di-manage
+        $stmt = $pdo->prepare("SELECT t.status, COUNT(*) as count FROM tasks t INNER JOIN projects p ON t.project_id = p.id WHERE p.manager_id = ? AND p.status = 'ACTIVE' GROUP BY t.status");
+        $stmt->execute([$_SESSION['user_id']]);
+    }
+    $task_status_stats = $stmt->fetchAll();
+} else {
+    $managed_projects = [];
+    $task_status_stats = [];
+    $selected_project_id = null;
+}
 ?>
 
 <!DOCTYPE html>
@@ -110,14 +143,6 @@ if ($_SESSION['user_role'] == 'ADMIN') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .card-stat {
-            transition: transform 0.3s;
-        }
-        .card-stat:hover {
-            transform: translateY(-5px);
-        }
-    </style>
 </head>
 <body>
     <div class="container-fluid">
@@ -309,6 +334,95 @@ if ($_SESSION['user_role'] == 'ADMIN') {
                                 <?php endif; ?>
                             </div>
                         </div>
+
+                        <!-- Statistik Distribusi Tasks berdasarkan Status (Admin/Manager Only) -->
+                        <?php if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER'): ?>
+                        <div class="card mt-4">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold">
+                                    <i class="bi bi-pie-chart-fill me-2"></i>Tasks Distribution by Status
+                                </h6>
+                                <form method="GET" action="dashboard.php" class="d-inline">
+                                    <select name="project_id" id="project_filter" class="form-select form-select-sm" style="width: auto; display: inline-block; min-width: 200px;" onchange="this.form.submit()">
+                                        <option value="">All Projects</option>
+                                        <?php foreach ($managed_projects as $proj): ?>
+                                            <option value="<?php echo $proj['id']; ?>" <?php echo (isset($selected_project_id) && $selected_project_id == $proj['id']) ? 'selected' : ''; ?>>
+                                                <?php echo htmlspecialchars($proj['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </form>
+                            </div>
+                            <div class="card-body">
+                                <?php
+                                $status_config = [
+                                    'TO_DO' => ['label' => 'To Do', 'color' => 'secondary', 'icon' => 'bi-circle', 'bg' => '#e9ecef'],
+                                    'IN_PROGRESS' => ['label' => 'In Progress', 'color' => 'primary', 'icon' => 'bi-arrow-repeat', 'bg' => '#cfe2ff'],
+                                    'REVIEW' => ['label' => 'Review', 'color' => 'warning', 'icon' => 'bi-eye', 'bg' => '#fff3cd'],
+                                    'DONE' => ['label' => 'Done', 'color' => 'success', 'icon' => 'bi-check-circle', 'bg' => '#d1e7dd']
+                                ];
+                                
+                                $total_tasks = array_sum(array_column($task_status_stats, 'count'));
+                                $status_counts = [];
+                                foreach ($task_status_stats as $stat) {
+                                    $status_counts[$stat['status']] = $stat['count'];
+                                }
+                                ?>
+                                <div class="row g-3">
+                                    <?php foreach ($status_config as $status => $config): 
+                                        $count = $status_counts[$status] ?? 0;
+                                        $percentage = $total_tasks > 0 ? round(($count / $total_tasks) * 100, 1) : 0;
+                                    ?>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-center p-3 rounded shadow-sm border-start border-4 border-<?php echo $config['color']; ?>" style="background-color: <?php echo $config['bg']; ?>;">
+                                            <div class="me-3">
+                                                <i class="bi <?php echo $config['icon']; ?> text-<?php echo $config['color']; ?>" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="fw-semibold text-<?php echo $config['color']; ?>"><?php echo $config['label']; ?></span>
+                                                    <span class="badge bg-<?php echo $config['color']; ?> rounded-pill" style="font-size: 0.9rem;"><?php echo $count; ?></span>
+                                                </div>
+                                                <div class="progress mb-1" style="height: 10px;">
+                                                    <div class="progress-bar bg-<?php echo $config['color']; ?>" 
+                                                         role="progressbar" 
+                                                         style="width: <?php echo $percentage; ?>%;" 
+                                                         aria-valuenow="<?php echo $percentage; ?>" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-percent"></i> <?php echo $percentage; ?>% of total
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="mt-3 pt-3 border-top text-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Total tasks: <strong class="text-primary"><?php echo $total_tasks; ?></strong>
+                                        <?php if (isset($selected_project_id) && $selected_project_id): ?>
+                                            <?php 
+                                            $selected_project_name = '';
+                                            foreach ($managed_projects as $proj) {
+                                                if ($proj['id'] == $selected_project_id) {
+                                                    $selected_project_name = $proj['name'];
+                                                    break;
+                                                }
+                                            }
+                                            ?>
+                                            <span class="text-muted">(Project: <?php echo htmlspecialchars($selected_project_name); ?>)</span>
+                                        <?php else: ?>
+                                            <span class="text-muted">(All Projects)</span>
+                                        <?php endif; ?>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Modul Tasks -->
