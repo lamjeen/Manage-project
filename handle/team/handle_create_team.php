@@ -22,22 +22,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $members = $_POST['members'] ?? [];
     $logo_path = null;
 
-    // Handle logo upload
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png'];
-        $max_size = 10 * 1024 * 1024; // 10MB in bytes
+        $max_size = 10 * 1024 * 1024;
         $filename = $_FILES['logo']['name'];
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
         $filesize = $_FILES['logo']['size'];
 
         if (!in_array(strtolower($filetype), $allowed)) {
-            // Invalid file type - redirect back with error
             header("Location: ../../form_team.php?error=invalid_file_type");
             exit;
         }
 
         if ($filesize > $max_size) {
-            // File too large - redirect back with error
             header("Location: ../../form_team.php?error=file_too_large");
             exit;
         }
@@ -58,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $team_id = $pdo->lastInsertId();
 
-    // Add team members
     foreach ($members as $member_id) {
         $stmt = $pdo->prepare("INSERT INTO team_members (team_id, user_id) VALUES (?, ?)");
         $stmt->execute([$team_id, $member_id]);

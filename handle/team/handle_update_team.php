@@ -17,7 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $members = $_POST['members'] ?? [];
 
-    // Check if user has permission to update
     if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
         $stmt = $pdo->prepare("SELECT team_head_id FROM teams WHERE id = ?");
         $stmt->execute([$team_id]);
@@ -29,13 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Get current logo path for cleanup
     $stmt = $pdo->prepare("SELECT logo_path FROM teams WHERE id = ?");
     $stmt->execute([$team_id]);
     $current_team = $stmt->fetch();
     $logo_path = $current_team['logo_path'];
 
-    // Handle logo upload
     if (isset($_FILES['logo']) && $_FILES['logo']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png'];
         $max_size = 10 * 1024 * 1024; // 10MB in bytes
@@ -44,18 +41,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filesize = $_FILES['logo']['size'];
 
         if (!in_array(strtolower($filetype), $allowed)) {
-            // Invalid file type - redirect back with error
             header("Location: ../../form_team.php?id=$team_id&error=invalid_file_type");
             exit;
         }
 
         if ($filesize > $max_size) {
-            // File too large - redirect back with error
             header("Location: ../../form_team.php?id=$team_id&error=file_too_large");
             exit;
         }
 
-        // Delete old logo
         if (!empty($logo_path)) {
             $old_logo_path = '../../uploads/' . $logo_path;
             if (file_exists($old_logo_path)) {
@@ -81,7 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
     $stmt->execute([$name, $description, $team_head_id, $logo_path, $team_id]);
 
-    // Update team members
     $stmt = $pdo->prepare("DELETE FROM team_members WHERE team_id = ?");
     $stmt->execute([$team_id]);
 

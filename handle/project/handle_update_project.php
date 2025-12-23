@@ -15,7 +15,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $manager_id = $_POST['manager_id'];
     $team_ids = $_POST['team_ids'] ?? [];
 
-    // Check if user has permission to update
     if ($_SESSION['user_role'] != 'ADMIN') {
         $stmt = $pdo->prepare("SELECT manager_id FROM projects WHERE id = ?");
         $stmt->execute([$project_id]);
@@ -40,7 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
     $stmt->execute([$name, $description, $start_date, $end_date, $status, $priority, $manager_id, $project_id]);
 
-    // Update project teams
     $stmt = $pdo->prepare("DELETE FROM project_team WHERE project_id = ?");
     $stmt->execute([$project_id]);
 

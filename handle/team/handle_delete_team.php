@@ -12,7 +12,6 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER') {
 if (isset($_POST['id'])) {
     $team_id = $_POST['id'];
 
-    // Check if user has permission to delete
     if ($_SESSION['user_role'] != 'ADMIN') {
         $stmt = $pdo->prepare("SELECT team_head_id FROM teams WHERE id = ?");
         $stmt->execute([$team_id]);
@@ -24,7 +23,6 @@ if (isset($_POST['id'])) {
         }
     }
 
-    // Get logo path for cleanup
     $stmt = $pdo->prepare("SELECT logo_path FROM teams WHERE id = ?");
     $stmt->execute([$team_id]);
     $team = $stmt->fetch();

@@ -57,8 +57,7 @@ if ($_SESSION['user_role'] == 'ADMIN') {
  $stmt->execute([$_SESSION['user_id']]);
  $my_tasks_count = $stmt->fetch()['total'];
 
-// query untuk mengambil tugas user saat ini (untuk ditampilkan)
-// hanya dari project yang statusnya ACTIVE
+// query untuk mengambil tugas user saat ini
  $stmt = $pdo->prepare("
      SELECT t.*, p.name as project_name 
      FROM tasks t 

@@ -26,13 +26,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $filesize = $_FILES['file']['size'];
 
         if (!in_array(strtolower($filetype), $allowed)) {
-            // Invalid file type - redirect back with error
             header("Location: ../../form_document.php?error=invalid_file_type");
             exit;
         }
 
         if ($filesize > $max_size) {
-            // File too large - redirect back with error
             header("Location: ../../form_document.php?error=file_too_large");
             exit;
         }

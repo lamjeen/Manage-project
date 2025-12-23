@@ -13,13 +13,11 @@ if (isset($_POST['id'])) {
 
     if ($document) {
         if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER' || $document['uploaded_by_id'] == $_SESSION['user_id']) {
-            // Delete file from filesystem
             $file_path = '../../uploads/' . $document['file_path'];
             if (file_exists($file_path)) {
                 unlink($file_path);
             }
 
-            // Delete from database
             $stmt = $pdo->prepare("DELETE FROM documents WHERE id = ?");
             $stmt->execute([$document_id]);
 

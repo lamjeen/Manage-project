@@ -13,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $task_id = $related_to == 'task' ? $_POST['task_id'] : null;
     $category = $_POST['category'];
 
-    // Check if user has permission to update
     $stmt = $pdo->prepare("SELECT uploaded_by_id, project_id, task_id FROM documents WHERE id = ?");
     $stmt->execute([$document_id]);
     $document = $stmt->fetch();
@@ -36,19 +35,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle file update if new file is uploaded
     if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
         $allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'zip', 'rar', 'jpg', 'jpeg', 'png', 'gif'];
-        $max_size = 50 * 1024 * 1024; // 50MB in bytes
+        $max_size = 50 * 1024 * 1024;
         $filename = $_FILES['file']['name'];
         $filetype = pathinfo($filename, PATHINFO_EXTENSION);
         $filesize = $_FILES['file']['size'];
 
         if (!in_array(strtolower($filetype), $allowed)) {
-            // Invalid file type - redirect back with error
             header("Location: ../../form_document.php?id=$document_id&error=invalid_file_type");
             exit;
         }
 
         if ($filesize > $max_size) {
-            // File too large - redirect back with error
             header("Location: ../../form_document.php?id=$document_id&error=file_too_large");
             exit;
         }
@@ -57,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $upload_path = '../../uploads/' . $new_filename;
 
         if (move_uploaded_file($_FILES['file']['tmp_name'], $upload_path)) {
-            // Delete old file
             if ($file_path && file_exists('../../uploads/' . $file_path)) {
                 unlink('../../uploads/' . $file_path);
             }

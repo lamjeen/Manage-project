@@ -9,7 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content = $_POST['content'];
     $is_pinned = isset($_POST['is_pinned']) ? 1 : 0;
 
-    // Check if user has permission to update
     $stmt = $pdo->prepare("SELECT author_id, task_id FROM comments WHERE id = ?");
     $stmt->execute([$comment_id]);
     $comment = $stmt->fetch();

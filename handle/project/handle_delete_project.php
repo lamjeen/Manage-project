@@ -26,11 +26,9 @@ if (isset($_POST['id'])) {
         exit;
     }
 
-    // Delete project teams first
     $stmt = $pdo->prepare("DELETE FROM project_team WHERE project_id = ?");
     $stmt->execute([$project_id]);
 
-    // Delete project
     $stmt = $pdo->prepare("DELETE FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);
 
