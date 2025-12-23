@@ -25,7 +25,6 @@ if ($_SESSION['user_role'] != 'ADMIN' && $_SESSION['user_role'] != 'MANAGER' && 
     exit;
 }
 
-// Form will submit directly to the update handler
 ?>
 
 <!DOCTYPE html>
