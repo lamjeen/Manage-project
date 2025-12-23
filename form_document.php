@@ -26,8 +26,6 @@ if (isset($_GET['id'])) {
     }
 }
 
-// Form will submit directly to the appropriate handler
-
  $stmt = $pdo->query("SELECT id, name FROM projects ORDER BY name");
  $projects = $stmt->fetchAll();
 

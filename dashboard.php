@@ -31,7 +31,7 @@ if ($_SESSION['user_role'] == 'ADMIN') {
  $users_count = $stmt->fetch()['total'];
 
 // query untuk mengambil proyek yang deadlinenya akan datang
-// Filter: hanya project yang user terlibat (sebagai manager atau melalui team)
+// filter: hanya project yang user terlibat (sebagai manager atau melalui team)
 // Admin bisa lihat semua project
 if ($_SESSION['user_role'] == 'ADMIN') {
     $stmt = $pdo->query("SELECT p.*, u.name as manager_name FROM projects p LEFT JOIN users u ON p.manager_id = u.id WHERE p.status = 'ACTIVE' AND p.end_date IS NOT NULL ORDER BY p.end_date ASC LIMIT 5");
@@ -58,7 +58,7 @@ if ($_SESSION['user_role'] == 'ADMIN') {
  $my_tasks_count = $stmt->fetch()['total'];
 
 // query untuk mengambil tugas user saat ini (untuk ditampilkan)
-// Hanya dari project yang statusnya ACTIVE
+// hanya dari project yang statusnya ACTIVE
  $stmt = $pdo->prepare("
      SELECT t.*, p.name as project_name 
      FROM tasks t 
@@ -78,8 +78,8 @@ if ($_SESSION['user_role'] == 'ADMIN') {
  $deadline_tasks = $stmt->fetchAll();
 
 // query untuk mengecek deadline H-1 untuk notifikasi proyek
-// Filter: hanya project yang user terlibat
-// Admin bisa lihat semua project
+// filter: hanya project yang user terlibat
+// admin bisa lihat semua project
 if ($_SESSION['user_role'] == 'ADMIN') {
     $stmt = $pdo->query("SELECT p.* FROM projects p WHERE p.status IN ('PLANNING', 'ACTIVE', 'ON_HOLD') AND p.end_date <= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND p.end_date >= CURDATE()");
 } else {
@@ -98,21 +98,14 @@ if ($_SESSION['user_role'] == 'ADMIN') {
  $deadline_projects = $stmt->fetchAll();
 
 // query untuk statistik distribusi tasks berdasarkan status menggunakan COUNT dengan GROUP BY
-// Business Insight: Menampilkan distribusi tasks per status untuk melihat overview progress tugas
-// Hanya tasks dari project yang di-manage oleh admin/manager dan status project ACTIVE
-// Filter per project yang dipilih
 if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER') {
-    // Ambil project_id dari GET parameter (jika ada)
     $selected_project_id = isset($_GET['project_id']) ? (int)$_GET['project_id'] : null;
     
-    // Query untuk mengambil daftar project yang di-manage
     $stmt = $pdo->prepare("SELECT id, name FROM projects WHERE manager_id = ? AND status = 'ACTIVE' ORDER BY name");
     $stmt->execute([$_SESSION['user_id']]);
     $managed_projects = $stmt->fetchAll();
     
-    // Query untuk statistik tasks per status
     if ($selected_project_id && $selected_project_id > 0) {
-        // Filter berdasarkan project yang dipilih
         $stmt = $pdo->prepare("
         SELECT t.status, COUNT(*) as count FROM tasks t 
         INNER JOIN projects p ON t.project_id = p.id 
@@ -121,7 +114,6 @@ if ($_SESSION['user_role'] == 'ADMIN' || $_SESSION['user_role'] == 'MANAGER') {
         ");
         $stmt->execute([$_SESSION['user_id'], $selected_project_id]);
     } else {
-        // Semua tasks dari semua project yang di-manage
         $stmt = $pdo->prepare("SELECT t.status, COUNT(*) as count FROM tasks t INNER JOIN projects p ON t.project_id = p.id WHERE p.manager_id = ? AND p.status = 'ACTIVE' GROUP BY t.status");
         $stmt->execute([$_SESSION['user_id']]);
     }
