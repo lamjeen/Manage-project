@@ -1,11 +1,6 @@
 CREATE DATABASE IF NOT EXISTS project_management;
 USE project_management;
 
--- =================================================================
--- Tabel-Tabel Utama
--- =================================================================
-
--- Tabel Users (Menyimpan data pengguna)
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -15,7 +10,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabel Teams (Menyimpan data tim/departemen)
 CREATE TABLE teams (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -26,7 +20,6 @@ CREATE TABLE teams (
     FOREIGN KEY (team_head_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel Projects (Menyimpan data proyek)
 CREATE TABLE projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -40,7 +33,6 @@ CREATE TABLE projects (
     FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel Tasks (Menyimpan data tugas)
 CREATE TABLE tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -58,7 +50,6 @@ CREATE TABLE tasks (
     FOREIGN KEY (assignee) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Tabel Documents (Menyimpan data dokumen)
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -77,7 +68,6 @@ CREATE TABLE documents (
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
--- Tabel Comments (Menyimpan data komentar pada tugas)
 CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     content TEXT NOT NULL,
@@ -96,22 +86,6 @@ CREATE TABLE comments (
     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
--- =================================================================
--- Tabel Relasi Many-to-Many
--- =================================================================
-
--- Tabel untuk relasi Many-to-Many antara Proyek dan Anggota 
--- (OLD DATABASE)
--- CREATE TABLE project_members (
---     project_id INT,
---     user_id INT,
---     role_in_project ENUM('LEADER', 'CONTRIBUTOR', 'VIEWER') NOT NULL,
---     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     PRIMARY KEY (project_id, user_id),
---     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
---     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
--- );
-
 CREATE TABLE project_team (
     project_id INT,
     team_id INT,
@@ -120,8 +94,6 @@ CREATE TABLE project_team (
     FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
 );
 
-
--- Tabel untuk relasi Many-to-Many antara Tim dan Anggota
 CREATE TABLE team_members (
     team_id INT,
     user_id INT,
@@ -129,16 +101,3 @@ CREATE TABLE team_members (
     FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
--- Tabel untuk relasi Many-to-Many antara Tugas dan Penanggung Jawab (Users)
--- CREATE TABLE task_assignees (
---     task_id INT,
---     user_id INT,
---     PRIMARY KEY (task_id, user_id),
---     FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
---     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
--- );
-
-
--- INSERT INTO users (name, email, password, role) VALUES 
--- ('Admin User', 'admin@example.com', 'pw', 'ADMIN');

@@ -9,7 +9,7 @@ $search_keyword = isset($_GET['search']) ? trim($_GET['search']) : '';
 $status_filter = isset($_GET['status']) ? trim($_GET['status']) : '';
 
 // Filter: hanya project yang user terlibat (sebagai manager atau melalui team)
-// Admin bisa lihat semua project
+// admin bisa lihat semua project
 $user_id_escaped = $pdo->quote($_SESSION['user_id']);
 if ($_SESSION['user_role'] == 'ADMIN') {
     $sql = "SELECT DISTINCT p.*, u.name as manager_name 
